@@ -244,3 +244,6 @@ ModelManifest.xml
 # Shader Output file
 *.cod
 *.cso
+
+# Large public file
+FBXSDK/
