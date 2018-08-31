@@ -1,17 +1,181 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="ソース ファイル">
+    <Filter Include="Sources">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="ヘッダー ファイル">
+    <Filter Include="Headers">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="リソース ファイル">
+    <Filter Include="Resources">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="3dgp">
+      <UniqueIdentifier>{6012e4b5-f790-43f1-af40-3abd6c465767}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3dgp\Headers">
+      <UniqueIdentifier>{e773402f-6c47-4a1a-a2f7-b69caa45c58f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3dgp\Sources">
+      <UniqueIdentifier>{f6d4f758-a222-4b0a-8e8c-ebf1d308018f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3dgp\Shaders">
+      <UniqueIdentifier>{c488e051-da4c-43d8-843b-bb890bc3d457}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="3dgp\3dgp_system.h">
+      <Filter>3dgp\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\blend.h">
+      <Filter>3dgp\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\framework.h">
+      <Filter>3dgp\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\high_resolution_timer.h">
+      <Filter>3dgp\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\mf_audio.h">
+      <Filter>3dgp\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\misc.h">
+      <Filter>3dgp\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\primitive3d.h">
+      <Filter>3dgp\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\render_target.h">
+      <Filter>3dgp\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\resources_manager.h">
+      <Filter>3dgp\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\scene.h">
+      <Filter>3dgp\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\skinned_mesh.h">
+      <Filter>3dgp\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\sprite.h">
+      <Filter>3dgp\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\sprite_string.h">
+      <Filter>3dgp\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\template.h">
+      <Filter>3dgp\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="game.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="numbers.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="obj2d.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="scene_main.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="scene_title.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="sound_data.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="sprite_data.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\game_system.h">
+      <Filter>3dgp</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="3dgp\blend.cpp">
+      <Filter>3dgp\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="3dgp\framework.cpp">
+      <Filter>3dgp\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="3dgp\mf_audio.cpp">
+      <Filter>3dgp\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="3dgp\primitive3d.cpp">
+      <Filter>3dgp\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="3dgp\render_target.cpp">
+      <Filter>3dgp\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="3dgp\resources_manager.cpp">
+      <Filter>3dgp\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="3dgp\skinned_mesh.cpp">
+      <Filter>3dgp\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="3dgp\sprite.cpp">
+      <Filter>3dgp\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="3dgp\sprite_string.cpp">
+      <Filter>3dgp\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="numbers.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="obj2d.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="scene_main.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="scene_title.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="sound_data.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="sprite_data.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="3dgp\game_system.cpp">
+      <Filter>3dgp</Filter>
+    </ClCompile>
+    <ClCompile Include="3dgp\main.cpp">
+      <Filter>3dgp</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="3dgp\texture_off.hlsli">
+      <Filter>3dgp\Shaders</Filter>
+    </None>
+    <None Include="3dgp\texture_on.hlsli">
+      <Filter>3dgp\Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="3dgp\texture_off_2d_vs.hlsl">
+      <Filter>3dgp\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="3dgp\texture_off_3d_vs.hlsl">
+      <Filter>3dgp\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="3dgp\texture_off_ps.hlsl">
+      <Filter>3dgp\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="3dgp\texture_on_2d_vs.hlsl">
+      <Filter>3dgp\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="3dgp\texture_on_3d_bone_vs.hlsl">
+      <Filter>3dgp\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="3dgp\texture_on_3d_vs.hlsl">
+      <Filter>3dgp\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="3dgp\texture_on_ps.hlsl">
+      <Filter>3dgp\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

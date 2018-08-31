@@ -89,10 +89,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>.\3dgp\DirectXTK-master\Inc;.\3dgp\FBXSDK\2016.1.2\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>.\3dgp\DirectXTK-master\Bin\Desktop_2015\Win32\Debug;.\3dgp\FBXSDK\2016.1.2\lib\vs2015\x86\debug</AdditionalLibraryDirectories>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;d3d11.lib;dxgi.lib;DirectXTK.lib;mfplay.lib;libfbxsdk-md.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -146,6 +149,95 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="3dgp\3dgp_system.h" />
+    <ClInclude Include="3dgp\blend.h" />
+    <ClInclude Include="3dgp\framework.h" />
+    <ClInclude Include="3dgp\game_system.h" />
+    <ClInclude Include="3dgp\high_resolution_timer.h" />
+    <ClInclude Include="3dgp\mf_audio.h" />
+    <ClInclude Include="3dgp\misc.h" />
+    <ClInclude Include="3dgp\primitive3d.h" />
+    <ClInclude Include="3dgp\render_target.h" />
+    <ClInclude Include="3dgp\resources_manager.h" />
+    <ClInclude Include="3dgp\scene.h" />
+    <ClInclude Include="3dgp\skinned_mesh.h" />
+    <ClInclude Include="3dgp\sprite.h" />
+    <ClInclude Include="3dgp\sprite_string.h" />
+    <ClInclude Include="3dgp\template.h" />
+    <ClInclude Include="game.h" />
+    <ClInclude Include="numbers.h" />
+    <ClInclude Include="obj2d.h" />
+    <ClInclude Include="scene_main.h" />
+    <ClInclude Include="scene_title.h" />
+    <ClInclude Include="sound_data.h" />
+    <ClInclude Include="sprite_data.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="3dgp\blend.cpp" />
+    <ClCompile Include="3dgp\framework.cpp" />
+    <ClCompile Include="3dgp\game_system.cpp" />
+    <ClCompile Include="3dgp\main.cpp" />
+    <ClCompile Include="3dgp\mf_audio.cpp" />
+    <ClCompile Include="3dgp\primitive3d.cpp" />
+    <ClCompile Include="3dgp\render_target.cpp" />
+    <ClCompile Include="3dgp\resources_manager.cpp" />
+    <ClCompile Include="3dgp\skinned_mesh.cpp" />
+    <ClCompile Include="3dgp\sprite.cpp" />
+    <ClCompile Include="3dgp\sprite_string.cpp" />
+    <ClCompile Include="numbers.cpp" />
+    <ClCompile Include="obj2d.cpp" />
+    <ClCompile Include="scene_main.cpp" />
+    <ClCompile Include="scene_title.cpp" />
+    <ClCompile Include="sound_data.cpp" />
+    <ClCompile Include="sprite_data.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="3dgp\texture_off.hlsli" />
+    <None Include="3dgp\texture_on.hlsli" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="3dgp\texture_off_2d_vs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">./Data/Shader/%(Filename).cso</ObjectFileOutput>
+      <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AssemblyCode</AssemblerOutput>
+      <AssemblerOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">./Data/Shader/%(Filename).cod</AssemblerOutputFile>
+    </FxCompile>
+    <FxCompile Include="3dgp\texture_off_3d_vs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">./Data/Shader/%(Filename).cso</ObjectFileOutput>
+      <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AssemblyCode</AssemblerOutput>
+      <AssemblerOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">./Data/Shader/%(Filename).cod</AssemblerOutputFile>
+    </FxCompile>
+    <FxCompile Include="3dgp\texture_off_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">./Data/Shader/%(Filename).cso</ObjectFileOutput>
+      <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AssemblyCode</AssemblerOutput>
+      <AssemblerOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">./Data/Shader/%(Filename).cod</AssemblerOutputFile>
+    </FxCompile>
+    <FxCompile Include="3dgp\texture_on_2d_vs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">./Data/Shader/%(Filename).cso</ObjectFileOutput>
+      <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AssemblyCode</AssemblerOutput>
+      <AssemblerOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">./Data/Shader/%(Filename).cod</AssemblerOutputFile>
+    </FxCompile>
+    <FxCompile Include="3dgp\texture_on_3d_bone_vs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">./Data/Shader/%(Filename).cso</ObjectFileOutput>
+      <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AssemblyCode</AssemblerOutput>
+      <AssemblerOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">./Data/Shader/%(Filename).cod</AssemblerOutputFile>
+    </FxCompile>
+    <FxCompile Include="3dgp\texture_on_3d_vs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">./Data/Shader/%(Filename).cso</ObjectFileOutput>
+      <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AssemblyCode</AssemblerOutput>
+      <AssemblerOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">./Data/Shader/%(Filename).cod</AssemblerOutputFile>
+    </FxCompile>
+    <FxCompile Include="3dgp\texture_on_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">./Data/Shader/%(Filename).cso</ObjectFileOutput>
+      <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AssemblyCode</AssemblerOutput>
+      <AssemblerOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">./Data/Shader/%(Filename).cod</AssemblerOutputFile>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
