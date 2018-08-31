@@ -15,7 +15,7 @@
 // 2D画像ロードデータ
 LOAD_TEXTURE e_loadTexture[] = {
 
-	{ TEX_NUMBERS,					"./DATA/Images/UI/numbers.png" },
+	{ TEX_NUMBERS,					"./Data/Images/UI/numbers.png" },
 
 	{ -1, NULL },
 };

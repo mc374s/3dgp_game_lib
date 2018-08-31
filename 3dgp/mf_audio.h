@@ -1,8 +1,10 @@
 #ifndef _MFAUDIO_H_
 #define _MFAUDIO_H_
-/*************Media Foundation Audio Player*******************/
+/*************Media Foundation Audio SpacePlayer*******************/
 
+#pragma comment(lib,"Mfplat")
 #pragma comment(lib,"mfplay")
+#include <mfapi.h>
 #include <mfplay.h>
 
 #define AUDIO_MAX_NUM (64)
@@ -29,16 +31,16 @@ public:
 		return &instance;
 	};
 
-	void loadAudios(const RESOURCE_DATA _data[]);
+	void loadAudios(const RESOURCE_DATA a_pData[]);
 	friend void MFAudiosRelease();
 	friend void MFAudioCheckLoops();
 
-	friend void MFAudioLoad(const int _fileNO, const char* _fileName);
-	friend void MFAudioPlay(const int _fileNO, const bool _doLoop = false);
-	friend void MFAudioContinue(const int _fileNO);
-	friend void MFAudioStop(const int _fileNO);
-	friend void MFAudioPause(const int _fileNO);
-	friend bool isMFAudioPlaying(const int _fileNO);
+	friend void MFAudioLoad(const int a_fileNO, const char* a_pFileName);
+	friend void MFAudioPlay(const int a_fileNO, const bool a_doLoop = false);
+	friend void MFAudioContinue(const int a_fileNO);
+	friend void MFAudioStop(const int a_fileNO);
+	friend void MFAudioPause(const int a_fileNO);
+	friend bool isMFAudioPlaying(const int a_fileNO);
 
 };
 

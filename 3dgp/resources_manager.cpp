@@ -1,14 +1,14 @@
 #include "resources_manager.h"
 #include <cstdio>
 
-using namespace MyResourcesManager;
+using namespace RM;
 
 /*///////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 // 画像データの管理
 int ResourcesManager::s_imgFileCounter = 0;
 D3D11_RESOURCES<ID3D11ShaderResourceView*> ResourcesManager::s_SRVResources[FILE_NUM_MAX];
 
-int MyResourcesManager::loadShaderResourceView(ID3D11Device* a_pDevice, char* a_pFilename, ID3D11Resource** a_ppOutResource, ID3D11ShaderResourceView** a_ppOutSRV) {
+int RM::loadShaderResourceView(ID3D11Device* a_pDevice, char* a_pFilename, ID3D11Resource** a_ppOutResource, ID3D11ShaderResourceView** a_ppOutSRV) {
 	int fileNO = 0;
 
 	// すでに存在しているリソース
@@ -50,7 +50,7 @@ int MyResourcesManager::loadShaderResourceView(ID3D11Device* a_pDevice, char* a_
 	return fileNO;
 }
 // リソースを解放
-void MyResourcesManager::releaseShaderResourceView(ID3D11ShaderResourceView* a_pInSRV) {
+void RM::releaseShaderResourceView(ID3D11ShaderResourceView* a_pInSRV) {
 	if (a_pInSRV)
 	{
 		for (int i = 0; i < ResourcesManager::s_imgFileCounter; i++)
@@ -70,7 +70,7 @@ int ResourcesManager::s_vsFileCounter = 0;
 D3D11_RESOURCES<ID3D11VertexShader*> ResourcesManager::s_vertexShaderResources[FILE_NUM_MAX];
 ID3D11InputLayout* ResourcesManager::s_inputLayoutResources[FILE_NUM_MAX];
 
-int MyResourcesManager::loadVertexShader(ID3D11Device* a_pDevice, char* a_pFilename, D3D11_INPUT_ELEMENT_DESC* a_pInLayoutDesc, int a_elementsNum, ID3D11VertexShader** a_ppOutVertexShader, ID3D11InputLayout** a_ppOutInputLayout)
+int RM::loadVertexShader(ID3D11Device* a_pDevice, char* a_pFilename, D3D11_INPUT_ELEMENT_DESC* a_pInLayoutDesc, int a_elementsNum, ID3D11VertexShader** a_ppOutVertexShader, ID3D11InputLayout** a_ppOutInputLayout)
 {
 	int fileNo = 0;
 
@@ -131,7 +131,7 @@ int MyResourcesManager::loadVertexShader(ID3D11Device* a_pDevice, char* a_pFilen
 };
 
 
-void MyResourcesManager::releaseVertexShader(ID3D11VertexShader* a_pInVertexShader, ID3D11InputLayout* a_pInInputLayout) {
+void RM::releaseVertexShader(ID3D11VertexShader* a_pInVertexShader, ID3D11InputLayout* a_pInInputLayout) {
 	if (a_pInVertexShader)
 	{
 		for (int i = 0; i < ResourcesManager::s_vsFileCounter; i++)
@@ -154,7 +154,7 @@ void MyResourcesManager::releaseVertexShader(ID3D11VertexShader* a_pInVertexShad
 int ResourcesManager::s_psFileCounter = 0;
 D3D11_RESOURCES<ID3D11PixelShader*> ResourcesManager::s_pixelShaderResources[FILE_NUM_MAX];
 
-int MyResourcesManager::loadPixelShader(ID3D11Device* a_pDevice, char* a_pFilename, ID3D11PixelShader** a_ppOut)
+int RM::loadPixelShader(ID3D11Device* a_pDevice, char* a_pFilename, ID3D11PixelShader** a_ppOut)
 {
 	int fileNo = 0;
 
@@ -205,7 +205,7 @@ int MyResourcesManager::loadPixelShader(ID3D11Device* a_pDevice, char* a_pFilena
 
 }
 
-void MyResourcesManager::releasePixelShader(ID3D11PixelShader* a_pIn) {
+void RM::releasePixelShader(ID3D11PixelShader* a_pIn) {
 	if (a_pIn)
 	{
 		for (int i = 0; i < ResourcesManager::s_psFileCounter; i++)
@@ -219,7 +219,7 @@ void MyResourcesManager::releasePixelShader(ID3D11PixelShader* a_pIn) {
 	}
 }
 
-HRESULT	MyResourcesManager::MakeDummyShaderResourceView(ID3D11Device *Device, ID3D11ShaderResourceView** shaderResourceView)
+HRESULT	RM::MakeDummyShaderResourceView(ID3D11Device *Device, ID3D11ShaderResourceView** shaderResourceView)
 {
 	HRESULT hr = S_OK;
 

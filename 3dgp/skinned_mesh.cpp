@@ -5,7 +5,7 @@ using namespace fbxsdk;
 
 #include <functional>
 #include "resources_manager.h"
-namespace RM = MyResourcesManager;
+namespace RM = RM;
 
 void fetchBoneInfluences(const FbxMesh *a_pFbxMesh, std::vector<SkinnedMesh::BoneInfluencesPerContralPoint> &a_influences)
 {
@@ -535,7 +535,7 @@ void SkinnedMesh::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMF
 	T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
 	W = S*R*T;
 
-	V = DirectX::XMMatrixLookAtLH(e_CameraData.eyePosition, e_CameraData.focusPosition, e_CameraData.upDirection);
+	V = DirectX::XMMatrixLookAtLH(e_camera.eyePosition, e_camera.focusPosition, e_camera.upDirection);
 	P = DirectX::XMMatrixPerspectiveFovLH(XM_PIDIV4, SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.01f, 100.0f);
 	/*W = DirectX::XMMatrixTranspose(W);
 	V = DirectX::XMMatrixTranspose(V);
@@ -556,7 +556,7 @@ void SkinnedMesh::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMF
 	updateCbuffer.projection = P;
 	updateCbuffer.worldViewProjection = a_globalTransform*m_coordinateConversion*WVP;
 	static XMVECTOR lightDirection = { 0.0f,0.0f,1.0f,0.0f };
-	lightDirection = e_CameraData.focusPosition - e_CameraData.eyePosition;
+	lightDirection = e_camera.focusPosition - e_camera.eyePosition;
 	updateCbuffer.lightDirection = XMFLOAT4(lightDirection.vector4_f32);
 	updateCbuffer.materialColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 

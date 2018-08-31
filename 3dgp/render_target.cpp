@@ -3,7 +3,7 @@
 #include <iostream>
 //#define _CRT_SECURE_NO_WARNINGS
 
-using namespace MyResourcesManager;
+using namespace RM;
 using namespace DirectX;
 
 bool RenderTarget::initialize(ID3D11Device* a_pDevice)

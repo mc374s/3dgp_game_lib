@@ -4,7 +4,8 @@
 #include <d3d11.h>
 #include "WICTextureLoader.h"
 
-namespace MyResourcesManager {
+//Namespace ResourcesManager
+namespace RM {
 
 	#define FILE_NUM_MAX (64)
 	#define SAFE_RELEASE(ptr) {if(ptr){ptr->Release();}}
@@ -64,8 +65,8 @@ namespace MyResourcesManager {
 
 	HRESULT	MakeDummyShaderResourceView(ID3D11Device *Device, ID3D11ShaderResourceView** shaderResourceView);
 
-}//namespace MyResourcesManager
+}//namespace RM
 
-//namespace MyResourcesManager = RM;
+//namespace RM = RM;
 
 #endif // !_RESOURCES_MANAGER_H_

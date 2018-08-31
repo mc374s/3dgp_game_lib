@@ -3,6 +3,8 @@
 #include "3dgp_system.h"
 
 #define BLEND_MODE_MAX (9)
+
+
 enum BLEND_MODE
 {
 	BLEND_NONE = 0,

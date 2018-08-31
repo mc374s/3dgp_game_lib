@@ -2,7 +2,7 @@
 
 #include "resources_manager.h"
 
-using namespace MyResourcesManager;
+using namespace RM;
 
 Primitive3D::Primitive3D(ID3D11Device *a_pDevice)
 {
@@ -14,9 +14,9 @@ Primitive3D::Primitive3D(ID3D11Device *a_pDevice)
 		{ "NORMAL",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 28,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
-	loadVertexShader(a_pDevice, "shader/texture_off_3d_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &m_pVertexShader, &m_pInputLayout);
+	loadVertexShader(a_pDevice, "Data/Shader/texture_off_3d_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &m_pVertexShader, &m_pInputLayout);
 
-	loadPixelShader(a_pDevice, "shader/texture_off_ps.cso", &m_pPixelShader);
+	loadPixelShader(a_pDevice, "Data/Shader/texture_off_ps.cso", &m_pPixelShader);
 
 	// create rasterizer state
 	D3D11_RASTERIZER_DESC rasterizerDesc;
@@ -73,7 +73,7 @@ Primitive3D::Primitive3D(ID3D11Device *a_pDevice)
 
 void Primitive3D::initialize(ID3D11Device *a_pDevice, const int &a_type, const int &a_latitudeNum, const int &a_longitudeNum)
 {
-	if (a_type==GEOMETRY_CUBE)
+	if (a_type == GEOMETRY_CUBE)
 	{
 
 		// vertex data
@@ -135,7 +135,7 @@ void Primitive3D::initialize(ID3D11Device *a_pDevice, const int &a_type, const i
 		createBuffers(a_pDevice, vertices, indices);
 	}
 
-	if (a_type==GEOMETRY_CYLINDER)
+	if (a_type == GEOMETRY_CYLINDER)
 	{
 		m_latitudeNum = a_latitudeNum;
 		m_longitudeNum = a_longitudeNum;
@@ -340,23 +340,22 @@ void Primitive3D::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMF
 		CUSTOM3D init;
 		a_pCustom3D = &init;
 	}
-	namespace DX = DirectX;
 	static XMFLOAT3 position, rotationAxis;
 	position = toNDC(a_pCustom3D->position);
 	rotationAxis = toNDC(a_pCustom3D->rotationAxis);
 	static XMMATRIX S, R, T, W, V, P, WVP;
-	S = R = T = W = V = P = WVP = DX::XMMatrixIdentity();
-	//R = DX::XMMatrixRotationAxis(XMVectorSet(rotationAxis.x, rotationAxis.y, rotationAxis.z, 0), _custom3D->angle*0.01745329251);
-	R = DX::XMMatrixRotationRollPitchYaw(a_pCustom3D->angleYawPitchRoll.y*0.01745, a_pCustom3D->angleYawPitchRoll.x*0.01745, a_pCustom3D->angleYawPitchRoll.z*0.01745);
-	S = DX::XMMatrixScaling(a_pCustom3D->scaling.x, a_pCustom3D->scaling.y, a_pCustom3D->scaling.z);
-	T = DX::XMMatrixTranslation(position.x, position.y, position.z);
+	S = R = T = W = V = P = WVP = DirectX::XMMatrixIdentity();
+	//R = DirectX::XMMatrixRotationAxis(XMVectorSet(rotationAxis.x, rotationAxis.y, rotationAxis.z, 0), _custom3D->angle*0.01745329251);
+	R = DirectX::XMMatrixRotationRollPitchYaw(a_pCustom3D->angleYawPitchRoll.y*0.01745, a_pCustom3D->angleYawPitchRoll.x*0.01745, a_pCustom3D->angleYawPitchRoll.z*0.01745);
+	S = DirectX::XMMatrixScaling(a_pCustom3D->scaling.x, a_pCustom3D->scaling.y, a_pCustom3D->scaling.z);
+	T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
 	W = S*R*T;
 	
-	V = DX::XMMatrixLookAtLH(e_CameraData.eyePosition, e_CameraData.focusPosition, e_CameraData.upDirection);
-	P = DX::XMMatrixPerspectiveFovLH(XM_PIDIV4, SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.01f, 100.0f);
-	/*W = DX::XMMatrixTranspose(W);
-	V = DX::XMMatrixTranspose(V);
-	P = DX::XMMatrixTranspose(P);*/
+	V = DirectX::XMMatrixLookAtLH(e_camera.eyePosition, e_camera.focusPosition, e_camera.upDirection);
+	P = DirectX::XMMatrixPerspectiveFovLH(XM_PIDIV4, SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.01f, 100.0f);
+	/*W = DirectX::XMMatrixTranspose(W);
+	V = DirectX::XMMatrixTranspose(V);
+	P = DirectX::XMMatrixTranspose(P);*/
 	WVP = W*V*P;
 
 	//D3D11_MAPPED_SUBRESOURCE mappedSubRec;
@@ -450,17 +449,17 @@ XMFLOAT3 Primitive3D::toNDC(const XMFLOAT3 &a_inputCoord)
 
 Primitive3D::~Primitive3D()
 {
-	if (m_pVertexBuffer) m_pVertexBuffer->Release();
-	if (m_pConstantBuffer) m_pConstantBuffer->Release();
-	if (m_pIndexBuffer) m_pIndexBuffer->Release();
+	SAFE_RELEASE(m_pVertexBuffer);
+	SAFE_RELEASE(m_pConstantBuffer);
+	SAFE_RELEASE(m_pIndexBuffer);
 
-	if (m_pWireRasterizerState) m_pWireRasterizerState->Release();
-	if (m_pFillRasterizerState) m_pFillRasterizerState->Release();
+	SAFE_RELEASE(m_pWireRasterizerState);
+	SAFE_RELEASE(m_pFillRasterizerState);
 
-	if (m_pDepthStencilState) m_pDepthStencilState->Release();
+	SAFE_RELEASE(m_pDepthStencilState);
 
-	if (m_pVertices) delete m_pVertices;
-	if (m_pIndices) delete m_pIndices;
+	SAFE_DELETE(m_pVertices);
+	SAFE_DELETE(m_pIndices);
 
 	releasePixelShader(m_pPixelShader);
 	releaseVertexShader(m_pVertexShader, m_pInputLayout);

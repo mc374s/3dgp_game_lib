@@ -2,32 +2,43 @@
 #define _FRAMEWORK_H_
 
 #include "3dgp_system.h"
-#include <ctime>
+#include "blend.h"
 
 #include "sprite.h"
+
 #include "primitive3d.h"
-#include "skinned_mesh.h"
+#include <ctime>
 
-
-#define FPS (60)
-
-#define N	(10)
+#include "render_target.h"
 
 #pragma comment(lib, "winmm")
 
+#define FPS (60)
 
+class Scene;
 
 class framework
 {
+private:
+	static Scene* s_pScene;
+	bool m_isFocused = true;
+
 public:
-	const float MIN_FRAME_TIME_DAFAULT = 1.0f / FPS;
-	float m_minFrameTime = MIN_FRAME_TIME_DAFAULT;
-	float m_frameTime = 0;
+	static void changeScene(Scene* a_pNextScene) {
+		if (a_pNextScene) {
+			s_pScene = a_pNextScene;
+		}
+	};
+
+	const double MIN_FRAME_TIME_DAFAULT = 1.0 / (double)FPS;
+	double m_minFrameTime = MIN_FRAME_TIME_DAFAULT;
+	double m_frameTime = 0.0f;
 	LARGE_INTEGER m_timeStart;
 	LARGE_INTEGER m_timeEnd;
 	LARGE_INTEGER m_timeFreq;
 
 	void setFPSLimitation(int a_FPS = 20);
+	bool m_isFullScreen;
 
 public:
 	HWND m_hWnd = NULL;
@@ -38,32 +49,25 @@ public:
 
 	UINT createDeviceFlags = 0;
 
-	D3D_DRIVER_TYPE         m_driverType = D3D_DRIVER_TYPE_NULL;
-	D3D_FEATURE_LEVEL       m_featureLevel = D3D_FEATURE_LEVEL_11_0;
-	ID3D11Device*           m_pDevice = NULL;
-	ID3D11DeviceContext*    m_pDeviceContext = NULL;
-	IDXGISwapChain*         m_pSwapChain = NULL;
-	ID3D11Texture2D*        m_pDepthStencilResource = NULL;
-	ID3D11RenderTargetView* m_pRenderTargetView = NULL;
-	ID3D11DepthStencilView* m_pDepthStencilView = NULL;
-	ID3D11BlendState*		m_pBlendState = NULL;
+	static ID3D11Device*			s_pDevice;
+	static ID3D11DeviceContext*		s_pDeviceContext;
 
-	IMFPMediaPlayer*		m_pMFPlayer = NULL;
+	static ID3D11RenderTargetView*	s_pRenderTargetView;
+	static ID3D11DepthStencilView*	s_pDepthStencilView;
+	ID3D11DepthStencilState*		m_pDepthStencilState;
 
-	Sprite* m_pSprites[1024];
+	D3D_DRIVER_TYPE					m_driverType = D3D_DRIVER_TYPE_NULL;
+	D3D_FEATURE_LEVEL				m_featureLevel = D3D_FEATURE_LEVEL_11_0;
+	IDXGISwapChain*					m_pSwapChain = NULL;
+	ID3D11Texture2D*				m_pDepthStencilResource = NULL;
+	ID3D11BlendState*				m_pBlendState = NULL;
 
+	Primitive3D *m_pPrimitive3D[20];
 
-	//MyGeometricPrimitive *m_pPrimitive3D;
-	Primitive3D *m_pPrimitive3D[16];
-	SkinnedMesh *m_pMesh[16];
-
-
-	LARGE_INTEGER frame[N] = { 0 };
-	LARGE_INTEGER max = { 0 };
-	int frameCounter = 0;
+	RenderTarget *m_pRenderTargets[20];
 
 	int blendMode = 1;
-	float alpha = 255.0f;
+	float m_alpha = 255.0f;
 	const char strBlendMode[16][16] = {
 		"NONE",
 		"ALPHA",
@@ -75,11 +79,19 @@ public:
 		"DARKEN",
 		"SCREEN"
 	};
-	bool keyDown = false;
 
-
-	framework(HWND hwnd);
-	~framework();
+	framework(HWND hwnd) /*: hwnd(hwnd)*/
+	{
+		//MessageBox(0, L"Constructor called", L"framework", MB_OK);
+		if (!initialize(hwnd)) {
+			MessageBox(0, L"run: Iniialize FAILED", 0, 0);
+			return;
+		}
+	}
+	~framework()
+	{
+		release();
+	}
 	int run();
 
 	LRESULT CALLBACK handle_message(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
@@ -87,12 +99,12 @@ public:
 private:
 
 	bool initialize(HWND hwnd);
-	void update(float elapsed_time/*Elapsed seconds from last frame*/);
-	void render(float elapsed_time/*Elapsed seconds from last frame*/);
+	void update(float elapsed_time = .0f/*Elapsed seconds from last frame*/);
+	void render(float elapsed_time = .0f/*Elapsed seconds from last frame*/);
 	void release();
 
 private:
-	high_resolution_timer timer;
+	high_resolution_timer m_timer;
 	void calculate_frame_stats();
 };
 
