@@ -246,3 +246,4 @@ ModelManifest.xml
 *.cso
 
 # Large public file
+/3dgp/FBXSDK/2016.1.2
