@@ -21,11 +21,7 @@ public:
 	void draw();
 
 	bool pause();
-	void retrySelection();
 	void gameMain();
-	void turnPagesController();
-	void viewMode();
-	void endViewMode();
 };
 
 #define SCENE_MAIN (SceneMain::getInstance())

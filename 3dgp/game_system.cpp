@@ -197,9 +197,9 @@ void View::clear()
 {
 	framework::s_pDeviceContext->OMSetRenderTargets(1, &framework::s_pRenderTargetView, framework::s_pDepthStencilView);
 
-	e_camera.viewPort.Width = SCREEN_WIDTH;
-	e_camera.viewPort.Height = SCREEN_HEIGHT;
-	framework::s_pDeviceContext->RSSetViewports(1, &e_camera.viewPort);
+	e_mainCamera.viewPort.Width = SCREEN_WIDTH;
+	e_mainCamera.viewPort.Height = SCREEN_HEIGHT;
+	framework::s_pDeviceContext->RSSetViewports(1, &e_mainCamera.viewPort);
 	setRenderTargetWH(SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 

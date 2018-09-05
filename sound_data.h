@@ -5,17 +5,8 @@ enum AUDIO_NO
 {
 	BGM_TITLE,
 	BGM_MAIN,
-	SE_START,
-	SE_FALL,
-	SE_OPEN,
-	SE_CLOSE,
-	SE_TURN,
-	SE_SPLASH,
 
-	SE_KEY_GOT,
-	SE_DOOR_OPENED,
-	SE_DEAD,
-	SE_CURSOR,
+	SE_START,
 };
 
 extern RESOURCE_DATA audio_data[];

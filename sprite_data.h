@@ -6,12 +6,18 @@ enum TEX_NO {
 
 	TEX_NUMBERS,
 
+	TEX_BG_TITLE,
+	TEX_BG_MAIN,
+
 };
 
 
 extern LOAD_TEXTURE e_loadTexture[];
 
 // 背景
+extern SPRITE_LEFTTOP e_sprMainBG;
+extern SPRITE_LEFTTOP e_sprTitleBG;
+
 
 // キャラなど
 

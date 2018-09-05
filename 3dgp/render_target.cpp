@@ -33,9 +33,9 @@ bool RenderTarget::initialize(ID3D11Device* a_pDevice)
 		{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 28,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "NORMAL",		0, DXGI_FORMAT_R32G32B32_FLOAT,		0, 36,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
-	loadVertexShader(a_pDevice, "3dgp/render_target_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &m_pVertexShader, &m_pInputLayout);
+	loadVertexShader(a_pDevice, "Data/Shader/texture_on_3d_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &m_pVertexShader, &m_pInputLayout);
 
-	loadPixelShader(a_pDevice, "3dgp/render_target_ps.cso", &m_pPixelShader);
+	loadPixelShader(a_pDevice, "Data/Shader/texture_on_ps.cso", &m_pPixelShader);
 
 	// create rasterizer state
 	D3D11_RASTERIZER_DESC rasterizerDesc;
@@ -201,9 +201,9 @@ void RenderTarget::render(ID3D11DeviceContext* a_pDeviceContext)
 
 	setRenderTargetWH(m_virtualWidth, m_virtualHeight);
 
-	e_camera.viewPort.Width = m_virtualWidth;
-	e_camera.viewPort.Height = m_virtualHeight;
-	a_pDeviceContext->RSSetViewports(1, &e_camera.viewPort);
+	e_mainCamera.viewPort.Width = m_virtualWidth;
+	e_mainCamera.viewPort.Height = m_virtualHeight;
+	a_pDeviceContext->RSSetViewports(1, &e_mainCamera.viewPort);
 }
 
 void RenderTarget::render(ID3D11DeviceContext* a_pDeviceContext, vertex a_pCoordNDC[])
@@ -317,8 +317,8 @@ void RenderTarget::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XM
 	T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
 	W = T*R*S;
 
-	//e_camera.clear();
-	V = DirectX::XMMatrixLookAtLH(e_camera.eyePosition, e_camera.focusPosition, e_camera.upDirection);
+	//e_mainCamera.clear();
+	V = DirectX::XMMatrixLookAtLH(e_mainCamera.eyePosition, e_mainCamera.focusPosition, e_mainCamera.upDirection);
 	P = DirectX::XMMatrixPerspectiveFovLH(XM_PIDIV4, SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.01f, 100.0f);
 	WVP = W*V*P;
 	/*W = DX::XMMatrixTranspose(W);
@@ -331,7 +331,7 @@ void RenderTarget::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XM
 	updateCbuffer.projection = P;
 	updateCbuffer.worldViewProjection = WVP;
 	static XMVECTOR lightV;
-	lightV = (e_camera.focusPosition - e_camera.eyePosition);
+	lightV = (e_mainCamera.focusPosition - e_mainCamera.eyePosition);
 	updateCbuffer.lightDirection = XMFLOAT4(lightV.vector4_f32[0], lightV.vector4_f32[1], lightV.vector4_f32[2], 0.0f);
 	updateCbuffer.materialColor = XMFLOAT4(0.8, 0.8, 0, 1);
 

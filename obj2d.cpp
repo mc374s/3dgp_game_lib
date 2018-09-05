@@ -28,10 +28,8 @@ void OBJ2D::memberCopy(const OBJ2D& a_inputObj)
 	m_step = a_inputObj.m_step;
 	m_alpha = a_inputObj.m_alpha;
 	m_type = a_inputObj.m_type;
-	m_concentration = a_inputObj.m_concentration;
 
 	m_isInit = a_inputObj.m_isInit;
-	m_liveInPagination = a_inputObj.m_liveInPagination;
 
 	m_pSprData = a_inputObj.m_pSprData;
 	m_pfMove = a_inputObj.m_pfMove;
@@ -69,10 +67,7 @@ void OBJ2D::clear()
 	m_custom3d.clear();
 
 	m_alpha = 255;
-	m_concentration = 0;
 	m_isInit = false;
-
-	m_liveInPagination = 1;
 
 	m_type = 0;
 	m_setAlpha = 255;
@@ -83,7 +78,7 @@ void OBJ2D::update()
 	if (m_pfMove){
 		(this->*m_pfMove)();
 	}
-	m_pos.y = m_initPos.y - SCROLL_Y;
+	//m_pos.y = m_initPos.y - SCROLL_Y;
 }
 
 void OBJ2D::draw() 
@@ -113,48 +108,6 @@ int OBJ2D::searchSet(OBJ2D** a_ppBegin, int a_max)
 		return i;
 	}
 	return -1;
-}
-
-void OBJ2D::blur()
-{
-	switch (m_step)
-	{
-	case STEP::INIT:
-		m_isHitAble = false;
-		m_timer = 0;
-		m_step = STEP::BEGIN;
-		//m_setAlpha = m_alpha - 15;
-		m_custom.scaleMode = SCALE_MODE::CENTER;
-		m_custom.scaleY = m_custom.scaleX = 0.7f;
-		//m_speed.x = (rand() / (float)RAND_MAX - 0.5f) / 10.0f;
-		//m_speed.y = (rand() / (float)RAND_MAX - 0.5f) / 10.0f;
-		//m_alpha = 0;
-		//break;
-	case STEP::BEGIN:
-		m_timer++;
-		//m_alpha -= 1;
-		//if (m_alpha < m_setAlpha)
-		//{
-		//	m_alpha = m_setAlpha;
-		//}
-		//m_pos += m_speed;
-		m_custom.scaleX += 0.01f;
-		if (m_custom.scaleX > 1.5f) {
-			m_custom.scaleX = 1.5f;
-			m_step = STEP::END;
-		}
-		m_custom.scaleY = m_custom.scaleX;
-		if (m_timer > 30) {
-			m_isHitAble = true;
-		}
-		break;
-	case STEP::END:
-		break;
-	case STEP::FINISH:
-		break;
-	default:
-		break;
-	}
 }
 
 

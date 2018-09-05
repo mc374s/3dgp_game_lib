@@ -5,7 +5,7 @@
 #include "Scene.h"
 
 
-CameraData e_camera;
+CameraData e_mainCamera;
 std::unique_ptr<DirectX::Keyboard> e_pKeyboard = std::make_unique<Keyboard>();
 DirectX::Keyboard::State KEY_BOARD = Keyboard::State();
 DirectX::Keyboard::KeyboardStateTracker KEY_TRACKER = DirectX::Keyboard::KeyboardStateTracker();
@@ -24,8 +24,8 @@ ID3D11DeviceContext*    framework::s_pDeviceContext = NULL;
 ID3D11RenderTargetView*	framework::s_pRenderTargetView = NULL;
 ID3D11DepthStencilView*	framework::s_pDepthStencilView = NULL;
 
-int renderTargetWidth = SCREEN_WIDTH;
-int renderTargetHeight = SCREEN_HEIGHT;
+int e_renderTargetWidth = SCREEN_WIDTH;
+int e_renderTargetHeight = SCREEN_HEIGHT;
 
 //ID3D11RenderTargetView* framework::s_pRenderTargetView = NULL;
 
@@ -385,7 +385,7 @@ void framework::update(float elapsed_time/*Elapsed seconds from last frame*/)
 		if (s_pScene->m_pNextScene)
 		{
 			s_pScene = s_pScene->m_pNextScene;
-			s_pScene->update(/*elapsed_time*/);
+			//s_pScene->update(/*elapsed_time*/);
 		}
 	}
 }
@@ -394,68 +394,104 @@ void framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 {
 
 	// Test variables
-	//static CUSTOM3D custom3DTemp;
-	//static float aXY = 0.0f, aZY = 0.0f;
-	//static float d = 0.66f;
-	//static XMFLOAT3 focusPos = { 0,0/* + 310 / (float)SCREEN_WIDTH*/,0 };
-	//if (GetAsyncKeyState('0') < 0) {
-	//	aXY = aZY = 0;
-	//	d = 0.66f;
-	//	custom3DTemp.clear();
-	//}
+	static double time;
+	static CUSTOM3D custom3DTemp;
+	static XMFLOAT3 position(0, 0, 0);
+	static float mX = 0, mY = 0, mZ = 0;
+	static float aXY = 0.0f, aZY = 0.0f;
+	static float d = 2 * XM_2PI;
+	static float hClosed = -2.0f;
+	static XMFLOAT3 focusPos = { 0,0/* + 310 / (float)SCREEN_WIDTH*/,0 };
+	if (GetAsyncKeyState('J') < 0) {
+		aXY -= 0.01f;
+	}
+	if (GetAsyncKeyState('L') < 0) {
+		aXY += 0.01f;
+	}
+	if (GetAsyncKeyState('I') < 0) {
+		aZY += 0.01f;
+	}
+	if (GetAsyncKeyState('K') < 0) {
+		aZY -= 0.01f;
+	}
+	if (GetAsyncKeyState('O') < 0) {
+		d += 0.05f;
+	}
+	if (GetAsyncKeyState('U') < 0) {
+		d -= 0.05f;
+	}
+	e_mainCamera.upDirection = { sinf(aZY)*sinf(aXY), cosf(aZY), sinf(aZY)*cosf(aXY), 0 };
+	e_mainCamera.eyePosition = { -fabs(d)*cosf(aZY)*sinf(aXY), fabs(d)*sinf(aZY)/* + 310 / (float)SCREEN_WIDTH*/, -fabs(d)*cosf(aZY)*cosf(aXY),0 };
 
-	//if (GetAsyncKeyState('J') < 0) {
-	//	aXY -= 0.01f;
-	//}
-	//if (GetAsyncKeyState('L') < 0) {
-	//	aXY += 0.01f;
-	//}
-	//if (GetAsyncKeyState('I') < 0) {
-	//	aZY += 0.01f;
-	//}
-	//if (GetAsyncKeyState('K') < 0) {
-	//	aZY -= 0.01f;
-	//}
-	//if (GetAsyncKeyState('O') < 0) {
-	//	d += 0.01f;
-	//}
-	//if (GetAsyncKeyState('U') < 0) {
-	//	d -= 0.01f;
-	//}
-	//e_camera.upDirection = { sinf(aZY)*sinf(aXY), cosf(aZY), sinf(aZY)*cosf(aXY), 0 };
-	//e_camera.eyePosition = { -fabs(d)*cosf(aZY)*sinf(aXY), fabs(d)*sinf(aZY)/* + 310 / (float)SCREEN_WIDTH*/, -fabs(d)*cosf(aZY)*cosf(aXY),0 };
-	//e_camera.eyePosition.vector4_f32[1] = fabs(d)*sinf(aZY);
-	//e_camera.eyePosition.vector4_f32[2] = -fabs(d)*cosf(aZY)*cosf(aXY);
-
-	/*if (GetAsyncKeyState('1') < 0) {
-	e_camera.eyePosition = { 1, 0, 0, 0 };
+	if (GetAsyncKeyState('1') < 0) {
+		e_mainCamera.eyePosition = { 2, 0, 0, 0 };
 	}
 	if (GetAsyncKeyState('2') < 0) {
-	e_camera.upDirection = { 0, 0, 1, 0 };
-	e_camera.eyePosition = { 0, 1, 0, 0 };
+		e_mainCamera.upDirection = { 0, 0, 1, 0 };
+		e_mainCamera.eyePosition = { 0, 1, 0, 0 };
 	}
 	if (GetAsyncKeyState('3') < 0) {
-	e_camera.eyePosition = { 0, 0, 1, 0 };
+		e_mainCamera.eyePosition = { 0, 0, 2, 0 };
 	}
-	if (GetAsyncKeyState('4') < 0) {
-	e_camera.eyePosition = { 0.5f, 0.5f, -0.5f, 0 };
-	}*/
+	if (GetAsyncKeyState('0') < 0) {
+		mX = mY = mZ = 0;
+		//a = 0.0f;
+		//h = -0.15f;
+		custom3DTemp.clear();
+	}
 
+	if (GetAsyncKeyState('W') < 0) {
+		custom3DTemp.angleYawPitchRoll.y += 1;
+	}
+	if (GetAsyncKeyState('S') < 0) {
+		custom3DTemp.angleYawPitchRoll.y -= 1;
+	}
+	if (GetAsyncKeyState('A') < 0) {
+		custom3DTemp.angleYawPitchRoll.x += 1;
+	}
+	if (GetAsyncKeyState('D') < 0) {
+		custom3DTemp.angleYawPitchRoll.x -= 1;
+	}
+	if (GetAsyncKeyState('Q') < 0) {
+		custom3DTemp.angleYawPitchRoll.z += 1;
+	}
+	if (GetAsyncKeyState('E') < 0) {
+		custom3DTemp.angleYawPitchRoll.z -= 1;
+	}
+	if (GetAsyncKeyState('Z') < 0) {
+		position.x -= 10;
+	}
+	if (GetAsyncKeyState('X') < 0) {
+		position.x += 10;
+	}
+	if (GetAsyncKeyState('C') < 0) {
+		position.y += 10;
+	}
+	if (GetAsyncKeyState('V') < 0) {
+		position.y -= 10;
+	}
+	if (GetAsyncKeyState('B') < 0) {
+		position.z += 10;
+	}
+	if (GetAsyncKeyState('N') < 0) {
+		position.z -= 10;
+	}
 
-	//e_camera.focusPosition = { focusPos.x,focusPos.y,focusPos.z,0 };
+	e_mainCamera.focusPosition = { focusPos.x,focusPos.y,focusPos.z,0 };
 
 	// Change the blending mode 
-	/*if (GetAsyncKeyState(VK_SPACE) < 0)
+	if (GetAsyncKeyState(VK_SPACE) < 0)
 	{
-	blendMode++;
-	blendMode %= 9;
-	}*/
+		blendMode++;
+		blendMode %= 9;
+	}
+	MyBlending::setMode(s_pDeviceContext, BLEND_ALPHA);
 
 	s_pDeviceContext->OMSetRenderTargets(1, &s_pRenderTargetView, s_pDepthStencilView);
 
-	e_camera.viewPort.Width = SCREEN_WIDTH;
-	e_camera.viewPort.Height = SCREEN_HEIGHT;
-	s_pDeviceContext->RSSetViewports(1, &e_camera.viewPort);
+	e_mainCamera.viewPort.Width = SCREEN_WIDTH;
+	e_mainCamera.viewPort.Height = SCREEN_HEIGHT;
+	s_pDeviceContext->RSSetViewports(1, &e_mainCamera.viewPort);
 
 	// Just clear the backbuffer
 	//float ClearColor[4] = { 0.0f / 255.0f, 111.0f / 255.0f, 129.0f / 255.0f, 1.0f }; //red,green,blue,alpha
@@ -478,9 +514,11 @@ void framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	//m_pPrimitive3D[1]->drawCylinder(s_pDeviceContext, XMFLOAT3(-310, 0, 10 + 0), XMFLOAT3(620, 700, 20), &custom3DTemp);
 
 	if (m_isFullScreen) {
+		// 垂直同期ON
 		m_pSwapChain->Present(1, 0);
 	}
 	else {
+		// 垂直同期OFF
 		m_pSwapChain->Present(0, 0);
 	}
 

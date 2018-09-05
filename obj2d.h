@@ -35,10 +35,8 @@ public:
 	int m_alpha;
 	int m_setAlpha;
 	int m_type;
-	float m_concentration; //濃度
 
 	bool m_isInit;
-	int m_liveInPagination; //所属しているページナンバー
 
 	virtual void clear();
 	virtual void update();
@@ -47,7 +45,6 @@ public:
 
 	static int searchSet(OBJ2D** a_ppBegin, int a_max);
 
-	void blur();
 
 };
 

@@ -17,7 +17,9 @@
 #ifndef _XBOX_ONE
 #if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY != WINAPI_FAMILY_PHONE_APP)
 #if (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/ )
-#pragma comment(lib,"xinput.lib")
+// TODO : Windows 7 did not support XINPUT1_4.DLL,
+//#pragma comment(lib,"xinput.lib")
+#pragma comment(lib,"xinput9_1_0.lib")
 #else
 #pragma comment(lib,"xinput9_1_0.lib")
 #endif

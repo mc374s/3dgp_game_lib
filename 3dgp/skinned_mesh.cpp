@@ -5,7 +5,6 @@ using namespace fbxsdk;
 
 #include <functional>
 #include "resources_manager.h"
-namespace RM = RM;
 
 void fetchBoneInfluences(const FbxMesh *a_pFbxMesh, std::vector<SkinnedMesh::BoneInfluencesPerContralPoint> &a_influences)
 {
@@ -535,7 +534,7 @@ void SkinnedMesh::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMF
 	T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
 	W = S*R*T;
 
-	V = DirectX::XMMatrixLookAtLH(e_camera.eyePosition, e_camera.focusPosition, e_camera.upDirection);
+	V = DirectX::XMMatrixLookAtLH(e_mainCamera.eyePosition, e_mainCamera.focusPosition, e_mainCamera.upDirection);
 	P = DirectX::XMMatrixPerspectiveFovLH(XM_PIDIV4, SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.01f, 100.0f);
 	/*W = DirectX::XMMatrixTranspose(W);
 	V = DirectX::XMMatrixTranspose(V);
@@ -556,7 +555,7 @@ void SkinnedMesh::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMF
 	updateCbuffer.projection = P;
 	updateCbuffer.worldViewProjection = a_globalTransform*m_coordinateConversion*WVP;
 	static XMVECTOR lightDirection = { 0.0f,0.0f,1.0f,0.0f };
-	lightDirection = e_camera.focusPosition - e_camera.eyePosition;
+	lightDirection = e_mainCamera.focusPosition - e_mainCamera.eyePosition;
 	updateCbuffer.lightDirection = XMFLOAT4(lightDirection.vector4_f32);
 	updateCbuffer.materialColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -570,7 +569,7 @@ void SkinnedMesh::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMF
 	//updateCbuffer.boneTransforms[2] = XMMatrixRotationRollPitchYaw(-a_pCustom3D->angleYawPitchRoll.y*0.01745f, -a_pCustom3D->angleYawPitchRoll.z*0.01745f, a_pCustom3D->angleYawPitchRoll.x*0.01745f);
 
 	if (a_skeletalAnimation.size() > 0) {
-		int frame = a_skeletalAnimation.animationTick / a_skeletalAnimation.samplingTime;
+		size_t frame = a_skeletalAnimation.animationTick / a_skeletalAnimation.samplingTime;
 		if (frame > a_skeletalAnimation.size() - 1) {
 			frame = 0;
 			a_skeletalAnimation.animationTick = 0;

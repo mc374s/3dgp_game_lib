@@ -28,8 +28,9 @@ SceneTitle::SceneTitle()
 	/*std::thread loadThread_2(loadAudioProgress);
 	loadThread_2.detach();*/
 	// pMFAudioManager->loadAudios(audio_data);
-	//m_pBG = new OBJ2D;
-	//m_pBG->m_pSprData = &e_sprTitleBG;
+	m_pBG = new OBJ2D;
+	m_pBG->m_pSprData = &e_sprTitleBG;
+	m_pBG->m_custom.scaleX = m_pBG->m_custom.scaleY = 1280.0f / 1920.0f;
 	//m_bg.m_pos = { SCREEN_WIDTH / 2,SCREEN_HEIGHT / 2,0 };
 
 	//pObjManager->init();
@@ -52,18 +53,18 @@ void SceneTitle::update()
 	switch (m_step) {
 	case STEP::INIT:
 
-		//MFAudioPlay(BGM_MAIN, true);
+		MFAudioPlay(BGM_TITLE, true);
 		m_step = STEP::BEGIN;
 		//break;
 
 	case STEP::BEGIN:
 		if (KEY_TRACKER.pressed.Z || PAD_TRACKER.a == PAD_TRACKER.PRESSED)
 		{
-			//MFAudioStop(BGM_MAIN);
+			MFAudioStop(BGM_TITLE);
 			MFAudioPlay(SE_START);
-			changeScene(SCENE_MAIN); 
+			changeScene(SCENE_MAIN);
+			break;
 		}
-		changeScene(SCENE_MAIN);
 		break;
 	default:
 		break;
@@ -74,6 +75,6 @@ void SceneTitle::draw()
 {
 	View::clear();
 
-	//m_pBG->draw();
+	m_pBG->draw();
 
 }

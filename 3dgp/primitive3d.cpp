@@ -333,7 +333,7 @@ void Primitive3D::render(ID3D11DeviceContext *a_pDeviceContext, bool a_doFill)
 	a_pDeviceContext->DrawIndexed(m_indexCount, 0, 0);
 }
 
-void Primitive3D::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position,const CUSTOM3D* a_pCustom3D)
+void Primitive3D::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const XMFLOAT4 &a_materialColor, const CUSTOM3D* a_pCustom3D)
 {
 	if (a_pCustom3D == nullptr)
 	{
@@ -351,7 +351,7 @@ void Primitive3D::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMF
 	T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
 	W = S*R*T;
 	
-	V = DirectX::XMMatrixLookAtLH(e_camera.eyePosition, e_camera.focusPosition, e_camera.upDirection);
+	V = DirectX::XMMatrixLookAtLH(e_mainCamera.eyePosition, e_mainCamera.focusPosition, e_mainCamera.upDirection);
 	P = DirectX::XMMatrixPerspectiveFovLH(XM_PIDIV4, SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.01f, 100.0f);
 	/*W = DirectX::XMMatrixTranspose(W);
 	V = DirectX::XMMatrixTranspose(V);
@@ -372,19 +372,20 @@ void Primitive3D::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMF
 	updateCbuffer.projection = P;
 	updateCbuffer.worldViewProjection = WVP;
 	updateCbuffer.lightDirection = XMFLOAT4(0.0f, -1.0f, 0.0f, 0.0f);
-	updateCbuffer.materialColor = XMFLOAT4(0.8, 0.8, 0, 1);
+	updateCbuffer.materialColor = a_materialColor;
 
 	a_pDeviceContext->UpdateSubresource(m_pConstantBuffer, 0, NULL, &updateCbuffer, 0, 0);
 	a_pDeviceContext->VSSetConstantBuffers(0, 1, &m_pConstantBuffer);
 	//_DeviceContext->Unmap(m_pConstantBuffer, 0); 
 }
 
-void Primitive3D::drawCube(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const XMFLOAT3 &a_size, const CUSTOM3D* a_pCustom3D)
+void Primitive3D::drawCube(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const XMFLOAT3 &a_size, const UINTCOLOR &a_blendColor, const CUSTOM3D* a_pCustom3D)
 {
 	//return;
 	int x = a_position.x, y = a_position.y, z = a_position.z;
 	float w = a_size.x, h = a_size.y, d = a_size.z;
 	float wHalf = w / 2.0f, hHalf = h / 2.0f, dHalf = d / 2.0f;
+	XMFLOAT4 ndColor = toNDColor(a_blendColor);
 	vertex3D vertices[] =
 	{
 		//UP
@@ -426,14 +427,14 @@ void Primitive3D::drawCube(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3
 	}
 	a_pDeviceContext->UpdateSubresource(m_pVertexBuffer, 0, NULL, vertices, 0, 0);
 
-	setProjection(a_pDeviceContext, a_position, a_pCustom3D);
+	setProjection(a_pDeviceContext, a_position, ndColor, a_pCustom3D);
 	render(a_pDeviceContext, true);
 }
 
 void Primitive3D::drawCylinder(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const XMFLOAT3 &a_size,const CUSTOM3D* a_pCustom3D)
 {
 
-	setProjection(a_pDeviceContext, a_position, a_pCustom3D);
+	setProjection(a_pDeviceContext, a_position, XMFLOAT4(0.5, 0.5, 0.4, 1.0f), a_pCustom3D);
 	render(a_pDeviceContext, true);
 	
 }

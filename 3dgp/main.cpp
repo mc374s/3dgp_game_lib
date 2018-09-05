@@ -2,6 +2,12 @@
 
 #include "framework.h"
 
+#include "../game.h"
+#include "../sound_data.h"
+#include "../sprite_data.h"
+#include "../scene_title.h"
+#include <thread>
+
 LRESULT CALLBACK fnWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	framework *f = reinterpret_cast<framework*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
@@ -31,6 +37,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, LPWSTR cmd_line
 
 	//MessageBox(0, L"main.cpp run", L"main", MB_OK);
 
+	pMFAudioManager->loadAudios(audio_data);
 
 
 	RECT rc = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
@@ -43,15 +50,21 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, LPWSTR cmd_line
 	nRet = nRet | WS_EX_LAYERED; 
 	SetWindowLong(hwnd, GWL_EXSTYLE, nRet);
 
-	float ClearColor[4] = { 0.0f / 255.0f, 111.0f / 255.0f, 129.0f / 255.0f, 1.0f };
 	
 	SetLayeredWindowAttributes(hwnd, 0, 255, LWA_ALPHA);
 
 	//SetLayeredWindowAttributes(hwnd, RGB(255, 255, 255), 180, LWA_COLORKEY);
+	
 
-	ShowWindow(hwnd, cmd_show);
 
 	framework f(hwnd);
+	srand(unsigned int(time(NULL)));
+	pTextureManager->loadTextures(e_loadTexture);		// 2D画像の一括ロード
+
+	framework::changeScene(SCENE_TITLE);
+
+
+	ShowWindow(hwnd, cmd_show);
 	SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(&f));
 
 	return f.run();

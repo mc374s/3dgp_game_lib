@@ -372,7 +372,7 @@ void Sprite::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3
 	T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
 	W = T*R*S;
 
-	V = DirectX::XMMatrixLookAtLH(e_camera.eyePosition, e_camera.focusPosition, e_camera.upDirection);
+	V = DirectX::XMMatrixLookAtLH(e_mainCamera.eyePosition, e_mainCamera.focusPosition, e_mainCamera.upDirection);
 	P = DirectX::XMMatrixPerspectiveFovLH(XM_PIDIV4, SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.01f, 100.0f);
 	WVP = W*V*P;
 	/*W = DirectX::XMMatrixTranspose(W);
@@ -386,7 +386,7 @@ void Sprite::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3
 	updateCbuffer.worldViewProjection = WVP;
 	//updateCbuffer.lightDirection = XMFLOAT4(0.0f, -1.0f, 0.0f, 0.0f);
 	static XMVECTOR lightDirection = { 0.0f,0.0f,1.0f,0.0f };
-	//lightDirection = e_camera.focusPosition - e_camera.eyePosition;
+	//lightDirection = e_mainCamera.focusPosition - e_mainCamera.eyePosition;
 	updateCbuffer.lightDirection = XMFLOAT4(lightDirection.vector4_f32);
 	updateCbuffer.materialColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 

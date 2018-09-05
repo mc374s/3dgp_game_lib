@@ -1,6 +1,11 @@
 #ifndef  _3DGPSYSTEM_H_
 #define  _3DGPSYSTEM_H_
 
+#pragma comment(lib,"d3d11")
+#pragma comment(lib,"dxgi")
+#pragma comment(lib,"DirectXTK")
+#pragma comment(lib,"libfbxsdk-md")
+
 #define _XM_NO_INTRINSICS_
 
 #include <windows.h>
@@ -74,7 +79,7 @@ struct CameraData
 	};
 };
 
-extern CameraData e_camera;
+extern CameraData e_mainCamera;
 
 extern std::unique_ptr<DirectX::Keyboard> e_pKeyboard;
 extern DirectX::Keyboard::State KEY_BOARD;
@@ -88,21 +93,21 @@ extern bool e_isAnyKeyDown;
 
 inline void setCamera(const CameraData &a_cameraData)
 {
-	e_camera = a_cameraData;
+	e_mainCamera = a_cameraData;
 };
 
 
 typedef UINT UINTCOLOR;
 
-extern int renderTargetWidth;
-extern int renderTargetHeight;
+extern int e_renderTargetWidth;
+extern int e_renderTargetHeight;
 
 inline void setRenderTargetWH(int a_width, int a_height)
 {
-	renderTargetWidth = a_width;
-	renderTargetHeight = a_height;
-	//renderTargetWidth = SCREEN_WIDTH;
-	//renderTargetHeight = SCREEN_HEIGHT;
+	e_renderTargetWidth = a_width;
+	e_renderTargetHeight = a_height;
+	//e_renderTargetWidth = SCREEN_WIDTH;
+	//e_renderTargetHeight = SCREEN_HEIGHT;
 }
 
 inline XMFLOAT3 toNDC_RT(XMFLOAT3 a_coord, bool a_doProjection = false)
@@ -118,8 +123,8 @@ inline XMFLOAT3 toNDC_RT(XMFLOAT3 a_coord, bool a_doProjection = false)
 	}
 	else
 	{
-		x = 2.0f*a_coord.x / renderTargetWidth - 1.0f;
-		y = 1.0f - 2.0f*a_coord.y / renderTargetHeight;
+		x = 2.0f*a_coord.x / e_renderTargetWidth - 1.0f;
+		y = 1.0f - 2.0f*a_coord.y / e_renderTargetHeight;
 	}
 
 	return XMFLOAT3(x, y, z);
