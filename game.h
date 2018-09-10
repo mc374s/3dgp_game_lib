@@ -9,7 +9,7 @@
 #include "./3dgp/template.h"
 #include "./3dgp/scene.h"
 
-//#define DEBUG
+#define DEBUG
 
 #include <vector>
 

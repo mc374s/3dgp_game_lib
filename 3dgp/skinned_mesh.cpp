@@ -515,22 +515,16 @@ void SkinnedMesh::createBuffers(ID3D11Device *a_pDevice, ID3D11Buffer** a_ppVert
 	
 }
 
-void SkinnedMesh::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const CUSTOM3D* a_pCustom3D, const XMMATRIX &a_globalTransform, SkeletalAnimation &a_skeletalAnimation, float a_elapsedTime)
+void SkinnedMesh::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const CUSTOM3D& a_custom3D, const XMMATRIX &a_globalTransform, SkeletalAnimation &a_skeletalAnimation, float a_elapsedTime)
 {
-	if (a_pCustom3D == nullptr)
-	{
-		CUSTOM3D init;
-		a_pCustom3D = &init;
-	}
-
 	static XMFLOAT3 position, rotationAxis;
-	position = toNDC(a_pCustom3D->position);
-	rotationAxis = toNDC(a_pCustom3D->rotationAxis);
+	position = toNDC(a_custom3D.position);
+	rotationAxis = toNDC(a_custom3D.rotationAxis);
 	static XMMATRIX S, R, T, W, V, P, WVP;
 	S = R = T = W = V = P = WVP = DirectX::XMMatrixIdentity();
 	//R = DirectX::XMMatrixRotationAxis(XMVectorSet(rotationAxis.x, rotationAxis.y, rotationAxis.z, 0), _custom3D->angle*0.01745329251);
-	R = DirectX::XMMatrixRotationRollPitchYaw(a_pCustom3D->angleYawPitchRoll.y*0.01745, a_pCustom3D->angleYawPitchRoll.x*0.01745, a_pCustom3D->angleYawPitchRoll.z*0.01745);
-	S = DirectX::XMMatrixScaling(a_pCustom3D->scaling.x, a_pCustom3D->scaling.y, a_pCustom3D->scaling.z);
+	R = DirectX::XMMatrixRotationRollPitchYaw(a_custom3D.angleYawPitchRoll.y*0.01745, a_custom3D.angleYawPitchRoll.x*0.01745, a_custom3D.angleYawPitchRoll.z*0.01745);
+	S = DirectX::XMMatrixScaling(a_custom3D.scaling.x, a_custom3D.scaling.y, a_custom3D.scaling.z);
 	T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
 	W = S*R*T;
 
@@ -560,13 +554,13 @@ void SkinnedMesh::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMF
 	updateCbuffer.materialColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	//static float angle = 0;
-	//updateCbuffer.boneTransforms[0] = XMMatrixRotationRollPitchYaw(0.0f, 0.0f, -a_pCustom3D->angleYawPitchRoll.z*0.01745f);
+	//updateCbuffer.boneTransforms[0] = XMMatrixRotationRollPitchYaw(0.0f, 0.0f, -a_custom3D.angleYawPitchRoll.z*0.01745f);
 	//updateCbuffer.boneTransforms[1] = XMMatrixIdentity();
-	//updateCbuffer.boneTransforms[2] = XMMatrixRotationRollPitchYaw(0.0f, 0.0f, -a_pCustom3D->angleYawPitchRoll.z*0.01745f);
+	//updateCbuffer.boneTransforms[2] = XMMatrixRotationRollPitchYaw(0.0f, 0.0f, -a_custom3D.angleYawPitchRoll.z*0.01745f);
 	//angle += 0.1f;
-	//updateCbuffer.boneTransforms[0] = XMMatrixRotationRollPitchYaw(-a_pCustom3D->angleYawPitchRoll.y*0.01745f, -a_pCustom3D->angleYawPitchRoll.z*0.01745f, a_pCustom3D->angleYawPitchRoll.x*0.01745f);
+	//updateCbuffer.boneTransforms[0] = XMMatrixRotationRollPitchYaw(-a_custom3D.angleYawPitchRoll.y*0.01745f, -a_custom3D.angleYawPitchRoll.z*0.01745f, a_custom3D.angleYawPitchRoll.x*0.01745f);
 	//updateCbuffer.boneTransforms[1] = XMMatrixIdentity();
-	//updateCbuffer.boneTransforms[2] = XMMatrixRotationRollPitchYaw(-a_pCustom3D->angleYawPitchRoll.y*0.01745f, -a_pCustom3D->angleYawPitchRoll.z*0.01745f, a_pCustom3D->angleYawPitchRoll.x*0.01745f);
+	//updateCbuffer.boneTransforms[2] = XMMatrixRotationRollPitchYaw(-a_custom3D.angleYawPitchRoll.y*0.01745f, -a_custom3D.angleYawPitchRoll.z*0.01745f, a_custom3D.angleYawPitchRoll.x*0.01745f);
 
 	if (a_skeletalAnimation.size() > 0) {
 		size_t frame = a_skeletalAnimation.animationTick / a_skeletalAnimation.samplingTime;
@@ -618,11 +612,11 @@ void SkinnedMesh::render(ID3D11DeviceContext *a_pDeviceContext, bool a_doFill,co
 	}
 }
 
-void SkinnedMesh::drawMesh(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const XMFLOAT3 &a_size, const CUSTOM3D* a_pCustom3D, float a_elapsedTime)
+void SkinnedMesh::drawMesh(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const CUSTOM3D& a_custom3D, float a_elapsedTime)
 {
 	for (Mesh &mesh : m_meshesList)
 	{
-		setProjection(a_pDeviceContext, a_position, a_pCustom3D, mesh.globalTransform, mesh.skeletalAnimation, a_elapsedTime);
+		setProjection(a_pDeviceContext, a_position, a_custom3D, mesh.globalTransform, mesh.skeletalAnimation, a_elapsedTime);
 		render(a_pDeviceContext, true, mesh);
 	}
 }

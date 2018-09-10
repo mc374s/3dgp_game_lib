@@ -163,7 +163,7 @@ void OBJ2DEX::animation()
 		{
 			m_aframe = 0;
 			m_animeNO++;
-			if ((m_pAnimeData[m_animeNO]).texNum < 0)
+			if ((m_pAnimeData[m_animeNO]).texNO < 0)
 			{
 				++m_animeCounter;
 				m_animeNO = 0;

@@ -77,4 +77,11 @@ void SceneTitle::draw()
 
 	m_pBG->draw();
 
+#ifdef  DEBUG
+
+	drawString(SCREEN_WIDTH / 2, 100, "SCENE TITLE", 0xFFFFFFFF, STR_CENTER, 48, 48);
+	drawString(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 200, "Push [Z] to next scene", 0xFFFFFFFF, STR_CENTER);
+
+#endif //  DEBUG
+
 }

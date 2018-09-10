@@ -158,14 +158,12 @@ class Sprite;
 
 struct LOAD_TEXTURE
 {
-	int		texNum;			// テクスチャ番号
+	int		texNO;			// テクスチャ番号
 	char	*fileName;		// ファイル名
 	bool	doProjection;	// 3dで描画するか
 	Sprite* img;
-	LOAD_TEXTURE(int a_texNum, char *a_pFileName, bool a_doProjection = false) :texNum(a_texNum), fileName(a_pFileName), doProjection(a_doProjection) {};
+	LOAD_TEXTURE(int a_texNum, char *a_pFileName, bool a_doProjection = false) :texNO(a_texNum), fileName(a_pFileName), doProjection(a_doProjection) {};
 };
-
-extern LOAD_TEXTURE *g_load_texture[TEX_MAX];
 
 
 struct CUSTOM
@@ -177,9 +175,9 @@ struct CUSTOM
 	float	centX, centY;
 	int		scaleMode;
 
-	D3DCOLOR rgba;
+	UINTCOLOR rgba;
 
-	CUSTOM(float _scaleX = 1.0f, float _scaleY = 1.0f, float _angle = .0f, bool _reflectX = false, bool _centRotate = true, float _centX = .0f, float _centY = .0f, int _scaleMode = 0, D3DCOLOR _rgba = 0xFFFFFFFF)
+	CUSTOM(float _scaleX = 1.0f, float _scaleY = 1.0f, float _angle = .0f, bool _reflectX = false, bool _centRotate = true, float _centX = .0f, float _centY = .0f, int _scaleMode = 0, UINTCOLOR _rgba = 0xFFFFFFFF)
 	{
 		scaleX = _scaleX;
 		scaleY = _scaleY;
@@ -209,13 +207,13 @@ struct CUSTOM
 
 struct SPRITE_DATA
 {
-	int		texNum = 0;
+	int		texNO = 0;
 	float	left, top;
 	float	width, height;
 	float	ofsX, ofsY;
 	int	frameNum;
 	SPRITE_DATA(int _texNum = -1, float _left = 0, float _top = 0, float _width = 0, float _height = 0, float _ofsX = 0, float _ofsY = 0, int _frameNum = 1) {
-		texNum = _texNum;
+		texNO = _texNum;
 		left = _left;
 		top = _top;
 		width = _width;
@@ -237,27 +235,31 @@ typedef SPRITE_DATA SPRITE_LEFTTOP;
 
 struct SPRITE_CENTER : public SPRITE_DATA
 {
-	SPRITE_CENTER(int texNum, float left, float top, float width, float height, int _frameNum = 1) : SPRITE_DATA(texNum, left, top, width, height, -width / 2, -height / 2, _frameNum) {};
+	SPRITE_CENTER(int texNO, float left, float top, float width, float height, int _frameNum = 1) : SPRITE_DATA(texNO, left, top, width, height, -width / 2, -height / 2, _frameNum) {};
 };
 
 struct SPRITE_BOTTOM : public SPRITE_DATA
 {
-	SPRITE_BOTTOM(int texNum, float left, float top, float width, float height, int _frameNum = 1) : SPRITE_DATA(texNum, left, top, width, height, -width / 2, -height, _frameNum) {};
+	SPRITE_BOTTOM(int texNO, float left, float top, float width, float height, int _frameNum = 1) : SPRITE_DATA(texNO, left, top, width, height, -width / 2, -height, _frameNum) {};
 };
 
 
 class TextureManager
 {
 private:
+	LOAD_TEXTURE *pTextures[TEX_MAX];
 
-public:
 	TextureManager() {};
 	~TextureManager() {
 		releaseTexture();
 	};
 
+
+public:
 	void loadTextures(LOAD_TEXTURE _data[]);
 	void loadTexture(LOAD_TEXTURE _data[], int a_textureNO);
+	const LOAD_TEXTURE* textureAt(int fileNO);
+
 
 	void releaseTexture();
 
@@ -272,9 +274,9 @@ public:
 
 int getInputKey();
 
-void drawString(int _x = 0, int _y = 0, char *_buf = nullptr, D3DCOLOR _color = 0xFFFFFFFF, int _format = STR_LEFT, int _sizeX = 32, int _sizeY = 32, float _angle = .0f);
+void drawString(int a_posX = 0, int a_posY = 0, char *a_pTextBuf = nullptr, UINTCOLOR a_textColor = 0xFFFFFFFF, int _format = STR_LEFT, int a_characterSizeX = 32, int a_characterSizeY = 32, float a_characterRotateAngle = .0f);
 
-void drawRectangle(float _x, float _y, float _w, float _h, float _angle = 0.0, UINTCOLOR _color = 0xFFFFFFFF);
+void drawRectangle(int a_leftTopX, int a_leftTopY, int a_width, int a_height, float a_rotateAngle = 0.0, UINTCOLOR a_fillColor = 0xFFFFFFFF);
 
 
 
@@ -290,6 +292,7 @@ private:
 
 
 public:
+
 	View(int a_viewWidth, int a_viewHeight);
 	View(float a_drawX, float a_drawY, float a_drawWidth, float a_drawHeight, float a_srcX = .0f, float a_srcY = .0f, float a_srcWidth = .0f, float a_srcHeight = .0f, float a_rotateAngle = .0f, UINTCOLOR a_blendColor = 0xFFFFFFFF, bool a_doReflection = false);
 	~View();
@@ -298,8 +301,10 @@ public:
 	CUSTOM3D m_custom3d;
 
 	void set();
+	// View, looks like a 3D textured sprite
 	void set(float a_drawX, float a_drawY, float a_drawWidth, float a_drawHeight, float a_srcX = .0f, float a_srcY = .0f, float a_srcWidth = .0f, float a_srcHeight = .0f, float a_rotateAngle = .0f, UINTCOLOR a_blendColor = 0xFFFFFFFF, bool a_doReflection = false);
-	
+
+	// Reset ViewPort to real screen
 	static void clear();
 };
 
@@ -321,5 +326,55 @@ public:
 	void draw();
 
 };
+
+
+// Skinned Mesh Data Managment
+
+class SkinnedMesh;
+
+struct LOAD_MESH
+{
+	int meshNO;
+	char* pFileName;
+	SkinnedMesh* pData;
+	LOAD_MESH(int meshNO, char* pFileName) :meshNO(meshNO), pFileName(pFileName) {};
+};
+
+
+struct MESH_DATA
+{
+	int meshNO;
+	XMFLOAT3 eulerAngle;
+	XMFLOAT3 offSet;
+	MESH_DATA(int meshNO, XMFLOAT3 eulerAngle, XMFLOAT3 offSet);
+	void draw(XMFLOAT3 position, const CUSTOM3D &custom = CUSTOM3D::initialValue());
+
+};
+
+class MeshManager
+{
+private:
+
+
+	MeshManager() {};
+	~MeshManager() {
+		releaseMeshes();
+	};
+
+public:
+
+	void loadMeshes(MESH_DATA data[]);
+	void loadMesh(MESH_DATA data[], int meshNO);
+
+	void releaseMeshes();
+
+	static MeshManager* getInstance() {
+		static MeshManager instance;
+		return &instance;
+	};
+
+};
+
+#define pMeshManager (MeshManager::getInstance())
 
 #endif // !_GAME_SYSTEM_H_

@@ -399,7 +399,7 @@ void framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	static XMFLOAT3 position(0, 0, 0);
 	static float mX = 0, mY = 0, mZ = 0;
 	static float aXY = 0.0f, aZY = 0.0f;
-	static float d = 2 * XM_2PI;
+	static float d = XM_PI;
 	static float hClosed = -2.0f;
 	static XMFLOAT3 focusPos = { 0,0/* + 310 / (float)SCREEN_WIDTH*/,0 };
 	if (GetAsyncKeyState('J') < 0) {
@@ -507,11 +507,16 @@ void framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 		s_pScene->draw(/*elapsed_time*/);
 	}
 
-	/*MyBlending::setMode(s_pDeviceContext, BLEND_NONE);
-	m_pPrimitive3D[0]->drawCube(s_pDeviceContext, XMFLOAT3(1024, 0, 0), XMFLOAT3(2048, 2, 2));
-	m_pPrimitive3D[0]->drawCube(s_pDeviceContext, XMFLOAT3(0, 1024, 0), XMFLOAT3(2, 2048, 2));
-	m_pPrimitive3D[0]->drawCube(s_pDeviceContext, XMFLOAT3(0, 0, 1024), XMFLOAT3(2, 2, 2048));*/
+	MyBlending::setMode(s_pDeviceContext, BLEND_NONE);
+	m_pPrimitive3D[0]->drawCube(s_pDeviceContext, XMFLOAT3(1024+5, 0, 0), XMFLOAT3(2048, 10, 10), 0xFF0000FF);
+	m_pPrimitive3D[0]->drawCube(s_pDeviceContext, XMFLOAT3(0, 1024-5, 0), XMFLOAT3(10, 2048, 10), 0x00FF00FF);
+	m_pPrimitive3D[0]->drawCube(s_pDeviceContext, XMFLOAT3(0, 0, 1024+5), XMFLOAT3(10, 10, 2048), 0x0000FFFF);
 	//m_pPrimitive3D[1]->drawCylinder(s_pDeviceContext, XMFLOAT3(-310, 0, 10 + 0), XMFLOAT3(620, 700, 20), &custom3DTemp);
+
+	char buf[256];
+	sprintf_s(buf, "posX: %lf \nposY: %lf \nposZ: %lf \ncameraDistance: %lf \n", custom3DTemp.position.x, custom3DTemp.position.y, custom3DTemp.position.z, d);
+	MyBlending::setMode(s_pDeviceContext, BLEND_ALPHA);
+	drawSprString(s_pDeviceContext, 0, 0, buf);
 
 	if (m_isFullScreen) {
 		// 垂直同期ON

@@ -1,6 +1,6 @@
 #ifndef _MFAUDIO_H_
 #define _MFAUDIO_H_
-/*************Media Foundation Audio SpacePlayer*******************/
+/*************Media Foundation Audio Player*******************/
 
 #pragma comment(lib,"Mfplat")
 #pragma comment(lib,"mfplay")

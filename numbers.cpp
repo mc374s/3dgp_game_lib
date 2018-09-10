@@ -98,7 +98,7 @@ void Numbers::draw()
 {
 	if (m_isVisible)
 	{
-		if (m_sprData.texNum > 0)
+		if (m_sprData.texNO > 0)
 		{
 			if (m_alpha > 255) {
 				m_alpha = 255;

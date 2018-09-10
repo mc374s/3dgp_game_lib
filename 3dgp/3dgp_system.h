@@ -53,7 +53,13 @@ struct CUSTOM3D
 		angle = 0.0f;
 		angleYawPitchRoll = { 0.0f, 0.0f, 0.0f };
 	};
+	static inline CUSTOM3D initialValue() {
+		CUSTOM3D clearedValue;
+		clearedValue.clear();
+		return clearedValue;
+	}
 };
+
 struct CameraData
 {
 	XMVECTOR eyePosition;

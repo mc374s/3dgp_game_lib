@@ -118,10 +118,10 @@ public:
 	void createBuffers(ID3D11Device *a_pDevice, ID3D11Buffer** a_ppVertexBuffer, ID3D11Buffer** a_ppIndexBuffer, vertex3D *a_pVertices, int a_vertexNum, WORD *a_pIndices, int a_indexNum);
 
 	inline XMFLOAT3 toNDC(XMFLOAT3 a_input);
-	void setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const CUSTOM3D* a_pCustom3D = nullptr, const XMMATRIX &a_globalTransform = XMMatrixIdentity(), SkeletalAnimation &a_skeletalAnimation= SkeletalAnimation(), float a_elapsedTime = 1 / 60.0f/*UNIT.23*/);
+	void setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const CUSTOM3D& a_pCustom3D = CUSTOM3D::initialValue(), const XMMATRIX &a_globalTransform = XMMatrixIdentity(), SkeletalAnimation &a_skeletalAnimation= SkeletalAnimation(), float a_elapsedTime = 1 / 60.0f/*UNIT.23*/);
 	void render(ID3D11DeviceContext *a_pDeviceContext, bool a_doFill, const Mesh &a_mesh);
 
-	void drawMesh(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const XMFLOAT3 &a_size, const CUSTOM3D* a_pCustom3D = nullptr, float a_elapsedTime = 1 / 60.0f/*UNIT.23*/);
+	void drawMesh(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const CUSTOM3D& a_pCustom3D = CUSTOM3D::initialValue(), float a_elapsedTime = 1 / 60.0f/*UNIT.23*/);
 };
 
 
