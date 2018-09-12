@@ -5,7 +5,6 @@
 #include <cmath>
 #include "sprite_string.h"
 
-typedef unsigned int D3DCOLOR;
 //*****************************************************************************
 //		３Ｄベクトル
 //*****************************************************************************
@@ -77,28 +76,6 @@ inline float Vector3Dot(Vector& v1, Vector& v2)
 }
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// edit by ChenYuezong 2018/05/25
-// operator " = [] () -> " must be defined as memeber operator
-
-XMFLOAT3& operator += (XMFLOAT3& lhv, const XMFLOAT3& rhv);
-XMFLOAT3& operator -= (XMFLOAT3& lhv, const XMFLOAT3& rhv);
-XMFLOAT3& operator *= (XMFLOAT3& lhv, float rhv);
-XMFLOAT3& operator /= (XMFLOAT3& lhv, float rhv);
-
-//inline XMFLOAT3 operator + () const { XMFLOAT3 ret(x, y, z); return ret; }
-//inline XMFLOAT3 operator - () const { XMFLOAT3 ret(-x, -y, -z); return ret; }
-
-const XMFLOAT3 operator + (const XMFLOAT3& lhv, const XMFLOAT3& rhv);
-const XMFLOAT3 operator - (const XMFLOAT3& lhv, const XMFLOAT3& rhv);
-const XMFLOAT3 operator * (const XMFLOAT3& lhv, float rhv);
-const XMFLOAT3 operator / (const XMFLOAT3& lhv, float rhv);
-
-bool const operator == (const XMFLOAT3& lhv, const XMFLOAT3& rhv);
-bool const operator != (const XMFLOAT3& lhv, const XMFLOAT3& rhv);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 //*****************************************************************************************************************************
 //
 //	define定義
@@ -109,13 +86,12 @@ const int	PAD_UP		= (1 << 0);
 const int	PAD_DOWN	= (1 << 1);
 const int	PAD_LEFT	= (1 << 2);
 const int	PAD_RIGHT	= (1 << 3);
-const int	PAD_START	= (1 << 4);
-const int	PAD_TRG1	= (1 << 5);
-const int	PAD_TRG2	= (1 << 6);
-const int	PAD_TRG3	= (1 << 7);
-const int	PAD_ENTER	= (1 << 8);
-const int	PAD_SELECT	= (1 << 8);
-const int	PAD_TRG4	= (1 << 9);
+const int	PAD_TRG1	= (1 << 4);
+const int	PAD_TRG2	= (1 << 5);
+const int	PAD_TRG3	= (1 << 6);
+const int	PAD_TRG4	= (1 << 7);
+const int	PAD_START	= (1 << 8);
+const int	PAD_BACK	= (1 << 9);
 const int	PAD_L1		= (1 << 10);
 const int	PAD_R1		= (1 << 11);
 const int	PAD_L2		= (1 << 12);
@@ -272,7 +248,7 @@ public:
 
 #define pTextureManager (TextureManager::getInstance())
 
-int getInputKey();
+int basicInput();
 
 void drawString(int a_posX = 0, int a_posY = 0, char *a_pTextBuf = nullptr, UINTCOLOR a_textColor = 0xFFFFFFFF, int _format = STR_LEFT, int a_characterSizeX = 32, int a_characterSizeY = 32, float a_characterRotateAngle = .0f);
 
@@ -346,12 +322,14 @@ struct MeshFile
 struct MeshData
 {
 	int fileNO;
-	XMFLOAT3 eulerAngle;
-	XMFLOAT3 offSet;
-	XMFLOAT3 preSetScale;
-	MeshData(int fileNO, XMFLOAT3 preSetScale = XMFLOAT3(1, 1, 1), XMFLOAT3 eulerAngle = XMFLOAT3(0, 0, 0), XMFLOAT3 offSet = XMFLOAT3(0, 0, 0)) :
-		fileNO(fileNO), preSetScale(preSetScale), eulerAngle(eulerAngle), offSet(offSet) {};
-	void draw(XMFLOAT3 position, const Transform &transform = Transform::initialValue());
+	Transform preSetTransform;
+	MeshData(int fileNO, XMFLOAT3 preSetScale = XMFLOAT3(1, 1, 1), XMFLOAT3 preSetPosition = XMFLOAT3(0, 0, 0), XMFLOAT3 preSetEulerAngle = XMFLOAT3(0, 0, 0))
+		:fileNO(fileNO) {
+		preSetTransform.scaling = preSetScale;
+		preSetTransform.position = preSetPosition;
+		preSetTransform.eulerAngle = preSetEulerAngle;
+	};
+	void draw(const Transform &transform = Transform::initialValue());
 
 };
 
@@ -368,7 +346,6 @@ private:
 	};
 
 public:
-
 	void loadMeshes(MeshFile sequencedData[]);
 	void loadMesh(MeshFile sequencedData[], int fileNO);
 

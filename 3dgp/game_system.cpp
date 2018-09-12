@@ -76,56 +76,28 @@ void TextureManager::releaseTexture()
 	ZeroMemory(pTextures, sizeof(LOAD_TEXTURE)*i);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// edit by ChenYuezong 2018/05/25
-// operator " = [] () -> " must be defined as memeber operator
 
-XMFLOAT3& operator += (XMFLOAT3& lhv, const XMFLOAT3& rhv) { lhv.x += rhv.x; lhv.y += rhv.y; lhv.z += rhv.z; return lhv; }
-XMFLOAT3& operator -= (XMFLOAT3& lhv, const XMFLOAT3& rhv) { lhv.x -= rhv.x; lhv.y -= rhv.y; lhv.z -= rhv.z; return lhv; }
-XMFLOAT3& operator *= (XMFLOAT3& lhv, float rhv) { lhv.x *= rhv; lhv.y *= rhv; lhv.z *= rhv; return lhv; }
-XMFLOAT3& operator /= (XMFLOAT3& lhv, float rhv) { lhv.x /= rhv; lhv.y /= rhv; lhv.z /= rhv; return lhv; }
-
-//inline XMFLOAT3 operator + () const { XMFLOAT3 ret(x, y, z); return ret; }
-//inline XMFLOAT3 operator - () const { XMFLOAT3 ret(-x, -y, -z); return ret; }
-
-const XMFLOAT3 operator + (const XMFLOAT3& lhv, const XMFLOAT3& rhv) { return XMFLOAT3(lhv.x + rhv.x, lhv.y + rhv.y, lhv.z + rhv.z); }
-const XMFLOAT3 operator - (const XMFLOAT3& lhv, const XMFLOAT3& rhv) { return XMFLOAT3(lhv.x - rhv.x, lhv.y - rhv.y, lhv.z - rhv.z); }
-const XMFLOAT3 operator * (const XMFLOAT3& lhv, float rhv) { XMFLOAT3 ret(lhv.x*rhv, lhv.y*rhv, lhv.z*rhv); return ret; }
-const XMFLOAT3 operator / (const XMFLOAT3& lhv, float rhv) { XMFLOAT3 ret(lhv.x / rhv, lhv.y / rhv, lhv.z / rhv); return ret; }
-
-bool const operator == (const XMFLOAT3& lhv, const XMFLOAT3& rhv)
-{
-	return (fabsf(lhv.x - rhv.x) < FLT_EPSILON) && (fabsf(lhv.y - rhv.y) < FLT_EPSILON) && (fabsf(lhv.z - rhv.z) < FLT_EPSILON);
-}
-bool const operator != (const XMFLOAT3& lhv, const XMFLOAT3& rhv)
-{
-	return (fabsf(lhv.x - rhv.x) > FLT_EPSILON) || (fabsf(lhv.y - rhv.y) > FLT_EPSILON) || (fabsf(lhv.z - rhv.z) > FLT_EPSILON);
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-int  getInputKey()
+int  basicInput()
 {
 	int command = 0x0;
 
-	if (KEY_BOARD.W || GAME_PAD.IsLeftThumbStickUp()) {
+	if (KEY_BOARD.Up || GAME_PAD.IsLeftThumbStickUp()) {
 		command |= PAD_UP;
 	}
-	if (KEY_BOARD.S || GAME_PAD.IsLeftThumbStickDown()) {
+	if (KEY_BOARD.Down || GAME_PAD.IsLeftThumbStickDown()) {
 		command |= PAD_DOWN;
 	}
-	if (KEY_BOARD.A || GAME_PAD.IsLeftThumbStickLeft()){
+	if (KEY_BOARD.Left || GAME_PAD.IsLeftThumbStickLeft()){
 		command |= PAD_LEFT;
 	}
-	if (KEY_BOARD.D || GAME_PAD.IsLeftThumbStickRight()){
+	if (KEY_BOARD.Right || GAME_PAD.IsLeftThumbStickRight()){
 		command |= PAD_RIGHT;
 	}
-	if (KEY_BOARD.Space || GAME_PAD.IsStartPressed()) {
+	if (KEY_BOARD.Enter || GAME_PAD.IsStartPressed()) {
 		command |= PAD_START;
 	}
-	if (KEY_BOARD.Enter || GAME_PAD.IsBackPressed()) {
-		command |= PAD_ENTER;
+	if (KEY_BOARD.Escape || GAME_PAD.IsBackPressed()) {
+		command |= PAD_BACK;
 	}
 	if (KEY_BOARD.Z || GAME_PAD.IsAPressed()) {
 		command |= PAD_TRG1;
@@ -232,10 +204,10 @@ void Cube::draw()
 
 // Skinned Mesh Data Management
 
-void MeshData::draw(XMFLOAT3 position, const Transform &transform)
+void MeshData::draw(const Transform &transform)
 {
 	if (fileNO >= 0 && fileNO < MAX_MESH_FILE_NUM && pMeshManager->meshAt(fileNO) && pMeshManager->meshAt(fileNO)->data) {
-		pMeshManager->meshAt(fileNO)->data->drawMesh(framework::s_pDeviceContext, preSetScale, position, transform);
+		pMeshManager->meshAt(fileNO)->data->drawMesh(framework::s_pDeviceContext, preSetTransform, transform);
 	}
 }
 

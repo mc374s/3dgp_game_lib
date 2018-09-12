@@ -84,29 +84,45 @@ void SceneTitle::draw()
 	{
 		fbxNO >= FBX_FILE_NO::ITEM_SWORD ? fbxNO = 0 : ++fbxNO;
 	}
+
+	if (KEY_TRACKER.pressed.W)
+	{
+		e_fbxPlayerWalk.preSetTransform.position.y += 1;
+	}
+	if (KEY_TRACKER.pressed.S)
+	{
+		e_fbxPlayerWalk.preSetTransform.position.y -= 1;
+	}
+
 	switch (fbxNO)
 	{
 	case FBX_FILE_NO::PLAYER_WALK:
-		e_fbxPlayerWalk.draw(XMFLOAT3(0, 0, 0));
+		e_fbxPlayerWalk.draw();
 		break;
 	case FBX_FILE_NO::PLAYER_RUN:
-		e_fbxPlayerRun.draw(XMFLOAT3(0, 0, 0));
+		e_fbxPlayerRun.draw();
 		break;
 	case FBX_FILE_NO::PLAYER_JUMP:
-		e_fbxPlayerJump.draw(XMFLOAT3(0, 0, 0));
+		e_fbxPlayerJump.draw();
 		break;
 	case FBX_FILE_NO::ITEM_SWORD:
-		e_fbxItemSword.draw(XMFLOAT3(0, 0, 0));
+		e_fbxItemSword.draw();
 		break;
 	default:
 		break;
 	}
-	e_fbxItemFloor.draw(XMFLOAT3(0, 0, 0));
+	e_fbxItemFloor.draw();
+
+
 
 #ifdef  DEBUG
 
 	drawString(SCREEN_WIDTH / 2, 100, "SCENE TITLE", 0xFFFFFFFF, STR_CENTER, 48, 48);
 	drawString(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 200, "Push [Z] to next scene", 0xFFFFFFFF, STR_CENTER);
+	char buf[256];
+	sprintf_s(buf, "PlayerPreSetPosX:%lf \nPlayerPreSetPosY:%lf \nPlayerPreSetPosZ:%lf \n",
+		e_fbxPlayerWalk.preSetTransform.position.x, e_fbxPlayerWalk.preSetTransform.position.y, e_fbxPlayerWalk.preSetTransform.position.z);
+	drawString(0, 300, buf);
 
 #endif //  DEBUG
 

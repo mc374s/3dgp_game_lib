@@ -95,6 +95,9 @@
     <ClInclude Include="obj3d.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="player.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="3dgp\blend.cpp">
@@ -152,6 +155,9 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="obj3d.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="player.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>

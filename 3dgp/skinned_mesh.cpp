@@ -433,7 +433,7 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *a_pDevice, const char *a_pFbxFileName, co
 		rasterizerDesc.CullMode = /*D3D11_CULL_BACK*//*D3D11_CULL_NONE*/D3D11_CULL_FRONT;
 	}
 	else {
-		rasterizerDesc.CullMode = D3D11_CULL_BACK/*D3D11_CULL_NONE*//*D3D11_CULL_FRONT*/;
+		rasterizerDesc.CullMode = /*D3D11_CULL_BACK*/D3D11_CULL_NONE/*D3D11_CULL_FRONT*/;
 	}
 	rasterizerDesc.FrontCounterClockwise = FALSE;
 	rasterizerDesc.DepthClipEnable = TRUE;
@@ -515,16 +515,45 @@ void SkinnedMesh::createBuffers(ID3D11Device *a_pDevice, ID3D11Buffer** a_ppVert
 	
 }
 
-void SkinnedMesh::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_preSetScale, const XMFLOAT3 &a_position, const Transform& a_custom3D, const XMMATRIX &a_globalTransform, SkeletalAnimation &a_skeletalAnimation, float a_elapsedTime)
+void SkinnedMesh::render(ID3D11DeviceContext *a_pDeviceContext, bool a_doFill, const Mesh &a_mesh)
+{
+	if (a_doFill) {
+		a_pDeviceContext->RSSetState(m_pFillRasterizerState);
+	}
+	else {
+		a_pDeviceContext->RSSetState(m_pWireRasterizerState);
+	}
+
+	UINT pStrides = sizeof(vertex3D);
+	UINT pOffsets = 0;
+	a_pDeviceContext->IASetPrimitiveTopology(/*D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP*/D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST/*D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP*/);
+	a_pDeviceContext->VSSetConstantBuffers(0, 1, &m_pConstantBuffer);
+	a_pDeviceContext->OMSetDepthStencilState(m_pDepthStencilState, 1);
+
+	a_pDeviceContext->IASetInputLayout(m_pInputLayout);
+	a_pDeviceContext->VSSetShader(m_pVertexShader, NULL, 0);
+	a_pDeviceContext->PSSetShader(m_pPixelShader, NULL, 0);
+	//a_pDeviceContext->PSSetShaderResources(0, 1, &subsetsList[0].diffuse.pShaderResourceView);
+	a_pDeviceContext->PSSetSamplers(0, 1, &m_pSamplerState);
+	//a_pDeviceContext->DrawIndexed(m_indexCount, 0, 0);
+	a_pDeviceContext->IASetVertexBuffers(0, 1, &a_mesh.vertexBuffer, &pStrides, &pOffsets);
+	a_pDeviceContext->IASetIndexBuffer(a_mesh.indexBuffer, DXGI_FORMAT_R16_UINT, 0);
+	for (Subset subset : a_mesh.subsetsList) {
+		a_pDeviceContext->PSSetShaderResources(0, 1, &subset.diffuse.pShaderResourceView);
+		a_pDeviceContext->DrawIndexed(subset.startIndex + subset.IndexCount, 0, 0);
+	}
+}
+
+void SkinnedMesh::setProjection(ID3D11DeviceContext *a_pDeviceContext, const Transform &preSetTransform, const Transform& transform, const XMMATRIX &a_globalTransform, SkeletalAnimation &a_skeletalAnimation, float a_elapsedTime)
 {
 	static XMFLOAT3 position, rotationAxis;
-	position = toNDC(a_custom3D.position);
-	rotationAxis = toNDC(a_custom3D.rotationAxis);
+	position = toNDC(transform.position + preSetTransform.position);
+	rotationAxis = toNDC(transform.rotationAxis);
 	static XMMATRIX S, R, T, W, V, P, WVP;
 	S = R = T = W = V = P = WVP = DirectX::XMMatrixIdentity();
 	//R = DirectX::XMMatrixRotationAxis(XMVectorSet(rotationAxis.x, rotationAxis.y, rotationAxis.z, 0), _custom3D->angle*0.01745329251);
-	R = DirectX::XMMatrixRotationRollPitchYaw(a_custom3D.angleYawPitchRoll.y*0.01745, a_custom3D.angleYawPitchRoll.x*0.01745, a_custom3D.angleYawPitchRoll.z*0.01745);
-	S = DirectX::XMMatrixScaling(a_custom3D.scaling.x*a_preSetScale.x, a_custom3D.scaling.y*a_preSetScale.y, a_custom3D.scaling.z*a_preSetScale.z);
+	R = DirectX::XMMatrixRotationRollPitchYaw(transform.eulerAngle.y*0.01745, transform.eulerAngle.x*0.01745, transform.eulerAngle.z*0.01745);
+	S = DirectX::XMMatrixScaling(transform.scaling.x*preSetTransform.scaling.x, transform.scaling.y*preSetTransform.scaling.y, transform.scaling.z*preSetTransform.scaling.z);
 	T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
 	W = S*R*T;
 
@@ -554,13 +583,13 @@ void SkinnedMesh::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMF
 	updateCbuffer.materialColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	//static float angle = 0;
-	//updateCbuffer.boneTransforms[0] = XMMatrixRotationRollPitchYaw(0.0f, 0.0f, -a_custom3D.angleYawPitchRoll.z*0.01745f);
+	//updateCbuffer.boneTransforms[0] = XMMatrixRotationRollPitchYaw(0.0f, 0.0f, -transform.eulerAngle.z*0.01745f);
 	//updateCbuffer.boneTransforms[1] = XMMatrixIdentity();
-	//updateCbuffer.boneTransforms[2] = XMMatrixRotationRollPitchYaw(0.0f, 0.0f, -a_custom3D.angleYawPitchRoll.z*0.01745f);
+	//updateCbuffer.boneTransforms[2] = XMMatrixRotationRollPitchYaw(0.0f, 0.0f, -transform.eulerAngle.z*0.01745f);
 	//angle += 0.1f;
-	//updateCbuffer.boneTransforms[0] = XMMatrixRotationRollPitchYaw(-a_custom3D.angleYawPitchRoll.y*0.01745f, -a_custom3D.angleYawPitchRoll.z*0.01745f, a_custom3D.angleYawPitchRoll.x*0.01745f);
+	//updateCbuffer.boneTransforms[0] = XMMatrixRotationRollPitchYaw(-transform.eulerAngle.y*0.01745f, -transform.eulerAngle.z*0.01745f, transform.eulerAngle.x*0.01745f);
 	//updateCbuffer.boneTransforms[1] = XMMatrixIdentity();
-	//updateCbuffer.boneTransforms[2] = XMMatrixRotationRollPitchYaw(-a_custom3D.angleYawPitchRoll.y*0.01745f, -a_custom3D.angleYawPitchRoll.z*0.01745f, a_custom3D.angleYawPitchRoll.x*0.01745f);
+	//updateCbuffer.boneTransforms[2] = XMMatrixRotationRollPitchYaw(-transform.eulerAngle.y*0.01745f, -transform.eulerAngle.z*0.01745f, transform.eulerAngle.x*0.01745f);
 
 	if (a_skeletalAnimation.size() > 0) {
 		size_t frame = a_skeletalAnimation.animationTick / a_skeletalAnimation.samplingTime;
@@ -583,40 +612,12 @@ void SkinnedMesh::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMF
 	//_DeviceContext->Unmap(m_pConstantBuffer, 0);
 }
 
-void SkinnedMesh::render(ID3D11DeviceContext *a_pDeviceContext, bool a_doFill,const Mesh &a_mesh)
-{
-	if (a_doFill) {
-		a_pDeviceContext->RSSetState(m_pFillRasterizerState);
-	}
-	else {
-		a_pDeviceContext->RSSetState(m_pWireRasterizerState);
-	}
 
-	UINT pStrides = sizeof(vertex3D);
-	UINT pOffsets = 0;
-	a_pDeviceContext->IASetPrimitiveTopology(/*D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP*/D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST/*D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP*/);
-	a_pDeviceContext->VSSetConstantBuffers(0, 1, &m_pConstantBuffer);
-	a_pDeviceContext->OMSetDepthStencilState(m_pDepthStencilState, 1);
-
-	a_pDeviceContext->IASetInputLayout(m_pInputLayout);
-	a_pDeviceContext->VSSetShader(m_pVertexShader, NULL, 0);
-	a_pDeviceContext->PSSetShader(m_pPixelShader, NULL, 0);
-	//a_pDeviceContext->PSSetShaderResources(0, 1, &subsetsList[0].diffuse.pShaderResourceView);
-	a_pDeviceContext->PSSetSamplers(0, 1, &m_pSamplerState);
-	//a_pDeviceContext->DrawIndexed(m_indexCount, 0, 0);
-	a_pDeviceContext->IASetVertexBuffers(0, 1, &a_mesh.vertexBuffer, &pStrides, &pOffsets);
-	a_pDeviceContext->IASetIndexBuffer(a_mesh.indexBuffer, DXGI_FORMAT_R16_UINT, 0);
-	for (Subset subset : a_mesh.subsetsList) {
-		a_pDeviceContext->PSSetShaderResources(0, 1, &subset.diffuse.pShaderResourceView);
-		a_pDeviceContext->DrawIndexed(subset.startIndex + subset.IndexCount, 0, 0);
-	}
-}
-
-void SkinnedMesh::drawMesh(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_preSetScale, const XMFLOAT3 &a_position, const Transform& a_custom3D, float a_elapsedTime)
+void SkinnedMesh::drawMesh(ID3D11DeviceContext *a_pDeviceContext, const Transform& preSetTransform, const Transform& transform, float elapsedTime)
 {
 	for (Mesh &mesh : m_meshesList)
 	{
-		setProjection(a_pDeviceContext, a_preSetScale, a_position, a_custom3D, mesh.globalTransform, mesh.skeletalAnimation, a_elapsedTime);
+		setProjection(a_pDeviceContext, preSetTransform, transform, mesh.globalTransform, mesh.skeletalAnimation, elapsedTime);
 		render(a_pDeviceContext, true, mesh);
 	}
 }

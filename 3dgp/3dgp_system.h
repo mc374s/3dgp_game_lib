@@ -37,6 +37,57 @@
 
 using namespace DirectX;
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// edit by ChenYuezong 2018/05/25
+// operator " = [] () -> " must be defined as memeber operator
+
+//XMFLOAT3& operator += (XMFLOAT3& lhv, const XMFLOAT3& rhv);
+//XMFLOAT3& operator -= (XMFLOAT3& lhv, const XMFLOAT3& rhv);
+//XMFLOAT3& operator *= (XMFLOAT3& lhv, float rhv);
+//XMFLOAT3& operator /= (XMFLOAT3& lhv, float rhv);
+//
+////inline XMFLOAT3 operator + () const { XMFLOAT3 ret(x, y, z); return ret; }
+////inline XMFLOAT3 operator - () const { XMFLOAT3 ret(-x, -y, -z); return ret; }
+//
+//const XMFLOAT3 operator + (const XMFLOAT3& lhv, const XMFLOAT3& rhv);
+//const XMFLOAT3 operator - (const XMFLOAT3& lhv, const XMFLOAT3& rhv);
+//const XMFLOAT3 operator * (const XMFLOAT3& lhv, float rhv);
+//const XMFLOAT3 operator / (const XMFLOAT3& lhv, float rhv);
+//
+//bool const operator == (const XMFLOAT3& lhv, const XMFLOAT3& rhv);
+//bool const operator != (const XMFLOAT3& lhv, const XMFLOAT3& rhv);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// edit by ChenYuezong 2018/05/25
+// operator " = [] () -> " must be defined as memeber operator
+
+inline XMFLOAT3& operator += (XMFLOAT3& lhv, const XMFLOAT3& rhv) { lhv.x += rhv.x; lhv.y += rhv.y; lhv.z += rhv.z; return lhv; }
+inline XMFLOAT3& operator -= (XMFLOAT3& lhv, const XMFLOAT3& rhv) { lhv.x -= rhv.x; lhv.y -= rhv.y; lhv.z -= rhv.z; return lhv; }
+inline XMFLOAT3& operator *= (XMFLOAT3& lhv, float rhv) { lhv.x *= rhv; lhv.y *= rhv; lhv.z *= rhv; return lhv; }
+inline XMFLOAT3& operator /= (XMFLOAT3& lhv, float rhv) { lhv.x /= rhv; lhv.y /= rhv; lhv.z /= rhv; return lhv; }
+
+//inline XMFLOAT3 operator + () const { XMFLOAT3 ret(x, y, z); return ret; }
+//inline XMFLOAT3 operator - () const { XMFLOAT3 ret(-x, -y, -z); return ret; }
+
+inline const XMFLOAT3 operator + (const XMFLOAT3& lhv, const XMFLOAT3& rhv) { return XMFLOAT3(lhv.x + rhv.x, lhv.y + rhv.y, lhv.z + rhv.z); }
+inline const XMFLOAT3 operator - (const XMFLOAT3& lhv, const XMFLOAT3& rhv) { return XMFLOAT3(lhv.x - rhv.x, lhv.y - rhv.y, lhv.z - rhv.z); }
+inline const XMFLOAT3 operator * (const XMFLOAT3& lhv, float rhv) { XMFLOAT3 ret(lhv.x*rhv, lhv.y*rhv, lhv.z*rhv); return ret; }
+inline const XMFLOAT3 operator / (const XMFLOAT3& lhv, float rhv) { XMFLOAT3 ret(lhv.x / rhv, lhv.y / rhv, lhv.z / rhv); return ret; }
+
+inline bool const operator == (const XMFLOAT3& lhv, const XMFLOAT3& rhv)
+{
+	return (fabsf(lhv.x - rhv.x) < FLT_EPSILON) && (fabsf(lhv.y - rhv.y) < FLT_EPSILON) && (fabsf(lhv.z - rhv.z) < FLT_EPSILON);
+}
+inline bool const operator != (const XMFLOAT3& lhv, const XMFLOAT3& rhv)
+{
+	return (fabsf(lhv.x - rhv.x) > FLT_EPSILON) || (fabsf(lhv.y - rhv.y) > FLT_EPSILON) || (fabsf(lhv.z - rhv.z) > FLT_EPSILON);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 struct Transform
 {
 	XMFLOAT3 position;
@@ -44,14 +95,14 @@ struct Transform
 	XMFLOAT3 rotationAxis;
 	FLOAT	 angle;
 	// TODO : Upgrade EulerAngles to Quaternions
-	XMFLOAT3 angleYawPitchRoll;
-	Transform() :position(0, 0, 0), scaling(1, 1, 1), rotationAxis(0, 1, 0), angle(0), angleYawPitchRoll(0, 0, 0) {};
+	XMFLOAT3 eulerAngle;
+	Transform() :position(0, 0, 0), scaling(1, 1, 1), rotationAxis(0, 1, 0), angle(0), eulerAngle(0, 0, 0) {};
 	void clear() {
 		position = { 0.0f, 0.0f, 0.0f };
 		scaling = { 1.0f, 1.0f, 1.0f };
 		rotationAxis = { 0.0f, 1.0f, 0.0f };
 		angle = 0.0f;
-		angleYawPitchRoll = { 0.0f, 0.0f, 0.0f };
+		eulerAngle = { 0.0f, 0.0f, 0.0f };
 	};
 	static inline Transform initialValue() {
 		Transform clearedValue;

@@ -169,6 +169,7 @@
     <ClInclude Include="numbers.h" />
     <ClInclude Include="obj2d.h" />
     <ClInclude Include="obj3d.h" />
+    <ClInclude Include="player.h" />
     <ClInclude Include="scene_main.h" />
     <ClInclude Include="scene_title.h" />
     <ClInclude Include="sound_data.h" />
@@ -190,6 +191,7 @@
     <ClCompile Include="numbers.cpp" />
     <ClCompile Include="obj2d.cpp" />
     <ClCompile Include="obj3d.cpp" />
+    <ClCompile Include="player.cpp" />
     <ClCompile Include="scene_main.cpp" />
     <ClCompile Include="scene_title.cpp" />
     <ClCompile Include="sound_data.cpp" />

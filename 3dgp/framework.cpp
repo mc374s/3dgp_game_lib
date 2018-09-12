@@ -441,22 +441,22 @@ void framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	}
 
 	if (GetAsyncKeyState('W') < 0) {
-		custom3DTemp.angleYawPitchRoll.y += 1;
+		custom3DTemp.eulerAngle.y += 1;
 	}
 	if (GetAsyncKeyState('S') < 0) {
-		custom3DTemp.angleYawPitchRoll.y -= 1;
+		custom3DTemp.eulerAngle.y -= 1;
 	}
 	if (GetAsyncKeyState('A') < 0) {
-		custom3DTemp.angleYawPitchRoll.x += 1;
+		custom3DTemp.eulerAngle.x += 1;
 	}
 	if (GetAsyncKeyState('D') < 0) {
-		custom3DTemp.angleYawPitchRoll.x -= 1;
+		custom3DTemp.eulerAngle.x -= 1;
 	}
 	if (GetAsyncKeyState('Q') < 0) {
-		custom3DTemp.angleYawPitchRoll.z += 1;
+		custom3DTemp.eulerAngle.z += 1;
 	}
 	if (GetAsyncKeyState('E') < 0) {
-		custom3DTemp.angleYawPitchRoll.z -= 1;
+		custom3DTemp.eulerAngle.z -= 1;
 	}
 	if (GetAsyncKeyState('Z') < 0) {
 		position.x -= 10;
