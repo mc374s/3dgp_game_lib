@@ -26,7 +26,7 @@ public:
 	bool m_isHitAble;
 
 	CUSTOM m_custom;
-	CUSTOM3D m_custom3d;
+	Transform m_custom3d;
 	//void(*m_pfMove)();
 	void(OBJ2D::*m_pfMove)();
 

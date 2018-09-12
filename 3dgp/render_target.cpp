@@ -291,11 +291,11 @@ void RenderTarget::render(ID3D11DeviceContext* a_pDeviceContext, float a_drawX, 
 	render(a_pDeviceContext, vertices);
 }
 
-void RenderTarget::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const CUSTOM3D* a_pCustom3D)
+void RenderTarget::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const Transform* a_pCustom3D)
 {
 	if (a_pCustom3D == nullptr)
 	{
-		CUSTOM3D init;
+		Transform init;
 		a_pCustom3D = &init;
 	}
 	static XMFLOAT3 position, rotationAxis;
@@ -339,7 +339,7 @@ void RenderTarget::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XM
 	a_pDeviceContext->VSSetConstantBuffers(0, 1, &m_pVSProjectionCBuffer);
 }
 
-void RenderTarget::render3D(ID3D11DeviceContext* a_pDeviceContext, float a_drawX, float a_drawY, float a_drawWidth, float a_drawHeight, float a_srcX, float a_srcY, float a_srcWidth, float a_srcHeight, float a_rotateAngle, UINTCOLOR a_blendColor, const CUSTOM3D* a_pCustom3D, bool a_doReflection)
+void RenderTarget::render3D(ID3D11DeviceContext* a_pDeviceContext, float a_drawX, float a_drawY, float a_drawWidth, float a_drawHeight, float a_srcX, float a_srcY, float a_srcWidth, float a_srcHeight, float a_rotateAngle, UINTCOLOR a_blendColor, const Transform* a_pCustom3D, bool a_doReflection)
 {
 	// 
 	m_virtualWidth = a_srcWidth;

@@ -158,9 +158,9 @@ class Sprite;
 
 struct LOAD_TEXTURE
 {
-	int		texNO;			// テクスチャ番号
-	char	*fileName;		// ファイル名
-	bool	doProjection;	// 3dで描画するか
+	int		texNO;
+	char	*fileName;
+	bool	doProjection;	// 3d空間で描画するかどうか
 	Sprite* img;
 	LOAD_TEXTURE(int a_texNum, char *a_pFileName, bool a_doProjection = false) :texNO(a_texNum), fileName(a_pFileName), doProjection(a_doProjection) {};
 };
@@ -222,7 +222,7 @@ struct SPRITE_DATA
 		ofsY = _ofsY;
 		frameNum = _frameNum;
 	};
-	void draw(Vector3 &a_pos, CUSTOM *a_pCustom = nullptr, CUSTOM3D *a_pCustom3d = nullptr);
+	void draw(Vector3 &a_pos, CUSTOM *a_pCustom = nullptr, Transform *a_pCustom3d = nullptr);
 	void draw(float _x, float _y, CUSTOM *_custom = nullptr);
 	void copy(const SPRITE_DATA* a_rhv) {
 		left = a_rhv->left; top = a_rhv->top; width = a_rhv->width; height = a_rhv->height; ofsX = a_rhv->ofsX; ofsY = a_rhv->ofsY;
@@ -298,7 +298,7 @@ public:
 	~View();
 
 	bool m_doReflection;
-	CUSTOM3D m_custom3d;
+	Transform m_custom3d;
 
 	void set();
 	// View, looks like a 3D textured sprite
@@ -321,40 +321,46 @@ public:
 	XMFLOAT3	m_position;
 	XMFLOAT3	m_size;
 	UINTCOLOR	m_blendColor;
-	CUSTOM3D	m_custom3d;
+	Transform	m_custom3d;
 
 	void draw();
 
 };
 
+// TODO: Review the Naming consistency 
 
-// Skinned Mesh Data Managment
+// Skinned Mesh Data Management
 
 class SkinnedMesh;
 
-struct LOAD_MESH
+struct MeshFile
 {
-	int meshNO;
-	char* pFileName;
-	SkinnedMesh* pData;
-	LOAD_MESH(int meshNO, char* pFileName) :meshNO(meshNO), pFileName(pFileName) {};
+	int fileNO;
+	char* path;
+	SkinnedMesh* data;
+	MeshFile() {};
+	MeshFile(int fileNO, char* filePath) :fileNO(fileNO), path(filePath) {};
 };
 
 
-struct MESH_DATA
+struct MeshData
 {
-	int meshNO;
+	int fileNO;
 	XMFLOAT3 eulerAngle;
 	XMFLOAT3 offSet;
-	MESH_DATA(int meshNO, XMFLOAT3 eulerAngle, XMFLOAT3 offSet);
-	void draw(XMFLOAT3 position, const CUSTOM3D &custom = CUSTOM3D::initialValue());
+	XMFLOAT3 preSetScale;
+	MeshData(int fileNO, XMFLOAT3 preSetScale = XMFLOAT3(1, 1, 1), XMFLOAT3 eulerAngle = XMFLOAT3(0, 0, 0), XMFLOAT3 offSet = XMFLOAT3(0, 0, 0)) :
+		fileNO(fileNO), preSetScale(preSetScale), eulerAngle(eulerAngle), offSet(offSet) {};
+	void draw(XMFLOAT3 position, const Transform &transform = Transform::initialValue());
 
 };
+
+#define MAX_MESH_FILE_NUM (64)
 
 class MeshManager
 {
 private:
-
+	MeshFile* meshes[MAX_MESH_FILE_NUM];
 
 	MeshManager() {};
 	~MeshManager() {
@@ -363,8 +369,10 @@ private:
 
 public:
 
-	void loadMeshes(MESH_DATA data[]);
-	void loadMesh(MESH_DATA data[], int meshNO);
+	void loadMeshes(MeshFile sequencedData[]);
+	void loadMesh(MeshFile sequencedData[], int fileNO);
+
+	const MeshFile* meshAt(int fileNO);
 
 	void releaseMeshes();
 

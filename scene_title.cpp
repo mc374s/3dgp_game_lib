@@ -6,6 +6,7 @@
 
 #include "scene_title.h"
 
+#include "mesh_data.h"
 
 
 #include <thread>
@@ -37,6 +38,8 @@ SceneTitle::SceneTitle()
 	//pPlayerManager->init();
 	//pPlayerManager->m_pPlayerTsuta->m_isOnLeftPage = false;
 	//changeScene(SCENE_MAIN);
+
+	pMeshManager->loadMeshes(e_sequencedFbxFiles);
 }
 
 SceneTitle::~SceneTitle() {
@@ -76,6 +79,29 @@ void SceneTitle::draw()
 	View::clear();
 
 	m_pBG->draw();
+	static int fbxNO = 0;
+	if (KEY_TRACKER.pressed.Space)
+	{
+		fbxNO >= FBX_FILE_NO::ITEM_SWORD ? fbxNO = 0 : ++fbxNO;
+	}
+	switch (fbxNO)
+	{
+	case FBX_FILE_NO::PLAYER_WALK:
+		e_fbxPlayerWalk.draw(XMFLOAT3(0, 0, 0));
+		break;
+	case FBX_FILE_NO::PLAYER_RUN:
+		e_fbxPlayerRun.draw(XMFLOAT3(0, 0, 0));
+		break;
+	case FBX_FILE_NO::PLAYER_JUMP:
+		e_fbxPlayerJump.draw(XMFLOAT3(0, 0, 0));
+		break;
+	case FBX_FILE_NO::ITEM_SWORD:
+		e_fbxItemSword.draw(XMFLOAT3(0, 0, 0));
+		break;
+	default:
+		break;
+	}
+	e_fbxItemFloor.draw(XMFLOAT3(0, 0, 0));
 
 #ifdef  DEBUG
 

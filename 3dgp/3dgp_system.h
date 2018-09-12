@@ -37,7 +37,7 @@
 
 using namespace DirectX;
 
-struct CUSTOM3D
+struct Transform
 {
 	XMFLOAT3 position;
 	XMFLOAT3 scaling;
@@ -45,7 +45,7 @@ struct CUSTOM3D
 	FLOAT	 angle;
 	// TODO : Upgrade EulerAngles to Quaternions
 	XMFLOAT3 angleYawPitchRoll;
-	CUSTOM3D() :position(0, 0, 0), scaling(1, 1, 1), rotationAxis(0, 1, 0), angle(0), angleYawPitchRoll(0, 0, 0) {};
+	Transform() :position(0, 0, 0), scaling(1, 1, 1), rotationAxis(0, 1, 0), angle(0), angleYawPitchRoll(0, 0, 0) {};
 	void clear() {
 		position = { 0.0f, 0.0f, 0.0f };
 		scaling = { 1.0f, 1.0f, 1.0f };
@@ -53,11 +53,11 @@ struct CUSTOM3D
 		angle = 0.0f;
 		angleYawPitchRoll = { 0.0f, 0.0f, 0.0f };
 	};
-	static inline CUSTOM3D initialValue() {
-		CUSTOM3D clearedValue;
+	static inline Transform initialValue() {
+		Transform clearedValue;
 		clearedValue.clear();
 		return clearedValue;
-	}
+	};
 };
 
 struct CameraData
@@ -116,19 +116,20 @@ inline void setRenderTargetWH(int a_width, int a_height)
 	//e_renderTargetHeight = SCREEN_HEIGHT;
 }
 
+// 
 inline XMFLOAT3 toNDC_RT(XMFLOAT3 a_coord, bool a_doProjection = false)
 {
 	float x, y, z = 0;
-	// 2D without projection
+
+	// Different Coordinate System
 	if (a_doProjection)
-	{
-		// 2D with projection
+	{	// 2D with projection
 		x = a_coord.x / (float)SCREEN_WIDTH;
 		y = a_coord.y / (float)SCREEN_WIDTH;
 		z = a_coord.z / (float)SCREEN_WIDTH;
 	}
 	else
-	{
+	{	// 2D without projection
 		x = 2.0f*a_coord.x / e_renderTargetWidth - 1.0f;
 		y = 1.0f - 2.0f*a_coord.y / e_renderTargetHeight;
 	}

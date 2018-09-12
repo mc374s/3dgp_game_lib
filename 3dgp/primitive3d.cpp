@@ -333,11 +333,11 @@ void Primitive3D::render(ID3D11DeviceContext *a_pDeviceContext, bool a_doFill)
 	a_pDeviceContext->DrawIndexed(m_indexCount, 0, 0);
 }
 
-void Primitive3D::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const XMFLOAT4 &a_materialColor, const CUSTOM3D* a_pCustom3D)
+void Primitive3D::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const XMFLOAT4 &a_materialColor, const Transform* a_pCustom3D)
 {
 	if (a_pCustom3D == nullptr)
 	{
-		CUSTOM3D init;
+		Transform init;
 		a_pCustom3D = &init;
 	}
 	static XMFLOAT3 position, rotationAxis;
@@ -381,7 +381,7 @@ void Primitive3D::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMF
 	//_DeviceContext->Unmap(m_pConstantBuffer, 0); 
 }
 
-void Primitive3D::drawCube(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const XMFLOAT3 &a_size, const UINTCOLOR &a_blendColor, const CUSTOM3D* a_pCustom3D)
+void Primitive3D::drawCube(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const XMFLOAT3 &a_size, const UINTCOLOR &a_blendColor, const Transform* a_pCustom3D)
 {
 	//return;
 	int x = a_position.x, y = a_position.y, z = a_position.z;
@@ -433,7 +433,7 @@ void Primitive3D::drawCube(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3
 	render(a_pDeviceContext, true);
 }
 
-void Primitive3D::drawCylinder(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const XMFLOAT3 &a_size,const CUSTOM3D* a_pCustom3D)
+void Primitive3D::drawCylinder(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const XMFLOAT3 &a_size,const Transform* a_pCustom3D)
 {
 
 	setProjection(a_pDeviceContext, a_position, XMFLOAT4(0.5, 0.5, 0.4, 1.0f), a_pCustom3D);

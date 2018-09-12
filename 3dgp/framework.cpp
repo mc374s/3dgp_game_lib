@@ -395,13 +395,13 @@ void framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 
 	// Test variables
 	static double time;
-	static CUSTOM3D custom3DTemp;
+	static Transform custom3DTemp;
 	static XMFLOAT3 position(0, 0, 0);
 	static float mX = 0, mY = 0, mZ = 0;
-	static float aXY = 0.0f, aZY = 0.0f;
+	static float aXY = -XM_PIDIV2, aZY = XM_1DIVPI;
 	static float d = XM_PI;
 	static float hClosed = -2.0f;
-	static XMFLOAT3 focusPos = { 0,0/* + 310 / (float)SCREEN_WIDTH*/,0 };
+	static XMFLOAT3 focusPos = { 0,0 + 600 / (float)SCREEN_WIDTH,0 };
 	if (GetAsyncKeyState('J') < 0) {
 		aXY -= 0.01f;
 	}

@@ -346,11 +346,11 @@ void Sprite::render(ID3D11DeviceContext* a_pDeviceContext, float a_drawX, float 
 	render(a_pDeviceContext, vertices);
 }
 
-void Sprite::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const CUSTOM3D* a_pCustom3D)
+void Sprite::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const Transform* a_pCustom3D)
 {
 	if (a_pCustom3D == nullptr)
 	{
-		CUSTOM3D init;
+		Transform init;
 		a_pCustom3D = &init;
 	}
 	static XMFLOAT3 position, rotationAxis;
@@ -394,7 +394,7 @@ void Sprite::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3
 	a_pDeviceContext->VSSetConstantBuffers(0, 1, &m_pVSProjectionCBuffer);
 }
 
-void Sprite::render3D(ID3D11DeviceContext* a_pDeviceContext, float a_drawX, float a_drawY, float a_drawWidth, float a_drawHeight, float a_srcX, float a_srcY, float a_srcWidth, float a_srcHeight, UINTCOLOR a_blendColor, float a_rotateAngle, bool a_doCenterRotation, float a_rotatePosX, float a_rotatePosY, bool a_doReflection, int a_scaleMode, const CUSTOM3D* a_pCustom3D)
+void Sprite::render3D(ID3D11DeviceContext* a_pDeviceContext, float a_drawX, float a_drawY, float a_drawWidth, float a_drawHeight, float a_srcX, float a_srcY, float a_srcWidth, float a_srcHeight, UINTCOLOR a_blendColor, float a_rotateAngle, bool a_doCenterRotation, float a_rotatePosX, float a_rotatePosY, bool a_doReflection, int a_scaleMode, const Transform* a_pCustom3D)
 {
 	setProjection(a_pDeviceContext, XMFLOAT3(0, 0, 0), a_pCustom3D);
 	render(a_pDeviceContext, a_drawX, a_drawY, a_drawWidth, a_drawHeight, a_srcX, a_srcY, a_srcWidth, a_srcHeight, a_blendColor, a_rotateAngle, a_doCenterRotation, a_rotatePosX, a_rotatePosY, a_doReflection, a_scaleMode);

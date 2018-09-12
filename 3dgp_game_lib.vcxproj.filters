@@ -89,6 +89,12 @@
     <ClInclude Include="3dgp\game_system.h">
       <Filter>3dgp</Filter>
     </ClInclude>
+    <ClInclude Include="mesh_data.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="obj3d.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="3dgp\blend.cpp">
@@ -140,6 +146,12 @@
       <Filter>3dgp</Filter>
     </ClCompile>
     <ClCompile Include="numbers.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="mesh_data.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="obj3d.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>

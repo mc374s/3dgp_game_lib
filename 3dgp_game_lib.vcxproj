@@ -165,8 +165,10 @@
     <ClInclude Include="3dgp\sprite_string.h" />
     <ClInclude Include="3dgp\template.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="mesh_data.h" />
     <ClInclude Include="numbers.h" />
     <ClInclude Include="obj2d.h" />
+    <ClInclude Include="obj3d.h" />
     <ClInclude Include="scene_main.h" />
     <ClInclude Include="scene_title.h" />
     <ClInclude Include="sound_data.h" />
@@ -184,8 +186,10 @@
     <ClCompile Include="3dgp\skinned_mesh.cpp" />
     <ClCompile Include="3dgp\sprite.cpp" />
     <ClCompile Include="3dgp\sprite_string.cpp" />
+    <ClCompile Include="mesh_data.cpp" />
     <ClCompile Include="numbers.cpp" />
     <ClCompile Include="obj2d.cpp" />
+    <ClCompile Include="obj3d.cpp" />
     <ClCompile Include="scene_main.cpp" />
     <ClCompile Include="scene_title.cpp" />
     <ClCompile Include="sound_data.cpp" />

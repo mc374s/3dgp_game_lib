@@ -4,6 +4,8 @@
 #include "blend.h"
 #include "sprite.h"
 
+#include "skinned_mesh.h"
+
 
 void SPRITE_DATA::draw(float _x, float _y, CUSTOM *_custom) {
 	if (texNO >= 0 && texNO < TEX_MAX && pTextureManager->textureAt(texNO) && pTextureManager->textureAt(texNO)->img)
@@ -17,7 +19,7 @@ void SPRITE_DATA::draw(float _x, float _y, CUSTOM *_custom) {
 	}
 }
 
-void SPRITE_DATA::draw(Vector3 &a_pos, CUSTOM *a_pCustom, CUSTOM3D *a_pCustom3d) {
+void SPRITE_DATA::draw(Vector3 &a_pos, CUSTOM *a_pCustom, Transform *a_pCustom3d) {
 	if (texNO >= 0 && texNO < TEX_MAX && pTextureManager->textureAt(texNO) && pTextureManager->textureAt(texNO)->img) {
 		if (pTextureManager->textureAt(texNO)->doProjection)
 		{
@@ -50,7 +52,7 @@ void TextureManager::loadTexture(LOAD_TEXTURE _data[], int a_textureNO)
 
 const LOAD_TEXTURE* TextureManager::textureAt(int fileNO)
 {
-	if (fileNO > 0 && fileNO < TEX_MAX)
+	if (fileNO >= 0 && fileNO < TEX_MAX)
 	{
 		return pTextures[fileNO];
 	}
@@ -69,7 +71,6 @@ void TextureManager::releaseTexture()
 		{
 			delete pTextures[i]->img;
 			ZeroMemory(pTextures[i], sizeof(*pTextures[i]));
-			
 		}
 	}
 	ZeroMemory(pTextures, sizeof(LOAD_TEXTURE)*i);
@@ -209,7 +210,7 @@ void View::clear()
 // Class Cube
 Cube::Cube(const XMFLOAT3 &a_position, const XMFLOAT3 &a_size, const UINTCOLOR &a_blendColor) :m_position(a_position), m_size(a_size), m_blendColor(a_blendColor)
 {
-	m_pPrimitive = new Primitive3D(framework::s_pDevice); 
+	m_pPrimitive = new Primitive3D(framework::s_pDevice);
 	m_pPrimitive->initialize(framework::s_pDevice, GEOMETRY_CUBE);
 }
 
@@ -227,7 +228,60 @@ void Cube::draw()
 	m_pPrimitive->drawCube(framework::s_pDeviceContext, m_position, m_size, m_blendColor, &m_custom3d);
 }
 
+////////////////////////////////////////////////////////////
 
+// Skinned Mesh Data Management
 
+void MeshData::draw(XMFLOAT3 position, const Transform &transform)
+{
+	if (fileNO >= 0 && fileNO < MAX_MESH_FILE_NUM && pMeshManager->meshAt(fileNO) && pMeshManager->meshAt(fileNO)->data) {
+		pMeshManager->meshAt(fileNO)->data->drawMesh(framework::s_pDeviceContext, preSetScale, position, transform);
+	}
+}
+
+void MeshManager::loadMesh(MeshFile data[], int fileNO)
+{
+	if (data[fileNO].fileNO != -1 || data[fileNO].path != NULL)
+	{
+		meshes[fileNO] = new MeshFile();
+		*meshes[fileNO] = data[fileNO];
+		meshes[fileNO]->data = new SkinnedMesh(framework::s_pDevice, data[fileNO].path);
+	}
+}
+
+void MeshManager::loadMeshes(MeshFile data[])
+{
+	for (int i = data[0].fileNO; data[i].fileNO != -1 || data[i].path != NULL; i++)
+	{
+		meshes[i] = new MeshFile();
+		*meshes[i] = data[i];
+		meshes[i]->data = new SkinnedMesh(framework::s_pDevice, data[i].path);
+	}
+}
+
+const MeshFile* MeshManager::meshAt(int fileNO)
+{
+	if (fileNO >= 0 && fileNO < MAX_MESH_FILE_NUM)
+	{
+		return meshes[fileNO];
+	}
+	else
+	{
+		return nullptr;
+	}
+}
+
+void MeshManager::releaseMeshes()
+{
+	for (int i = 0; i < MAX_MESH_FILE_NUM; i++)
+	{
+		if (meshes[i])
+		{
+			delete meshes[i]->data;
+			ZeroMemory(meshes[i], sizeof(*meshes[i]));
+		}
+	}
+	ZeroMemory(meshes, sizeof(MeshFile)*MAX_MESH_FILE_NUM);
+}
 
 ////////////////////////////////////////////////////////////

@@ -70,11 +70,11 @@ public:
 	void createBuffers(ID3D11Device *a_pDevice, vertex3D *a_pVertices, int a_vertexNum, WORD *a_pIndices, int a_indexNum);
 
 	inline XMFLOAT3 toNDC(const XMFLOAT3 &a_inputCoord);
-	void setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const XMFLOAT4 &a_materialColor = XMFLOAT4(1, 1, 1, 1), const CUSTOM3D* a_pCustom3D = nullptr);
+	void setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const XMFLOAT4 &a_materialColor = XMFLOAT4(1, 1, 1, 1), const Transform* a_pCustom3D = nullptr);
 	void render(ID3D11DeviceContext *a_pDeviceContext, bool a_doFill);
 
-	void drawCube(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const XMFLOAT3 &a_size, const UINTCOLOR &a_blendColor = 0xFFFFFFFF, const CUSTOM3D* a_pCustom3D = nullptr);
-	void drawCylinder(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const XMFLOAT3 &a_size,const CUSTOM3D* a_pCustom3D = nullptr);
+	void drawCube(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const XMFLOAT3 &a_size, const UINTCOLOR &a_blendColor = 0xFFFFFFFF, const Transform* a_pCustom3D = nullptr);
+	void drawCylinder(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const XMFLOAT3 &a_size,const Transform* a_pCustom3D = nullptr);
 };
 
 

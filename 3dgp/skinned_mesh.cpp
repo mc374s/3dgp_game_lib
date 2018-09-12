@@ -421,9 +421,9 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *a_pDevice, const char *a_pFbxFileName, co
 		{ "BONES",		0, DXGI_FORMAT_R32G32B32A32_SINT,		0, 68,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		//{ "BONES",		0, DXGI_FORMAT_R32G32B32A32_SINT,		0, D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
-	RM::loadVertexShader(a_pDevice, "shader/texture_on_3d_bone_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &m_pVertexShader, &m_pInputLayout);
+	RM::loadVertexShader(a_pDevice, "Data/Shader/texture_on_3d_bone_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &m_pVertexShader, &m_pInputLayout);
 
-	RM::loadPixelShader(a_pDevice, "shader/texture_on_ps.cso", &m_pPixelShader);
+	RM::loadPixelShader(a_pDevice, "Data/Shader/texture_on_ps.cso", &m_pPixelShader);
 
 	// Create rasterizer state
 	D3D11_RASTERIZER_DESC rasterizerDesc;
@@ -515,7 +515,7 @@ void SkinnedMesh::createBuffers(ID3D11Device *a_pDevice, ID3D11Buffer** a_ppVert
 	
 }
 
-void SkinnedMesh::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const CUSTOM3D& a_custom3D, const XMMATRIX &a_globalTransform, SkeletalAnimation &a_skeletalAnimation, float a_elapsedTime)
+void SkinnedMesh::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_preSetScale, const XMFLOAT3 &a_position, const Transform& a_custom3D, const XMMATRIX &a_globalTransform, SkeletalAnimation &a_skeletalAnimation, float a_elapsedTime)
 {
 	static XMFLOAT3 position, rotationAxis;
 	position = toNDC(a_custom3D.position);
@@ -524,7 +524,7 @@ void SkinnedMesh::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMF
 	S = R = T = W = V = P = WVP = DirectX::XMMatrixIdentity();
 	//R = DirectX::XMMatrixRotationAxis(XMVectorSet(rotationAxis.x, rotationAxis.y, rotationAxis.z, 0), _custom3D->angle*0.01745329251);
 	R = DirectX::XMMatrixRotationRollPitchYaw(a_custom3D.angleYawPitchRoll.y*0.01745, a_custom3D.angleYawPitchRoll.x*0.01745, a_custom3D.angleYawPitchRoll.z*0.01745);
-	S = DirectX::XMMatrixScaling(a_custom3D.scaling.x, a_custom3D.scaling.y, a_custom3D.scaling.z);
+	S = DirectX::XMMatrixScaling(a_custom3D.scaling.x*a_preSetScale.x, a_custom3D.scaling.y*a_preSetScale.y, a_custom3D.scaling.z*a_preSetScale.z);
 	T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
 	W = S*R*T;
 
@@ -612,11 +612,11 @@ void SkinnedMesh::render(ID3D11DeviceContext *a_pDeviceContext, bool a_doFill,co
 	}
 }
 
-void SkinnedMesh::drawMesh(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const CUSTOM3D& a_custom3D, float a_elapsedTime)
+void SkinnedMesh::drawMesh(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_preSetScale, const XMFLOAT3 &a_position, const Transform& a_custom3D, float a_elapsedTime)
 {
 	for (Mesh &mesh : m_meshesList)
 	{
-		setProjection(a_pDeviceContext, a_position, a_custom3D, mesh.globalTransform, mesh.skeletalAnimation, a_elapsedTime);
+		setProjection(a_pDeviceContext, a_preSetScale, a_position, a_custom3D, mesh.globalTransform, mesh.skeletalAnimation, a_elapsedTime);
 		render(a_pDeviceContext, true, mesh);
 	}
 }
