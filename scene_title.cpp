@@ -8,8 +8,11 @@
 
 #include "mesh_data.h"
 
-
 #include <thread>
+
+#include "player.h"
+
+Player g_player;
 
 //void loadTextureProgress()
 //{
@@ -40,6 +43,9 @@ SceneTitle::SceneTitle()
 	//changeScene(SCENE_MAIN);
 
 	pMeshManager->loadMeshes(e_sequencedFbxFiles);
+
+	g_player.init();
+
 }
 
 SceneTitle::~SceneTitle() {
@@ -61,13 +67,16 @@ void SceneTitle::update()
 		//break;
 
 	case STEP::BEGIN:
-		if (KEY_TRACKER.pressed.Z || PAD_TRACKER.a == PAD_TRACKER.PRESSED)
+		if (KEY_TRACKER.pressed.Enter || PAD_TRACKER.start == PAD_TRACKER.PRESSED)
 		{
 			MFAudioStop(BGM_TITLE);
 			MFAudioPlay(SE_START);
 			changeScene(SCENE_MAIN);
 			break;
 		}
+
+		g_player.update();
+
 		break;
 	default:
 		break;
@@ -79,7 +88,12 @@ void SceneTitle::draw()
 	View::clear();
 
 	m_pBG->draw();
-	static int fbxNO = 0;
+
+	e_fbxItemFloor.draw();
+	
+	g_player.draw();
+
+	/*static int fbxNO = 0;
 	if (KEY_TRACKER.pressed.Space)
 	{
 		fbxNO >= FBX_FILE_NO::ITEM_SWORD ? fbxNO = 0 : ++fbxNO;
@@ -110,19 +124,14 @@ void SceneTitle::draw()
 		break;
 	default:
 		break;
-	}
-	e_fbxItemFloor.draw();
+	}*/
 
 
 
 #ifdef  DEBUG
 
 	drawString(SCREEN_WIDTH / 2, 100, "SCENE TITLE", 0xFFFFFFFF, STR_CENTER, 48, 48);
-	drawString(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 200, "Push [Z] to next scene", 0xFFFFFFFF, STR_CENTER);
-	char buf[256];
-	sprintf_s(buf, "PlayerPreSetPosX:%lf \nPlayerPreSetPosY:%lf \nPlayerPreSetPosZ:%lf \n",
-		e_fbxPlayerWalk.preSetTransform.position.x, e_fbxPlayerWalk.preSetTransform.position.y, e_fbxPlayerWalk.preSetTransform.position.z);
-	drawString(0, 300, buf);
+	drawString(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 200, "Push [ENTER] to next scene", 0xFFFFFFFF, STR_CENTER);
 
 #endif //  DEBUG
 

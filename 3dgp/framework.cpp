@@ -514,7 +514,8 @@ void framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	//m_pPrimitive3D[1]->drawCylinder(s_pDeviceContext, XMFLOAT3(-310, 0, 10 + 0), XMFLOAT3(620, 700, 20), &custom3DTemp);
 
 	char buf[256];
-	sprintf_s(buf, "posX: %lf \nposY: %lf \nposZ: %lf \ncameraDistance: %lf \n", custom3DTemp.position.x, custom3DTemp.position.y, custom3DTemp.position.z, d);
+	sprintf_s(buf, "mainCamera: \nPosX: %lf \nPosY: %lf \nPosZ: %lf \nDistance: %lf \n", 
+		e_mainCamera.eyePosition.vector4_f32[0], e_mainCamera.eyePosition.vector4_f32[1], e_mainCamera.eyePosition.vector4_f32[2], d);
 	MyBlending::setMode(s_pDeviceContext, BLEND_ALPHA);
 	drawSprString(s_pDeviceContext, 0, 0, buf);
 

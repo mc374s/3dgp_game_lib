@@ -29,7 +29,6 @@ void OBJ3D::memberCopy(const OBJ3D& inputObj)
 	meshData = inputObj.meshData;
 	moveFunc = inputObj.moveFunc;
 
-	setAlpha = inputObj.setAlpha;
 	isHitAble = inputObj.isHitAble;
 }
 

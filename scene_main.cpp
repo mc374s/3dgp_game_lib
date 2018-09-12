@@ -49,7 +49,7 @@ void SceneMain::update()
 	case STEP::BEGIN:
 
 		gameMain();
-		if (KEY_TRACKER.pressed.Z || PAD_TRACKER.a == PAD_TRACKER.PRESSED)
+		if (KEY_TRACKER.pressed.Enter || PAD_TRACKER.start == PAD_TRACKER.PRESSED)
 		{
 			MFAudioStop(BGM_MAIN);
 			MFAudioPlay(SE_START);
@@ -77,7 +77,7 @@ void SceneMain::draw()
 #ifdef  DEBUG
 
 	drawString(SCREEN_WIDTH / 2, 100, "SCENE MAIN", 0xFFFFFFFF, STR_CENTER, 48, 48);
-	drawString(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 200, "Push [Z] to SCENE TITLE", 0xFFFFFFFF, STR_CENTER);
+	drawString(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 200, "Push [ENTER] to SCENE TITLE", 0xFFFFFFFF, STR_CENTER);
 
 
 #endif //  DEBUG

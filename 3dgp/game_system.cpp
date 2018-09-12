@@ -93,22 +93,22 @@ int  basicInput()
 	if (KEY_BOARD.Right || GAME_PAD.IsLeftThumbStickRight()){
 		command |= PAD_RIGHT;
 	}
-	if (KEY_BOARD.Enter || GAME_PAD.IsStartPressed()) {
+	if (KEY_TRACKER.pressed.Enter || GAME_PAD.IsStartPressed()) {
 		command |= PAD_START;
 	}
-	if (KEY_BOARD.Escape || GAME_PAD.IsBackPressed()) {
+	if (KEY_TRACKER.pressed.Escape || GAME_PAD.IsBackPressed()) {
 		command |= PAD_BACK;
 	}
-	if (KEY_BOARD.Z || GAME_PAD.IsAPressed()) {
+	if (KEY_TRACKER.pressed.Z || GAME_PAD.IsAPressed()) {
 		command |= PAD_TRG1;
 	}
-	if (KEY_BOARD.X || GAME_PAD.IsBPressed()) {
+	if (KEY_TRACKER.pressed.X || GAME_PAD.IsBPressed()) {
 		command |= PAD_TRG2;
 	}
-	if (KEY_BOARD.C || GAME_PAD.IsXPressed()) {
+	if (KEY_TRACKER.pressed.C || GAME_PAD.IsXPressed()) {
 		command |= PAD_TRG3;
 	}
-	if (KEY_BOARD.V || GAME_PAD.IsYPressed()) {
+	if (KEY_TRACKER.pressed.V || GAME_PAD.IsYPressed()) {
 		command |= PAD_TRG4;
 	}
 
