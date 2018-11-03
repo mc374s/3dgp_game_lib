@@ -62,7 +62,7 @@ void MFAudioLoad(const int _fileNO, const char* _fileName)
 	size_t temp;
 	mbstowcs_s(&temp, wcFileName, cSize, _fileName, cSize);
 
-	HRESULT hr = MFPCreateMediaPlayer(wcFileName, FALSE, 0, NULL,/* m_hWnd*/NULL, &MFAudioManager::pMFPlayer[_fileNO]);
+	HRESULT hr = MFPCreateMediaPlayer(wcFileName, FALSE, 0, NULL,/* hwnd*/NULL, &MFAudioManager::pMFPlayer[_fileNO]);
 	delete[] wcFileName;
 	if (FAILED(hr)){
 		MessageBox(0, L"MFPCreateMediaPlayer Failed.", L"framework", MB_OK);

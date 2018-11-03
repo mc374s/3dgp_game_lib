@@ -5,7 +5,7 @@
 class high_resolution_timer
 {
 public:
-	high_resolution_timer() : delta_time(-1.0), paused_time(0), stopped(false)
+	high_resolution_timer() : delttime(-1.0), paused_time(0), stopped(false)
 	{
 		LONGLONG counts_per_sec;
 		QueryPerformanceFrequency(reinterpret_cast<LARGE_INTEGER*>(&counts_per_sec));
@@ -51,7 +51,7 @@ public:
 
 	float time_interval() const  // in seconds
 	{
-		return static_cast<float>(delta_time);
+		return static_cast<float>(delttime);
 	}
 
 	void reset() // Call before message loop.
@@ -96,13 +96,13 @@ public:
 	{
 		if (stopped)
 		{
-			delta_time = 0.0;
+			delttime = 0.0;
 			return;
 		}
 
 		QueryPerformanceCounter(reinterpret_cast<LARGE_INTEGER*>(&this_time));
 		// Time difference between this frame and the previous.
-		delta_time = (this_time - last_time)*seconds_per_count;
+		delttime = (this_time - last_time)*seconds_per_count;
 
 		// Prepare for next frame.
 		last_time = this_time;
@@ -110,15 +110,15 @@ public:
 		// Force nonnegative.  The DXSDK's CDXUTTimer mentions that if the 
 		// processor goes into a power save mode or we get shuffled to another
 		// processor, then mDeltaTime can be negative.
-		if (delta_time < 0.0)
+		if (delttime < 0.0)
 		{
-			delta_time = 0.0;
+			delttime = 0.0;
 		}
 	}
 
 private:
 	double seconds_per_count;
-	double delta_time;
+	double delttime;
 
 	LONGLONG base_time;
 	LONGLONG paused_time;

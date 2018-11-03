@@ -64,7 +64,7 @@ int MyBlending::s_blendMode[BLEND_MODE_MAX][6] = {
 
 };
 
-void MyBlending::initialize(ID3D11Device *a_pDevice)
+void MyBlending::initialize(ID3D11Device *pDevice)
 {
 
 	D3D11_BLEND_DESC blendDesc;
@@ -87,7 +87,7 @@ void MyBlending::initialize(ID3D11Device *a_pDevice)
 
 		if (blendDesc.RenderTarget[0].SrcBlend != 0)
 		{
-			HRESULT hr = a_pDevice->CreateBlendState(&blendDesc, &s_pblendState[i]);
+			HRESULT hr = pDevice->CreateBlendState(&blendDesc, &s_pblendState[i]);
 			if (FAILED(hr))
 			{
 				MessageBox(0, L"Blend: Create BlendState failed", 0, 0);
@@ -97,13 +97,13 @@ void MyBlending::initialize(ID3D11Device *a_pDevice)
 	}
 }
 
-void MyBlending::setMode(ID3D11DeviceContext* &a_pDeviceContext, int a_mode)
+void MyBlending::setMode(ID3D11DeviceContext* &pDeviceContext, int mode)
 {
-	if (s_oldMode != a_mode)
+	if (s_oldMode != mode)
 	{
-		s_oldMode = a_mode;
+		s_oldMode = mode;
 		float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-		a_pDeviceContext->OMSetBlendState(s_pblendState[a_mode], blendFactor, 0xFFFFFFFF);
+		pDeviceContext->OMSetBlendState(s_pblendState[mode], blendFactor, 0xFFFFFFFF);
 	}
 }
 

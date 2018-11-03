@@ -16,8 +16,8 @@ private:
 	static Sprite *s_pSprString;
 
 public:
-	friend Sprite* initSprString(ID3D11Device* a_pDevice, char *a_pFilename = nullptr);
-	friend void drawSprString(ID3D11DeviceContext* a_pDeviceConetxt, int a_drawX = 0, int a_drawY = 0, char *a_pIn = nullptr, UINTCOLOR a_blendColor = 0xFFFFFFFF, int a_format = STR_LEFT, int a_sizeX = 32, int a_sizeY = 32, float a_rotateAngle = .0f, Sprite *a_pSprStringFont = nullptr);
+	friend Sprite* initSprString(ID3D11Device* pDevice, char *pFilename = nullptr);
+	friend void drawSprString(ID3D11DeviceContext* pDeviceConetxt, int drawX = 0, int drawY = 0, char *pIn = nullptr, UINTCOLOR blendColor = 0xFFFFFFFF, int format = STR_LEFT, int sizeX = 32, int sizeY = 32, float rotateAngle = .0f, Sprite *pSprStringFont = nullptr);
 
 	friend void releaseSprString();
 };

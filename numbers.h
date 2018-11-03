@@ -6,14 +6,14 @@
 class Numbers
 {
 private:
-	SPRITE_DATA m_sprData;
+	SPRITE_DATA sprData;
 
 public:
-	virtual void memberCopy(const Numbers& a_inputObj);
+	virtual void memberCopy(const Numbers& inputObj);
 	//Numbers();
-	Numbers(const Numbers& a_inputObj);
+	Numbers(const Numbers& inputObj);
 	virtual ~Numbers();
-	const Numbers& Numbers::operator=(const Numbers& a_right);
+	const Numbers& Numbers::operator=(const Numbers& right);
 
 	struct DIGIT
 	{
@@ -22,25 +22,25 @@ public:
 		float	w, h;
 	}digit[DIGIT_MAX];
 
-	Numbers(SPRITE_DATA* a_fontData = nullptr);
+	Numbers(SPRITE_DATA* fontData = nullptr);
 
-	Vector3 m_pos;
-	Vector3 m_speed;
-	Vector3 m_speedAcc;
-	Vector3 m_speedMax;
+	Vector3 pos;
+	Vector3 speed;
+	Vector3 speedAcc;
+	Vector3 speedMax;
 
-	CUSTOM m_custom;
+	Transform2D transform2D;
 
-	int m_timer;
-	int m_step;
-	int m_alpha;
+	int timer;
+	int step;
+	int alpha;
 
-	int m_value;
-	int m_digitNum;
-	bool m_isVisibleAlways;
-	bool m_isVisible;
+	int value;
+	int digitNum;
+	bool isVisibleAlways;
+	bool isVisible;
 
-	void setValue(int a_value, Vector3 a_size = Vector3(1.0f, 1.0f, 0.0f));
+	void setValue(int value, Vector3 size = Vector3(1.0f, 1.0f, 0.0f));
 
 	virtual void clear();
 	virtual void update();

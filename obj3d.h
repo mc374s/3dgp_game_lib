@@ -5,17 +5,19 @@ class OBJ3D
 {
 protected:
 	virtual void memberCopy(const OBJ3D& inputObj);
+
+public:
 	OBJ3D();
 	OBJ3D(const OBJ3D& inputObj);
 	virtual ~OBJ3D();
 	const OBJ3D& OBJ3D::operator=(const OBJ3D& rhv);
-
 	MeshData* meshData;
 	Vector3 initPos;
 	Vector3 setPos;
 	Vector3 speed;
 	Vector3 speedAcc;
 	Vector3 speedMax;
+	
 
 	Vector3 size;
 	bool isHitAble;
@@ -28,7 +30,7 @@ public:
 	int step;
 	int type;
 	bool isInit;
-	//void(*m_pfMove)();
+	//void(*pfMove)();
 	void(OBJ3D::*moveFunc)();
 
 

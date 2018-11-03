@@ -8,42 +8,42 @@ class OBJ2D
 private:
 
 public:
-	virtual void memberCopy(const OBJ2D& a_inputObj);
+	virtual void memberCopy(const OBJ2D& inputObj);
 	OBJ2D();
-	OBJ2D(const OBJ2D& a_inputObj);
+	OBJ2D(const OBJ2D& inputObj);
 	virtual ~OBJ2D();
-	const OBJ2D& OBJ2D::operator=(const OBJ2D& a_right);
+	const OBJ2D& OBJ2D::operator=(const OBJ2D& right);
 
-	SPRITE_DATA* m_pSprData;
-	Vector3 m_pos;
-	Vector3 m_initPos;
-	Vector3 m_setPos;
-	Vector3 m_speed;
-	Vector3 m_speedAcc;
-	Vector3 m_speedMax;
+	SPRITE_DATA* pSprData;
+	Vector3 pos;
+	Vector3 initPos;
+	Vector3 setPos;
+	Vector3 speed;
+	Vector3 speedAcc;
+	Vector3 speedMax;
 
-	Vector3 m_size;
-	bool m_isHitAble;
+	Vector3 size;
+	bool isHitAble;
 
-	CUSTOM m_custom;
-	Transform m_custom3d;
-	//void(*m_pfMove)();
-	void(OBJ2D::*m_pfMove)();
+	Transform2D transform2D;
+	Transform transform;
+	//void(*pfMove)();
+	void(OBJ2D::*pfMove)();
 
-	int m_timer;
-	int m_step;
-	int m_alpha;
-	int m_setAlpha;
-	int m_type;
+	int timer;
+	int step;
+	int alpha;
+	int setAlpha;
+	int type;
 
-	bool m_isInit;
+	bool isInit;
 
 	virtual void clear();
 	virtual void update();
 
 	virtual void draw();
 
-	static int searchSet(OBJ2D** a_ppBegin, int a_max);
+	static int searchSet(OBJ2D** ppBegin, int max);
 
 
 };
@@ -55,17 +55,17 @@ private:
 
 public:
 
-	int m_aframe;
-	int m_animeNO;
-	int m_animeCounter;
+	int aframe;
+	int animeNO;
+	int animeCounter;
 
-	SPRITE_DATA* m_pAnimeData;
+	SPRITE_DATA* pAnimeData;
 
-	virtual void memberCopy(const OBJ2DEX& a_inputObj);
+	virtual void memberCopy(const OBJ2DEX& inputObj);
 	OBJ2DEX();
-	OBJ2DEX(const OBJ2DEX& a_inputObj);
+	OBJ2DEX(const OBJ2DEX& inputObj);
 	virtual ~OBJ2DEX();
-	const OBJ2DEX& operator=(const OBJ2DEX& a_right);
+	const OBJ2DEX& operator=(const OBJ2DEX& right);
 
 
 	virtual void clear();
@@ -80,11 +80,11 @@ public:
 class Manager
 {
 public:
-	int m_timer;
-	int m_step;
+	int timer;
+	int step;
 	Manager() {
-		m_timer = 0;
-		m_step = 0;
+		timer = 0;
+		step = 0;
 	};
 	virtual ~Manager() {};
 
@@ -99,8 +99,8 @@ private:
 
 public:
 	void init();
-	void update(int a_liveInPagination = 1);
-	void draw(int a_liveInPagination = 1);
+	void update(int liveInPagination = 1);
+	void draw(int liveInPagination = 1);
 
 	ObjManager() {};
 	~ObjManager();
@@ -109,7 +109,7 @@ public:
 
 #define pObjManager (ObjManager::getInstance())
 
-//#define GET_IDLE_OBJ_NO (OBJ2D::searchSet(pObjManager->m_ppObjs, OBJ_MAX_NUM))
+//#define GET_IDLE_OBJ_NO (OBJ2D::searchSet(pObjManager->ppObjs, OBJ_MAX_NUM))
 
 
 #endif // !_OBJ2D_H_

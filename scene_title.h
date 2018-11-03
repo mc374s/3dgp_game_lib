@@ -7,7 +7,7 @@ class OBJ2D;
 class SceneTitle :public Scene, public Singleton<SceneTitle>
 {
 private:
-	OBJ2D* m_pBG;
+	OBJ2D* pBG;
 public:
 	SceneTitle();
 	~SceneTitle();

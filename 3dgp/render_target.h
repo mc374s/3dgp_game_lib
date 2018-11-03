@@ -29,46 +29,46 @@ private:
 private:
 
 	HRESULT hr;
-	UINT m_vertexCount;
+	UINT vertexCount;
 
-	ID3D11RasterizerState*		m_pRasterizerStateCullBack;
-	ID3D11RasterizerState*		m_pRasterizerStateCullFront;
+	ID3D11RasterizerState*		pRasterizerStateCullBack;
+	ID3D11RasterizerState*		pRasterizerStateCullFront;
 
-	ID3D11Buffer*				m_pVertexBuffer;
-	ID3D11Buffer*				m_pVSProjectionCBuffer;
+	ID3D11Buffer*				pVertexBuffer;
+	ID3D11Buffer*				pVSProjectionCBuffer;
 
-	D3D11_TEXTURE2D_DESC		m_renderTargetTextureDesc;
-	ID3D11Texture2D*			m_pRenderTargetTexture = NULL;
-	ID3D11RenderTargetView*		m_pRenderTargetView = NULL;
+	D3D11_TEXTURE2D_DESC		renderTargetTextureDesc;
+	ID3D11Texture2D*			pRenderTargetTexture = NULL;
+	ID3D11RenderTargetView*		pRenderTargetView = NULL;
 
-	ID3D11DepthStencilState*	m_pDepthStencilState;
+	ID3D11DepthStencilState*	pDepthStencilState;
 
-	ID3D11ShaderResourceView*	m_pShaderResourceView;
-	ID3D11VertexShader*			m_pVertexShader;
-	ID3D11InputLayout*			m_pInputLayout;
-	ID3D11PixelShader*			m_pPixelShader;
+	ID3D11ShaderResourceView*	pShaderResourceView;
+	ID3D11VertexShader*			pVertexShader;
+	ID3D11InputLayout*			pInputLayout;
+	ID3D11PixelShader*			pPixelShader;
 
 
-	int m_virtualWidth = 1280;
-	int m_virtualHeight = 720;
+	int virtualWidth = 1280;
+	int virtualHeight = 720;
 
 public:
 
-	RenderTarget(ID3D11Device* a_pDevice, int a_renderWidth = 512, int a_renderHeight = 512);
+	RenderTarget(ID3D11Device* pDevice, int renderWidth = 512, int renderHeight = 512);
 	~RenderTarget();
-	bool initialize(ID3D11Device* a_pDevice);
+	bool initialize(ID3D11Device* pDevice);
 
-	XMFLOAT3 toNDC(float a_screenX, float a_screenY);
-	XMFLOAT3 toNDC(XMFLOAT3 a_coord);
-	XMFLOAT2 toNDC_UV(XMFLOAT2 a_coord);
-	XMFLOAT3 rotationZ(XMFLOAT3 a_coord, float a_angle, XMFLOAT3 a_center);
+	XMFLOAT3 toNDC(float screenX, float screenY);
+	XMFLOAT3 toNDC(XMFLOAT3 coord);
+	XMFLOAT2 toNDC_UV(XMFLOAT2 coord);
+	XMFLOAT3 rotationZ(XMFLOAT3 coord, float angle, XMFLOAT3 center);
 
-	void render(ID3D11DeviceContext* a_pDeviceContext);
-	void render(ID3D11DeviceContext* a_pDeviceContext, vertex a_pCoordNDC[]);
-	void render(ID3D11DeviceContext* a_pDeviceContext, float a_drawX, float a_drawY, float a_drawWidth, float a_drawHeight, float a_srcX = .0f, float a_srcY = .0f, float a_srcWidth = .0f, float a_srcHeight = .0f, float a_rotateAngle = .0f, UINTCOLOR a_blendColor = 0xFFFFFFFF, bool a_doReflection = false);
+	void render(ID3D11DeviceContext* pDeviceContext);
+	void render(ID3D11DeviceContext* pDeviceContext, vertex pCoordNDC[]);
+	void render(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, float rotateAngle = .0f, UINTCOLOR blendColor = 0xFFFFFFFF, bool doReflection = false);
 
-	void setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const Transform* a_pCustom3D = nullptr);
-	void render3D(ID3D11DeviceContext* a_pDeviceContext, float a_drawX, float a_drawY, float a_drawWidth, float a_drawHeight, float a_srcX = .0f, float a_srcY = .0f, float a_srcWidth = .0f, float a_srcHeight = .0f, float a_rotateAngle = .0f, UINTCOLOR a_blendColor = 0xFFFFFFFF, const Transform* _custom3D = nullptr, bool a_doReflection = false);
+	void setProjection(ID3D11DeviceContext *pDeviceContext, const XMFLOAT3 &position, const Transform& transform = Transform::initialValue());
+	void render3D(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, float rotateAngle = .0f, UINTCOLOR blendColor = 0xFFFFFFFF, const Transform& transform = Transform::initialValue(), bool doReflection = false);
 };
 
 

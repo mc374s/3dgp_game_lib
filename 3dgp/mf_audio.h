@@ -31,16 +31,16 @@ public:
 		return &instance;
 	};
 
-	void loadAudios(const RESOURCE_DATA a_pData[]);
+	void loadAudios(const RESOURCE_DATA pData[]);
 	friend void MFAudiosRelease();
 	friend void MFAudioCheckLoops();
 
-	friend void MFAudioLoad(const int a_fileNO, const char* a_pFileName);
-	friend void MFAudioPlay(const int a_fileNO, const bool a_doLoop = false);
-	friend void MFAudioContinue(const int a_fileNO);
-	friend void MFAudioStop(const int a_fileNO);
-	friend void MFAudioPause(const int a_fileNO);
-	friend bool isMFAudioPlaying(const int a_fileNO);
+	friend void MFAudioLoad(const int fileNO, const char* pFileName);
+	friend void MFAudioPlay(const int fileNO, const bool doLoop = false);
+	friend void MFAudioContinue(const int fileNO);
+	friend void MFAudioStop(const int fileNO);
+	friend void MFAudioPause(const int fileNO);
+	friend bool isMFAudioPlaying(const int fileNO);
 
 };
 

@@ -16,9 +16,9 @@ public:
 
 // TODO : Overload float's operator == and !=
 //template<typename T>
-//bool operator==(const T& a_leftValue,const T& a_rightValue) const
+//bool operator==(const T& leftValue,const T& rightValue) const
 //{
-//	if (fabsf(a_leftValue - a_rightValue) < FLT_EPSILON)
+//	if (fabsf(leftValue - rightValue) < FLT_EPSILON)
 //	{
 //		return true;
 //	} 
@@ -29,9 +29,9 @@ public:
 //}
 //
 //template<typename T>
-//bool operator!=(const T& a_leftValue, const T& a_rightValue) const
+//bool operator!=(const T& leftValue, const T& rightValue) const
 //{
-//	if (fabsf(a_leftValue - a_rightValue) > FLT_EPSILON)
+//	if (fabsf(leftValue - rightValue) > FLT_EPSILON)
 //	{
 //		return true;
 //	} 

@@ -2,58 +2,58 @@
 
 Sprite* SpriteString::s_pSprString = nullptr;
 
-Sprite* initSprString(ID3D11Device* a_pDevice, char *a_pFilename)
+Sprite* initSprString(ID3D11Device* pDevice, char *pFilename)
 {
-	if (a_pFilename)
+	if (pFilename)
 	{
-		SpriteString::s_pSprString = new Sprite(a_pDevice, a_pFilename);
+		SpriteString::s_pSprString = new Sprite(pDevice, pFilename);
 	}
 	else
 	{
-		SpriteString::s_pSprString = new Sprite(a_pDevice, "3dgp/fonts/font5.png");
+		SpriteString::s_pSprString = new Sprite(pDevice, "3dgp/fonts/font5.png");
 	}
 	return SpriteString::s_pSprString;
 }
 
-void drawSprString(ID3D11DeviceContext* a_pDeviceConetxt, int a_drawX, int a_drawY, char* a_pIn, UINTCOLOR a_blendColor, int a_format, int a_sizeX, int a_sizeY, float a_rotateAngle, Sprite *a_pSprStringFont)
+void drawSprString(ID3D11DeviceContext* pDeviceConetxt, int drawX, int drawY, char* pIn, UINTCOLOR blendColor, int format, int sizeX, int sizeY, float rotateAngle, Sprite *pSprStringFont)
 {
-	int adjustX = 0, marginX = -a_sizeX*0.4;
-	if (a_format == STR_CENTER && a_pIn)
+	int adjustX = 0, marginX = -sizeX*0.4;
+	if (format == STR_CENTER && pIn)
 	{
-		if (strchr(a_pIn, '\n'))
+		if (strchr(pIn, '\n'))
 		{
-			adjustX = -(strchr(a_pIn, '\n') - a_pIn)*(a_sizeX + marginX) / 2;
+			adjustX = -(strchr(pIn, '\n') - pIn)*(sizeX + marginX) / 2;
 		}
 		else
 		{
-			adjustX = -((int)strlen(a_pIn))*(a_sizeX + marginX) / 2;
+			adjustX = -((int)strlen(pIn))*(sizeX + marginX) / 2;
 		}
 	}
-	if (a_pSprStringFont && a_pIn)
+	if (pSprStringFont && pIn)
 	{
-		for (int i = 0, j = 0; a_pIn[i] != '\0'; i++, j++)
+		for (int i = 0, j = 0; pIn[i] != '\0'; i++, j++)
 		{
-			if (a_pIn[i] == '\n')
+			if (pIn[i] == '\n')
 			{
-				a_drawY += a_sizeY * 1;
+				drawY += sizeY * 1;
 				j = -1;
 				continue;
 			}
-			a_pSprStringFont->render(a_pDeviceConetxt, a_drawX + j * (a_sizeX + marginX) + adjustX, a_drawY, a_sizeX, a_sizeY, (a_pIn[i] - (a_pIn[i] >> 0x4 << 0x4)) << 0x5, a_pIn[i] >> 0x4 << 0x5, 32.0f, 32.0f, a_blendColor, a_rotateAngle);
+			pSprStringFont->render(pDeviceConetxt, drawX + j * (sizeX + marginX) + adjustX, drawY, sizeX, sizeY, (pIn[i] - (pIn[i] >> 0x4 << 0x4)) << 0x5, pIn[i] >> 0x4 << 0x5, 32.0f, 32.0f, blendColor, rotateAngle);
 		}
 	}
-	else if (a_pIn)
+	else if (pIn)
 	{
 
-		for (int i = 0, j = 0; a_pIn[i] != '\0'; i++, j++)
+		for (int i = 0, j = 0; pIn[i] != '\0'; i++, j++)
 		{
-			if (a_pIn[i] == '\n')
+			if (pIn[i] == '\n')
 			{
-				a_drawY += a_sizeY * 1;
+				drawY += sizeY * 1;
 				j = -1;
 				continue;
 			}
-			SpriteString::s_pSprString->render(a_pDeviceConetxt, a_drawX + j * (a_sizeX + marginX) + adjustX, a_drawY, a_sizeX, a_sizeY, (a_pIn[i] - (a_pIn[i] >> 0x4 << 0x4)) << 0x5, a_pIn[i] >> 0x4 << 0x5, 32.0f, 32.0f, a_blendColor, a_rotateAngle);
+			SpriteString::s_pSprString->render(pDeviceConetxt, drawX + j * (sizeX + marginX) + adjustX, drawY, sizeX, sizeY, (pIn[i] - (pIn[i] >> 0x4 << 0x4)) << 0x5, pIn[i] >> 0x4 << 0x5, 32.0f, 32.0f, blendColor, rotateAngle);
 		}
 	}
 }

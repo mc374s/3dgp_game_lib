@@ -6,22 +6,22 @@
 using namespace RM;
 using namespace DirectX;
 
-bool RenderTarget::initialize(ID3D11Device* a_pDevice)
+bool RenderTarget::initialize(ID3D11Device* pDevice)
 {
-	m_vertexCount = 4 /*sizeof(vertices) / sizeof(vertex)*/;
+	vertexCount = 4 /*sizeof(vertices) / sizeof(vertex)*/;
 
 	D3D11_BUFFER_DESC bufferDesc;
 	ZeroMemory(&bufferDesc, sizeof(bufferDesc));
 	bufferDesc.Usage = /*D3D11_USAGE_IMMUTABLE*//*D3D11_USAGE_DEFAULT*/D3D11_USAGE_DYNAMIC;
-	bufferDesc.ByteWidth = sizeof(vertex) * m_vertexCount;
+	bufferDesc.ByteWidth = sizeof(vertex) * vertexCount;
 	bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE/*0*/;
 
 	// Create vertex buffer
-	hr = a_pDevice->CreateBuffer(&bufferDesc, NULL, &m_pVertexBuffer);
+	hr = pDevice->CreateBuffer(&bufferDesc, NULL, &pVertexBuffer);
 	if (FAILED(hr))
 	{
-		MessageBox(0, L"sprite: Initialize m_pVertexBuffer failed", 0, 0);
+		MessageBox(0, L"sprite: Initialize pVertexBuffer failed", 0, 0);
 		return false;
 	}
 
@@ -33,9 +33,9 @@ bool RenderTarget::initialize(ID3D11Device* a_pDevice)
 		{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 28,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "NORMAL",		0, DXGI_FORMAT_R32G32B32_FLOAT,		0, 36,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
-	loadVertexShader(a_pDevice, "Data/Shader/texture_on_3d_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &m_pVertexShader, &m_pInputLayout);
+	loadVertexShader(pDevice, "Data/Shader/texture_on_3d_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &pVertexShader, &pInputLayout);
 
-	loadPixelShader(a_pDevice, "Data/Shader/texture_on_ps.cso", &m_pPixelShader);
+	loadPixelShader(pDevice, "Data/Shader/texture_on_ps.cso", &pPixelShader);
 
 	// create rasterizer state
 	D3D11_RASTERIZER_DESC rasterizerDesc;
@@ -47,9 +47,9 @@ bool RenderTarget::initialize(ID3D11Device* a_pDevice)
 	rasterizerDesc.DepthBiasClamp = 0;
 	rasterizerDesc.SlopeScaledDepthBias = 0;
 
-	hr = a_pDevice->CreateRasterizerState(&rasterizerDesc, &m_pRasterizerStateCullBack);
+	hr = pDevice->CreateRasterizerState(&rasterizerDesc, &pRasterizerStateCullBack);
 	rasterizerDesc.CullMode = D3D11_CULL_FRONT;
-	hr = a_pDevice->CreateRasterizerState(&rasterizerDesc, &m_pRasterizerStateCullFront);
+	hr = pDevice->CreateRasterizerState(&rasterizerDesc, &pRasterizerStateCullFront);
 	if (FAILED(hr))
 	{
 		MessageBox(0, L"sprite: Initialize hr failed", 0, 0);
@@ -63,7 +63,7 @@ bool RenderTarget::initialize(ID3D11Device* a_pDevice)
 	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
 
-	hr = a_pDevice->CreateDepthStencilState(&depthStencilDesc, &m_pDepthStencilState);
+	hr = pDevice->CreateDepthStencilState(&depthStencilDesc, &pDepthStencilState);
 	if (FAILED(hr))
 	{
 		MessageBox(0, L"Create DepthStencilState failed", L"RenderTarget::Initialize", 0);
@@ -78,30 +78,30 @@ bool RenderTarget::initialize(ID3D11Device* a_pDevice)
 	//subResourceData.pSysMem = &VSConstantData;
 	bufferDesc.ByteWidth = sizeof(PROJECTION_CBUFFER);
 
-	hr = a_pDevice->CreateBuffer(&bufferDesc, NULL, &m_pVSProjectionCBuffer);
+	hr = pDevice->CreateBuffer(&bufferDesc, NULL, &pVSProjectionCBuffer);
 	if (FAILED(hr)) {
-		MessageBox(0, L"Create m_pConstantBuffer failed", L"RenderTarget::Initialize()", 0);
+		MessageBox(0, L"Create pConstantBuffer failed", L"RenderTarget::Initialize()", 0);
 		return false;
 	}
 
 	return true;
 }
 
-RenderTarget::RenderTarget(ID3D11Device* a_pDevice, int a_renderWidth, int a_renderHeight)
+RenderTarget::RenderTarget(ID3D11Device* pDevice, int renderWidth, int renderHeight)
 {
-	initialize(a_pDevice);
-	//loadShaderResourceView(a_pDevice, a_pFilename, &resource, &m_pShaderResourceView);
+	initialize(pDevice);
+	//loadShaderResourceView(pDevice, pFilename, &resource, &pShaderResourceView);
 
 	//// TEXTURE2D_DESC Initialize
-	//m_Texture2dDesc.MipLevels = 1;
-	//m_Texture2dDesc.ArraySize = 1;
-	//m_Texture2dDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	//m_Texture2dDesc.SampleDesc.Count = 1;
-	//m_Texture2dDesc.SampleDesc.Quality = 0;
-	//m_Texture2dDesc.Usage = D3D11_USAGE_DEFAULT;
-	//m_Texture2dDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	//m_Texture2dDesc.CPUAccessFlags = 0;
-	//m_Texture2dDesc.MiscFlags = 0;
+	//Texture2dDesc.MipLevels = 1;
+	//Texture2dDesc.ArraySize = 1;
+	//Texture2dDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	//Texture2dDesc.SampleDesc.Count = 1;
+	//Texture2dDesc.SampleDesc.Quality = 0;
+	//Texture2dDesc.Usage = D3D11_USAGE_DEFAULT;
+	//Texture2dDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	//Texture2dDesc.CPUAccessFlags = 0;
+	//Texture2dDesc.MiscFlags = 0;
 
 	//if (resource == NULL)
 	//{
@@ -109,35 +109,35 @@ RenderTarget::RenderTarget(ID3D11Device* a_pDevice, int a_renderWidth, int a_ren
 	//	return;
 	//}
 	//resource->QueryInterface(&texture2d);
-	//texture2d->GetDesc(&m_Texture2dDesc);
+	//texture2d->GetDesc(&Texture2dDesc);
 
 	///////////////////////////////////////////
 	// Render to Texture test
-	ZeroMemory(&m_renderTargetTextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
-	m_renderTargetTextureDesc.Width = a_renderWidth;
-	m_renderTargetTextureDesc.Height = a_renderHeight;
-	m_renderTargetTextureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-	m_renderTargetTextureDesc.Format = /*DXGI_FORMAT_R32G32B32A32_FLOAT*/DXGI_FORMAT_R8G8B8A8_UNORM/*DXGI_FORMAT_D24_UNORM_S8_UINT*/;
-	m_renderTargetTextureDesc.SampleDesc.Count = 1;
-	m_renderTargetTextureDesc.Usage = D3D11_USAGE_DEFAULT;
-	m_renderTargetTextureDesc.CPUAccessFlags = 0;
-	m_renderTargetTextureDesc.MiscFlags = 0;
-	m_renderTargetTextureDesc.MipLevels = 1;
-	m_renderTargetTextureDesc.ArraySize = 1;
+	ZeroMemory(&renderTargetTextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
+	renderTargetTextureDesc.Width = renderWidth;
+	renderTargetTextureDesc.Height = renderHeight;
+	renderTargetTextureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	renderTargetTextureDesc.Format = /*DXGI_FORMAT_R32G32B32A32_FLOAT*/DXGI_FORMAT_R8G8B8A8_UNORM/*DXGI_FORMAT_D24_UNORM_S8_UINT*/;
+	renderTargetTextureDesc.SampleDesc.Count = 1;
+	renderTargetTextureDesc.Usage = D3D11_USAGE_DEFAULT;
+	renderTargetTextureDesc.CPUAccessFlags = 0;
+	renderTargetTextureDesc.MiscFlags = 0;
+	renderTargetTextureDesc.MipLevels = 1;
+	renderTargetTextureDesc.ArraySize = 1;
 
-	hr = a_pDevice->CreateTexture2D(&m_renderTargetTextureDesc, NULL, &m_pRenderTargetTexture);
+	hr = pDevice->CreateTexture2D(&renderTargetTextureDesc, NULL, &pRenderTargetTexture);
 	if (FAILED(hr))
 	{
 		MessageBox(0, L"sprite: Create Texture2D failed", 0, 0);
 		exit(-1);
 	}
-	//m_pRenderTargetTexture->QueryInterface(&m_pRenderSurface);
+	//pRenderTargetTexture->QueryInterface(&pRenderSurface);
 
 	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
-	renderTargetViewDesc.Format = m_renderTargetTextureDesc.Format;
+	renderTargetViewDesc.Format = renderTargetTextureDesc.Format;
 	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 	renderTargetViewDesc.Texture2D.MipSlice = 0;
-	hr = a_pDevice->CreateRenderTargetView(m_pRenderTargetTexture, &renderTargetViewDesc, &m_pRenderTargetView);
+	hr = pDevice->CreateRenderTargetView(pRenderTargetTexture, &renderTargetViewDesc, &pRenderTargetView);
 	if (FAILED(hr))
 	{
 		MessageBox(0, L"sprite: Create RenderTargetView failed", 0, 0);
@@ -145,11 +145,11 @@ RenderTarget::RenderTarget(ID3D11Device* a_pDevice, int a_renderWidth, int a_ren
 	}
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
-	shaderResourceViewDesc.Format = m_renderTargetTextureDesc.Format;
+	shaderResourceViewDesc.Format = renderTargetTextureDesc.Format;
 	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
 	shaderResourceViewDesc.Texture2D.MipLevels = 1;
-	hr = a_pDevice->CreateShaderResourceView(m_pRenderTargetTexture, &shaderResourceViewDesc, &m_pShaderResourceView);
+	hr = pDevice->CreateShaderResourceView(pRenderTargetTexture, &shaderResourceViewDesc, &pShaderResourceView);
 	if (FAILED(hr))
 	{
 		MessageBox(0, L"sprite: Create CreateShaderResourceView failed", 0, 0);
@@ -164,115 +164,115 @@ RenderTarget::RenderTarget(ID3D11Device* a_pDevice, int a_renderWidth, int a_ren
 RenderTarget::~RenderTarget()
 {
 
-	SAFE_RELEASE(m_pRasterizerStateCullBack);
-	SAFE_RELEASE(m_pRasterizerStateCullFront);
-	SAFE_RELEASE(m_pVertexBuffer);
-	SAFE_RELEASE(m_pVSProjectionCBuffer);
+	SAFE_RELEASE(pRasterizerStateCullBack);
+	SAFE_RELEASE(pRasterizerStateCullFront);
+	SAFE_RELEASE(pVertexBuffer);
+	SAFE_RELEASE(pVSProjectionCBuffer);
 	
-	SAFE_RELEASE(m_pDepthStencilState);
-	SAFE_RELEASE(m_pRenderTargetTexture);
-	SAFE_RELEASE(m_pRenderTargetView);
+	SAFE_RELEASE(pDepthStencilState);
+	SAFE_RELEASE(pRenderTargetTexture);
+	SAFE_RELEASE(pRenderTargetView);
 
 
-	SAFE_RELEASE(m_pShaderResourceView);
-	releasePixelShader(m_pPixelShader);
-	releaseVertexShader(m_pVertexShader, m_pInputLayout);
+	SAFE_RELEASE(pShaderResourceView);
+	releasePixelShader(pPixelShader);
+	releaseVertexShader(pVertexShader, pInputLayout);
 
 
 }
 
-void RenderTarget::render(ID3D11DeviceContext* a_pDeviceContext)
+void RenderTarget::render(ID3D11DeviceContext* pDeviceContext)
 {
 
 	UINT pStrides = sizeof(vertex);
 	UINT pOffsets = 0;
-	a_pDeviceContext->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &pStrides, &pOffsets);
-	a_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP/*D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST*//*D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP*/);
-	a_pDeviceContext->PSSetShaderResources(0, 1, &m_pShaderResourceView);
-	a_pDeviceContext->IASetInputLayout(m_pInputLayout);
-	a_pDeviceContext->VSSetShader(m_pVertexShader, NULL, 0);
-	a_pDeviceContext->PSSetShader(m_pPixelShader, NULL, 0);
-	a_pDeviceContext->OMSetDepthStencilState(m_pDepthStencilState, 1);
-	a_pDeviceContext->Draw(m_vertexCount, 0);
+	pDeviceContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &pStrides, &pOffsets);
+	pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP/*D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST*//*D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP*/);
+	pDeviceContext->PSSetShaderResources(0, 1, &pShaderResourceView);
+	pDeviceContext->IASetInputLayout(pInputLayout);
+	pDeviceContext->VSSetShader(pVertexShader, NULL, 0);
+	pDeviceContext->PSSetShader(pPixelShader, NULL, 0);
+	pDeviceContext->OMSetDepthStencilState(pDepthStencilState, 1);
+	pDeviceContext->Draw(vertexCount, 0);
 
 	float ClearColor[4] = { 128.0f / 255.0f, 128.0f / 255.0f, 128.0f / 255.0f, 0.0f };
-	a_pDeviceContext->ClearRenderTargetView(m_pRenderTargetView, ClearColor);
-	a_pDeviceContext->OMSetRenderTargets(1, &m_pRenderTargetView, NULL);
+	pDeviceContext->ClearRenderTargetView(pRenderTargetView, ClearColor);
+	pDeviceContext->OMSetRenderTargets(1, &pRenderTargetView, NULL);
 
-	setRenderTargetWH(m_virtualWidth, m_virtualHeight);
+	setRenderTargetWH(virtualWidth, virtualHeight);
 
-	e_mainCamera.viewPort.Width = m_virtualWidth;
-	e_mainCamera.viewPort.Height = m_virtualHeight;
-	a_pDeviceContext->RSSetViewports(1, &e_mainCamera.viewPort);
+	e_mainCamera.viewPort.Width = virtualWidth;
+	e_mainCamera.viewPort.Height = virtualHeight;
+	pDeviceContext->RSSetViewports(1, &e_mainCamera.viewPort);
 }
 
-void RenderTarget::render(ID3D11DeviceContext* a_pDeviceContext, vertex a_pCoordNDC[])
+void RenderTarget::render(ID3D11DeviceContext* pDeviceContext, vertex pCoordNDC[])
 {
 
 	D3D11_MAPPED_SUBRESOURCE mappedSubRec;
-	hr = a_pDeviceContext->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD/*D3D11_MAP_WRITE_NO_OVERWRITE*/, 0, &mappedSubRec);
+	hr = pDeviceContext->Map(pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD/*D3D11_MAP_WRITE_NO_OVERWRITE*/, 0, &mappedSubRec);
 	if (FAILED(hr))
 	{
 		MessageBox(0, L"sprite: Render Map failed", 0, 0);
 		return;
 	}
-	memcpy(mappedSubRec.pData, a_pCoordNDC, sizeof(vertex)*m_vertexCount);
-	a_pDeviceContext->Unmap(m_pVertexBuffer, 0);
+	memcpy(mappedSubRec.pData, pCoordNDC, sizeof(vertex)*vertexCount);
+	pDeviceContext->Unmap(pVertexBuffer, 0);
 
-	render(a_pDeviceContext);
+	render(pDeviceContext);
 
 }
 
-void RenderTarget::render(ID3D11DeviceContext* a_pDeviceContext, float a_drawX, float a_drawY, float a_drawWidth, float a_drawHeight, float a_srcX, float a_srcY, float a_srcWidth, float a_srcHeight, float a_rotateAngle, UINTCOLOR a_blendColor, bool a_doReflection)
+void RenderTarget::render(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, float rotateAngle, UINTCOLOR blendColor, bool doReflection)
 {
-	if ((int)a_srcWidth == 0 || (int)a_srcHeight == 0)
+	if ((int)srcWidth == 0 || (int)srcHeight == 0)
 	{
-		a_srcWidth = a_drawWidth;
-		a_srcHeight = a_drawHeight;
+		srcWidth = drawWidth;
+		srcHeight = drawHeight;
 	}
 
 	// Caculate 2D texture coordinate and update vertics buffer
 	XMFLOAT4 colorNDC;
-	colorNDC = toNDColor(a_blendColor);
+	colorNDC = toNDColor(blendColor);
 	vertex vertices[] = {
 		{
-			XMFLOAT3(a_drawX, a_drawY, 0),								XMFLOAT4(colorNDC.x, colorNDC.y, colorNDC.z, colorNDC.w),
-			XMFLOAT2(a_srcX, a_srcY)
+			XMFLOAT3(drawX, drawY, 0),								XMFLOAT4(colorNDC.x, colorNDC.y, colorNDC.z, colorNDC.w),
+			XMFLOAT2(srcX, srcY)
 		},
 		{
-			XMFLOAT3(a_drawX + a_drawWidth, a_drawY, 0),				XMFLOAT4(colorNDC.x, colorNDC.y, colorNDC.z, colorNDC.w),
-			XMFLOAT2(a_srcX + a_srcWidth, a_srcY)
+			XMFLOAT3(drawX + drawWidth, drawY, 0),				XMFLOAT4(colorNDC.x, colorNDC.y, colorNDC.z, colorNDC.w),
+			XMFLOAT2(srcX + srcWidth, srcY)
 		},
 		{
-			XMFLOAT3(a_drawX, a_drawY + a_drawHeight, 0),				XMFLOAT4(colorNDC.x, colorNDC.y, colorNDC.z, colorNDC.w),
-			XMFLOAT2(a_srcX , a_srcY + a_srcHeight)
+			XMFLOAT3(drawX, drawY + drawHeight, 0),				XMFLOAT4(colorNDC.x, colorNDC.y, colorNDC.z, colorNDC.w),
+			XMFLOAT2(srcX , srcY + srcHeight)
 		},
 		{
-			XMFLOAT3(a_drawX + a_drawWidth, a_drawY + a_drawHeight, 0),	XMFLOAT4(colorNDC.x, colorNDC.y, colorNDC.z, colorNDC.w),
-			XMFLOAT2(a_srcX + a_srcWidth, a_srcY + a_srcHeight)
+			XMFLOAT3(drawX + drawWidth, drawY + drawHeight, 0),	XMFLOAT4(colorNDC.x, colorNDC.y, colorNDC.z, colorNDC.w),
+			XMFLOAT2(srcX + srcWidth, srcY + srcHeight)
 		},
 	};
 
 
 
-	XMFLOAT3 center(a_drawX + a_drawWidth / 2, a_drawY + a_drawHeight / 2, 0);
+	XMFLOAT3 center(drawX + drawWidth / 2, drawY + drawHeight / 2, 0);
 
 	// Rotation And Change to NDC coordinate
-	float angleRadian = a_rotateAngle * 0.01745/*(M_PI / 180,0f)*/;
-	for (unsigned int i = 0; i < m_vertexCount; i++)
+	float angleRadian = rotateAngle * 0.01745/*(M_PI / 180,0f)*/;
+	for (unsigned int i = 0; i < vertexCount; i++)
 	{
 		vertices[i].position = rotationZ(vertices[i].position, angleRadian, center);
 		vertices[i].position = toNDC(vertices[i].position);
 		vertices[i].texcoord = toNDC_UV(vertices[i].texcoord);
 		vertices[i].normal = { 0,0,-1 };
-		if (a_doReflection)
+		if (doReflection)
 		{
 			vertices[i].normal.x = -vertices[i].normal.x;
 			vertices[i].normal.y = -vertices[i].normal.y;
 			vertices[i].normal.z = -vertices[i].normal.z;
 		}
 	}
-	if (a_doReflection)
+	if (doReflection)
 	{
 		static XMFLOAT2 swapTemp;
 		swapTemp = vertices[0].texcoord;
@@ -281,40 +281,35 @@ void RenderTarget::render(ID3D11DeviceContext* a_pDeviceContext, float a_drawX, 
 		swapTemp = vertices[2].texcoord;
 		vertices[2].texcoord = vertices[3].texcoord;
 		vertices[3].texcoord = swapTemp;
-		a_pDeviceContext->RSSetState(m_pRasterizerStateCullFront);
+		pDeviceContext->RSSetState(pRasterizerStateCullFront);
 	}
 	else
 	{
-		a_pDeviceContext->RSSetState(m_pRasterizerStateCullBack);
+		pDeviceContext->RSSetState(pRasterizerStateCullBack);
 	}
 
-	render(a_pDeviceContext, vertices);
+	render(pDeviceContext, vertices);
 }
 
-void RenderTarget::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const Transform* a_pCustom3D)
+void RenderTarget::setProjection(ID3D11DeviceContext *pDeviceContext, const XMFLOAT3 &position, const Transform& transform)
 {
-	if (a_pCustom3D == nullptr)
-	{
-		Transform init;
-		a_pCustom3D = &init;
-	}
-	static XMFLOAT3 position, rotationAxis;
-	position = toNDC(a_pCustom3D->position);
-	rotationAxis = toNDC(a_pCustom3D->rotationAxis);
+	static XMFLOAT3 positionNDC, rotationAxisNDC;
+	positionNDC = toNDC(transform.position);
+	rotationAxisNDC = toNDC(transform.rotationAxis);
 	static XMMATRIX S, R, T, W, V, P, WVP;
 	S = R = T = W = V = P = WVP = DirectX::XMMatrixIdentity();
-	//S = DirectX::XMMatrixScaling(a_pCustom3D->scaling.x, a_pCustom3D->scaling.y, a_pCustom3D->scaling.z);
-	////R = DirectX::XMMatrixRotationAxis(XMVectorSet(rotationAxis.x, rotationAxis.y, rotationAxis.z, 0), a_pCustom3D->a_rotateAngle*0.01745329251);
-	//R = DirectX::XMMatrixRotationRollPitchYaw(a_pCustom3D->eulerAngle.y*0.01745, a_pCustom3D->eulerAngle.x*0.01745, a_pCustom3D->eulerAngle.z*0.01745);
-	//T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
+	//S = DirectX::XMMatrixScaling(transform.scaling.x, transform.scaling.y, transform.scaling.z);
+	////R = DirectX::XMMatrixRotationAxis(XMVectorSet(rotationAxisNDC.x, rotationAxisNDC.y, rotationAxisNDC.z, 0), transform.rotateAngle*0.01745329251);
+	//R = DirectX::XMMatrixRotationRollPitchYaw(transform.eulerAngle.y*0.01745, transform.eulerAngle.x*0.01745, transform.eulerAngle.z*0.01745);
+	//T = DirectX::XMMatrixTranslation(positionNDC.x, positionNDC.y, positionNDC.z);
 	//W = S*R*T;
-	//R = DirectX::XMMatrixRotationAxis(XMVectorSet(rotationAxis.x, rotationAxis.y, rotationAxis.z, 0), _custom3D->angle*0.01745329251);
-	R = DirectX::XMMatrixRotationAxis(XMVectorSet(0, 1, 0, 0), a_pCustom3D->eulerAngle.x*0.01745)
-		*DirectX::XMMatrixRotationAxis(XMVectorSet(1, 0, 0, 0), a_pCustom3D->eulerAngle.y*0.01745)
-		*DirectX::XMMatrixRotationAxis(XMVectorSet(0, 0, 1, 0), a_pCustom3D->eulerAngle.z*0.01745);
-	//R = DX::XMMatrixRotationRollPitchYaw(a_pCustom3D->eulerAngle.y*0.01745, a_pCustom3D->eulerAngle.x*0.01745, a_pCustom3D->eulerAngle.z*0.01745);
-	S = DirectX::XMMatrixScaling(a_pCustom3D->scaling.x, a_pCustom3D->scaling.y, a_pCustom3D->scaling.z);
-	T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
+	//R = DirectX::XMMatrixRotationAxis(XMVectorSet(rotationAxisNDC.x, rotationAxisNDC.y, rotationAxisNDC.z, 0), transform2D3D->angle*0.01745329251);
+	R = DirectX::XMMatrixRotationAxis(XMVectorSet(0, 1, 0, 0), transform.eulerAngle.x*0.01745)
+		*DirectX::XMMatrixRotationAxis(XMVectorSet(1, 0, 0, 0), transform.eulerAngle.y*0.01745)
+		*DirectX::XMMatrixRotationAxis(XMVectorSet(0, 0, 1, 0), transform.eulerAngle.z*0.01745);
+	//R = DX::XMMatrixRotationRollPitchYaw(transform.eulerAngle.y*0.01745, transform.eulerAngle.x*0.01745, transform.eulerAngle.z*0.01745);
+	S = DirectX::XMMatrixScaling(transform.scaling.x, transform.scaling.y, transform.scaling.z);
+	T = DirectX::XMMatrixTranslation(positionNDC.x, positionNDC.y, positionNDC.z);
 	W = T*R*S;
 
 	//e_mainCamera.clear();
@@ -335,28 +330,28 @@ void RenderTarget::setProjection(ID3D11DeviceContext *a_pDeviceContext, const XM
 	updateCbuffer.lightDirection = XMFLOAT4(lightV.vector4_f32[0], lightV.vector4_f32[1], lightV.vector4_f32[2], 0.0f);
 	updateCbuffer.materialColor = XMFLOAT4(0.8, 0.8, 0, 1);
 
-	a_pDeviceContext->UpdateSubresource(m_pVSProjectionCBuffer, 0, NULL, &updateCbuffer, 0, 0);
-	a_pDeviceContext->VSSetConstantBuffers(0, 1, &m_pVSProjectionCBuffer);
+	pDeviceContext->UpdateSubresource(pVSProjectionCBuffer, 0, NULL, &updateCbuffer, 0, 0);
+	pDeviceContext->VSSetConstantBuffers(0, 1, &pVSProjectionCBuffer);
 }
 
-void RenderTarget::render3D(ID3D11DeviceContext* a_pDeviceContext, float a_drawX, float a_drawY, float a_drawWidth, float a_drawHeight, float a_srcX, float a_srcY, float a_srcWidth, float a_srcHeight, float a_rotateAngle, UINTCOLOR a_blendColor, const Transform* a_pCustom3D, bool a_doReflection)
+void RenderTarget::render3D(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, float rotateAngle, UINTCOLOR blendColor, const Transform& transform, bool doReflection)
 {
 	// 
-	m_virtualWidth = a_srcWidth;
-	m_virtualHeight = a_srcHeight;
-	setProjection(a_pDeviceContext, XMFLOAT3(0, 0, 0), a_pCustom3D);
-	render(a_pDeviceContext, a_drawX, a_drawY, a_drawWidth, a_drawHeight, a_srcX, a_srcY, a_srcWidth, a_srcHeight, a_rotateAngle, a_blendColor, a_doReflection);
+	virtualWidth = srcWidth;
+	virtualHeight = srcHeight;
+	setProjection(pDeviceContext, XMFLOAT3(0, 0, 0), transform);
+	render(pDeviceContext, drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, rotateAngle, blendColor, doReflection);
 }
 
-XMFLOAT3 RenderTarget::toNDC(float a_screenX, float a_screenY)
+XMFLOAT3 RenderTarget::toNDC(float screenX, float screenY)
 {
 	float x, y;
-	x = 2.0f*a_screenX / SCREEN_WIDTH - 1.0f;
-	y = 1.0f - 2.0f*a_screenY / SCREEN_HEIGHT;
+	x = 2.0f*screenX / SCREEN_WIDTH - 1.0f;
+	y = 1.0f - 2.0f*screenY / SCREEN_HEIGHT;
 	return XMFLOAT3(x, y, 0);
 }
 
-XMFLOAT3 RenderTarget::toNDC(XMFLOAT3 a_coord)
+XMFLOAT3 RenderTarget::toNDC(XMFLOAT3 coord)
 {
 	float x, y, z;
 	// 2D without projection
@@ -364,34 +359,34 @@ XMFLOAT3 RenderTarget::toNDC(XMFLOAT3 a_coord)
 	y = 1.0f - 2.0f*_coord.y / SCREEN_WIDTH;*/
 
 	// 2D with projection
-	x = a_coord.x / (float)SCREEN_WIDTH;
-	y = -a_coord.y / (float)SCREEN_WIDTH;
-	z = a_coord.z / (float)SCREEN_WIDTH;
+	x = coord.x / (float)SCREEN_WIDTH;
+	y = -coord.y / (float)SCREEN_WIDTH;
+	z = coord.z / (float)SCREEN_WIDTH;
 	return XMFLOAT3(x, y, z);
 }
 
 // Screen coordinate to UV NDC coordinate
-XMFLOAT2 RenderTarget::toNDC_UV(XMFLOAT2 a_coord)
+XMFLOAT2 RenderTarget::toNDC_UV(XMFLOAT2 coord)
 {
 	float x, y;
 	float imgWidth, imgHeight;
-	imgWidth = m_renderTargetTextureDesc.Width;
-	imgHeight = m_renderTargetTextureDesc.Height;
+	imgWidth = renderTargetTextureDesc.Width;
+	imgHeight = renderTargetTextureDesc.Height;
 
-	x = a_coord.x / imgWidth;
-	y = a_coord.y / imgHeight;
+	x = coord.x / imgWidth;
+	y = coord.y / imgHeight;
 	return XMFLOAT2(x, y);
 }
 
-XMFLOAT3 RenderTarget::rotationZ(XMFLOAT3 a_coord, float a_rotateAngle, XMFLOAT3 a_centerCoord)
+XMFLOAT3 RenderTarget::rotationZ(XMFLOAT3 coord, float rotateAngle, XMFLOAT3 centerCoord)
 {
 	XMFLOAT3 P, Pr;
-	P.x = a_coord.x - a_centerCoord.x;
-	P.y = a_coord.y - a_centerCoord.y;
+	P.x = coord.x - centerCoord.x;
+	P.y = coord.y - centerCoord.y;
 	P.z = 0/*_coord.z - _center.z*/;
 	// rotation
-	Pr.x = P.x*cosf(a_rotateAngle) - P.y*sinf(a_rotateAngle) + a_centerCoord.x;
-	Pr.y = P.y*cosf(a_rotateAngle) + P.x*sinf(a_rotateAngle) + a_centerCoord.y;
+	Pr.x = P.x*cosf(rotateAngle) - P.y*sinf(rotateAngle) + centerCoord.x;
+	Pr.y = P.y*cosf(rotateAngle) + P.x*sinf(rotateAngle) + centerCoord.y;
 	Pr.z = 0;
 	return Pr;
 }

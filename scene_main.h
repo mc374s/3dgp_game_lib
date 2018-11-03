@@ -7,10 +7,10 @@ class OBJ2D;
 class SceneMain :public Scene, public Singleton<SceneMain>
 {
 private:
-	OBJ2D* m_pBG;
+	OBJ2D* pBG;
 
-	bool m_isPaused = false;
-	int m_selectionNO;
+	bool isPaused = false;
+	int selectionNO;
 	
 public:
 	SceneMain();

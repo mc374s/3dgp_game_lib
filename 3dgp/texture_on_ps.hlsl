@@ -94,12 +94,13 @@ float4 main(VS_OUT pin) : SV_TARGET
 	color.g = 1 - color.g;
 	color.b = 1 - color.b;*/
 	// íEêF
-	/*float gray = (color.r + color.g + color.b) / 3;
+	/*float gray = (color.r + color.g + color.b) / 3.0;
 	color.r = color.g = color.b = gray;*/
 	// êFìhÇË
 	/*color.r = pin.color.r;
 	color.g = pin.color.g;
 	color.b = pin.color.b;*/
+
 	//if (color.g < 0.5 /*&& color.g > 0*/) {
 	//	color.a = 0;
 	//}

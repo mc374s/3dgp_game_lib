@@ -8,43 +8,43 @@
 //	clear();
 //}
 
-Numbers::Numbers(SPRITE_DATA* a_pFontData)
+Numbers::Numbers(SPRITE_DATA* pFontData)
 {
 	clear();
-	if (a_pFontData == nullptr)
+	if (pFontData == nullptr)
 	{
-		m_sprData = e_sprNumbers;
+		sprData = e_sprNumbers;
 	}
 	else
 	{
-		m_sprData = *a_pFontData;
+		sprData = *pFontData;
 	}
 }
 
-void Numbers::memberCopy(const Numbers& a_inputObj)
+void Numbers::memberCopy(const Numbers& inputObj)
 {
-	m_pos = a_inputObj.m_pos;
-	m_speed = a_inputObj.m_speed;
-	m_speedAcc = a_inputObj.m_speedAcc;
-	m_speedMax = a_inputObj.m_speedMax;
+	pos = inputObj.pos;
+	speed = inputObj.speed;
+	speedAcc = inputObj.speedAcc;
+	speedMax = inputObj.speedMax;
 
-	m_custom = a_inputObj.m_custom;
+	transform2D = inputObj.transform2D;
 
-	m_timer = a_inputObj.m_timer;
-	m_step = a_inputObj.m_step;
-	m_alpha = a_inputObj.m_alpha;
-	m_isVisibleAlways = a_inputObj.m_isVisibleAlways;
-	m_isVisible = a_inputObj.m_isVisible;
+	timer = inputObj.timer;
+	step = inputObj.step;
+	alpha = inputObj.alpha;
+	isVisibleAlways = inputObj.isVisibleAlways;
+	isVisible = inputObj.isVisible;
 
-	m_value = a_inputObj.m_value;
-	m_digitNum = a_inputObj.m_digitNum;
+	value = inputObj.value;
+	digitNum = inputObj.digitNum;
 
-	m_sprData = a_inputObj.m_sprData;
+	sprData = inputObj.sprData;
 }
 
-Numbers::Numbers(const Numbers& a_inputObj)
+Numbers::Numbers(const Numbers& inputObj)
 {
-	memberCopy(a_inputObj);
+	memberCopy(inputObj);
 }
 
 Numbers::~Numbers()
@@ -52,41 +52,41 @@ Numbers::~Numbers()
 	clear();
 }
 
-const Numbers& Numbers::operator=(const Numbers& a_right)
+const Numbers& Numbers::operator=(const Numbers& right)
 {
-	memberCopy(a_right);
+	memberCopy(right);
 	return *this;
 }
 
 
 void Numbers::clear()
 {
-	//SAFE_DELETE(m_sprData);
-	m_pos = Vector3(0, 0, 0);
-	m_speed = m_speedAcc = m_speedMax = Vector3(0, 0, 0);
-	m_timer = 0;
-	m_step = 0;
-	m_alpha = 255;
+	//SAFE_DELETE(sprData);
+	pos = Vector3(0, 0, 0);
+	speed = speedAcc = speedMax = Vector3(0, 0, 0);
+	timer = 0;
+	step = 0;
+	alpha = 255;
 
-	m_isVisibleAlways = true;
-	m_isVisible = false;
+	isVisibleAlways = true;
+	isVisible = false;
 }
 
-void Numbers::setValue(int a_value, Vector3 a_size)
+void Numbers::setValue(int value, Vector3 size)
 {
-	for (m_digitNum = 0; m_digitNum < DIGIT_MAX && a_value > 0; ++m_digitNum)
+	for (digitNum = 0; digitNum < DIGIT_MAX && value > 0; ++digitNum)
 	{
-		digit[m_digitNum].val = a_value % 10;	//  一の位を抽出
-		digit[m_digitNum].w = a_size.x;
-		digit[m_digitNum].h = a_size.y;
-		digit[m_digitNum].x = 0;
-		digit[m_digitNum].y = 0;
-		a_value /= 10;					//  桁を1つシフト
+		digit[digitNum].val = value % 10;	//  一の位を抽出
+		digit[digitNum].w = size.x;
+		digit[digitNum].h = size.y;
+		digit[digitNum].x = 0;
+		digit[digitNum].y = 0;
+		value /= 10;					//  桁を1つシフト
 	}
-	--m_digitNum;
-	m_custom.scaleX = a_size.x;
-	m_custom.scaleY = a_size.y;
-	//m_isVisible = true;
+	--digitNum;
+	transform2D.scaleX = size.x;
+	transform2D.scaleY = size.y;
+	//isVisible = true;
 }
 
 void Numbers::update()
@@ -96,26 +96,26 @@ void Numbers::update()
 
 void Numbers::draw()
 {
-	if (m_isVisible)
+	if (isVisible)
 	{
-		if (m_sprData.texNO > 0)
+		if (sprData.texNO > 0)
 		{
-			if (m_alpha > 255) {
-				m_alpha = 255;
+			if (alpha > 255) {
+				alpha = 255;
 			}
-			if (m_alpha < 0) {
-				m_alpha = 0;
+			if (alpha < 0) {
+				alpha = 0;
 			}
-			m_custom.rgba = m_custom.rgba >> 8 << 8 | m_alpha;
-			for (int i = m_digitNum; i >= 0; --i)
+			transform2D.rgba = transform2D.rgba >> 8 << 8 | alpha;
+			for (int i = digitNum; i >= 0; --i)
 			{
-				m_sprData.top = digit[i].val*m_sprData.height;
-				m_sprData.draw(m_pos.x + (m_digitNum - i)*digit[i].w*m_sprData.width, m_pos.y, &m_custom);
+				sprData.top = digit[i].val*sprData.height;
+				sprData.draw(pos.x + (digitNum - i)*digit[i].w*sprData.width, pos.y, transform2D);
 			}
 		}
-		if (!m_isVisibleAlways)
+		if (!isVisibleAlways)
 		{
-			m_isVisible = false;
+			isVisible = false;
 		}
 	}
 }

@@ -28,7 +28,7 @@ private:
 	~MyBlending() {};
 
 public:
-	enum RenderTargetNum
+	enum RenderTargetElement
 	{
 		SRCBLEND,
 		DESTBLEND,
@@ -38,8 +38,8 @@ public:
 		BLENDOPALPHA,
 	};
 
-	static void initialize(ID3D11Device *a_pDevice);
-	static void setMode(ID3D11DeviceContext* &a_pDeviceContext, int a_mode = BLEND_NONE);
+	static void initialize(ID3D11Device *pDevice);
+	static void setMode(ID3D11DeviceContext* &pDeviceContext, int mode = BLEND_NONE);
 	static void release();
 };
 

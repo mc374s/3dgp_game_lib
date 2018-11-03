@@ -79,31 +79,31 @@ private:
 	};
 
 private:
-	//ID3D11Buffer*				m_pVertexBuffer;
-	//ID3D11Buffer*				m_pIndexBuffer;
-	ID3D11Buffer*				m_pConstantBuffer;
-	ID3D11RasterizerState*		m_pWireRasterizerState;
-	ID3D11RasterizerState*		m_pFillRasterizerState;
-	ID3D11DepthStencilState*	m_pDepthStencilState;
+	//ID3D11Buffer*				pVertexBuffer;
+	//ID3D11Buffer*				pIndexBuffer;
+	ID3D11Buffer*				pConstantBuffer;
+	ID3D11RasterizerState*		pWireRasterizerState;
+	ID3D11RasterizerState*		pFillRasterizerState;
+	ID3D11DepthStencilState*	pDepthStencilState;
 
-	int m_indexCount;
-	int m_vertexCount;
-	int m_latitudeNum;
-	int m_longitudeNum;
+	int indexCount;
+	int vertexCount;
+	int latitudeNum;
+	int longitudeNum;
 
 	HRESULT hr;
-	//ID3D11ShaderResourceView*	m_pShaderResourceView;
-	ID3D11VertexShader*			m_pVertexShader;
-	ID3D11InputLayout*			m_pInputLayout;
-	ID3D11PixelShader*			m_pPixelShader;
+	//ID3D11ShaderResourceView*	pShaderResourceView;
+	ID3D11VertexShader*			pVertexShader;
+	ID3D11InputLayout*			pInputLayout;
+	ID3D11PixelShader*			pPixelShader;
 
-	ID3D11SamplerState*			m_pSamplerState;
+	ID3D11SamplerState*			pSamplerState;
 
-	//Material m_diffuse;
+	//Material diffuse;
 	//std::vector<Subset> subsetsList;
 
-	std::vector<Mesh> m_meshesList;
-	XMMATRIX m_coordinateConversion = {
+	std::vector<Mesh> meshesList;
+	XMMATRIX coordinateConversion = {
 		1.0f, 0.0f, 0.0f, 0.0f,
 		0.0f, 0.0f, 1.0f, 0.0f,
 		0.0f, 1.0f, 0.0f, 0.0f,
@@ -112,16 +112,16 @@ private:
 
 
 public:
-	SkinnedMesh(ID3D11Device *a_pDevice, const char *a_pFbxFileName, const bool a_exchangeYandZ = false);
+	SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const bool exchangeYandZ = false);
 	virtual ~SkinnedMesh();
 	
-	void createBuffers(ID3D11Device *a_pDevice, ID3D11Buffer** a_ppVertexBuffer, ID3D11Buffer** a_ppIndexBuffer, vertex3D *a_pVertices, int a_vertexNum, WORD *a_pIndices, int a_indexNum);
+	void createBuffers(ID3D11Device *pDevice, ID3D11Buffer** ppVertexBuffer, ID3D11Buffer** ppIndexBuffer, vertex3D *pVertices, int vertexNum, WORD *pIndices, int indexNum);
 
-	inline XMFLOAT3 toNDC(XMFLOAT3 a_input);
-	void setProjection(ID3D11DeviceContext *a_pDeviceContext, const Transform& preSetTransform = Transform::initialValue(), const Transform& transform = Transform::initialValue(), const XMMATRIX &a_globalTransform = XMMatrixIdentity(), SkeletalAnimation &a_skeletalAnimation = SkeletalAnimation(), float a_elapsedTime = 1 / 60.0f/*UNIT.23*/);
-	void render(ID3D11DeviceContext *a_pDeviceContext, bool a_doFill, const Mesh &a_mesh);
+	inline XMFLOAT3 toNDC(XMFLOAT3 input);
+	void setProjection(ID3D11DeviceContext *pDeviceContext, const Transform& preSetTransform = Transform::initialValue(), const Transform& transform = Transform::initialValue(), const XMMATRIX &globalTransform = XMMatrixIdentity(), SkeletalAnimation &skeletalAnimation = SkeletalAnimation(), float elapsedTime = 1 / 60.0f/*UNIT.23*/);
+	void render(ID3D11DeviceContext *pDeviceContext, bool doFill, const Mesh &mesh);
 
-	void drawMesh(ID3D11DeviceContext *a_pDeviceContext, const Transform& preSetTransform = Transform::initialValue(), const Transform& transform = Transform::initialValue(), float elapsedTime = 1 / 60.0f/*UNIT.23*/);
+	void drawMesh(ID3D11DeviceContext *pDeviceContext, const Transform& preSetTransform = Transform::initialValue(), const Transform& transform = Transform::initialValue(), float elapsedTime = 1 / 60.0f/*UNIT.23*/);
 };
 
 

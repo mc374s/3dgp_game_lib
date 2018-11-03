@@ -12,9 +12,9 @@ float SCROLL_Y = 0;
 SceneMain::SceneMain()
 {
 	//init();
-	m_pBG = new OBJ2D;
-	m_pBG->m_pSprData = &e_sprMainBG;
-	m_pBG->m_custom.scaleX = m_pBG->m_custom.scaleY = 1280.0f / 1920.0f;
+	pBG = new OBJ2D;
+	pBG->pSprData = &e_sprMainBG;
+	pBG->transform2D.scaleX = pBG->transform2D.scaleY = 1280.0f / 1920.0f;
 
 }
 
@@ -25,12 +25,12 @@ void SceneMain::init()
 
 SceneMain::~SceneMain()
 {
-	if (m_pNextScene)
+	if (pNextScene)
 	{
 		//delete nextScene;
-		m_pNextScene = nullptr;
+		pNextScene = nullptr;
 	}
-	SAFE_DELETE(m_pBG);
+	SAFE_DELETE(pBG);
 };
 
 void SceneMain::update()
@@ -39,11 +39,11 @@ void SceneMain::update()
 		return;
 	}
 
-	switch (m_step)
+	switch (step)
 	{
 	case STEP::INIT:
 		MFAudioPlay(BGM_MAIN, true);
-		m_step = STEP::BEGIN;
+		step = STEP::BEGIN;
 
 		//break;
 	case STEP::BEGIN:
@@ -58,7 +58,7 @@ void SceneMain::update()
 		}
 		break;
 	case STEP::END:
-		m_timer++;
+		timer++;
 
 		break;
 	default:
@@ -71,7 +71,7 @@ void SceneMain::draw()
 {
 	View::clear();
 
-	m_pBG->draw();
+	pBG->draw();
 
 
 #ifdef  DEBUG
@@ -82,8 +82,8 @@ void SceneMain::draw()
 
 #endif //  DEBUG
 
-	if (m_step == STEP::INIT) {
-		drawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0x000000FF & (unsigned int)((20 - m_timer) / 20.0f * 255));
+	if (step == STEP::INIT) {
+		drawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0x000000FF & (unsigned int)((20 - timer) / 20.0f * 255));
 	}
 
 }
@@ -92,10 +92,10 @@ bool SceneMain::pause()
 {
 	static int pressTimer = 0;
 	if ((KEY_TRACKER.pressed.Space || PAD_TRACKER.menu == PAD_TRACKER.PRESSED)) {
-		m_isPaused = true;
+		isPaused = true;
 	}
 
-	if (m_isPaused)
+	if (isPaused)
 	{
 		pressTimer++;
 
@@ -106,10 +106,10 @@ bool SceneMain::pause()
 		if (pressTimer > 15 && (KEY_TRACKER.pressed.Space || PAD_TRACKER.start == PAD_TRACKER.PRESSED))
 		{
 			pressTimer = 0;
-			m_isPaused = false;
+			isPaused = false;
 		}
 	}
-	return m_isPaused;
+	return isPaused;
 }
 
 void SceneMain::gameMain()

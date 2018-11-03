@@ -10,7 +10,7 @@ OBJ3D::OBJ3D()
 
 void OBJ3D::memberCopy(const OBJ3D& inputObj)
 {
-	initPos = inputObj.initPos;
+	/*initPos = inputObj.initPos;
 	setPos = inputObj.setPos;
 	speed = inputObj.speed;
 	speedAcc = inputObj.speedAcc;
@@ -29,7 +29,11 @@ void OBJ3D::memberCopy(const OBJ3D& inputObj)
 	meshData = inputObj.meshData;
 	moveFunc = inputObj.moveFunc;
 
-	isHitAble = inputObj.isHitAble;
+	isHitAble = inputObj.isHitAble;*/
+
+	memcpy(this, &inputObj, sizeof(OBJ3D));
+	meshData = inputObj.meshData;
+	moveFunc = inputObj.moveFunc;
 }
 
 OBJ3D::OBJ3D(const OBJ3D& inputObj)

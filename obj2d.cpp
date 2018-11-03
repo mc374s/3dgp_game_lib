@@ -10,37 +10,41 @@ OBJ2D::OBJ2D()
 	clear();
 }
 
-void OBJ2D::memberCopy(const OBJ2D& a_inputObj)
+void OBJ2D::memberCopy(const OBJ2D& inputObj)
 {
-	m_pos = a_inputObj.m_pos;
-	m_initPos = a_inputObj.m_initPos;
-	m_setPos = a_inputObj.m_setPos;
-	m_speed = a_inputObj.m_speed;
-	m_speedAcc = a_inputObj.m_speedAcc;
-	m_speedMax = a_inputObj.m_speedMax;
+	pos = inputObj.pos;
+	initPos = inputObj.initPos;
+	setPos = inputObj.setPos;
+	speed = inputObj.speed;
+	speedAcc = inputObj.speedAcc;
+	speedMax = inputObj.speedMax;
 
-	m_size = a_inputObj.m_size;
+	size = inputObj.size;
 
-	m_custom = a_inputObj.m_custom;
-	m_custom3d = a_inputObj.m_custom3d;
+	transform2D = inputObj.transform2D;
+	transform = inputObj.transform;
 
-	m_timer = a_inputObj.m_timer;
-	m_step = a_inputObj.m_step;
-	m_alpha = a_inputObj.m_alpha;
-	m_type = a_inputObj.m_type;
+	timer = inputObj.timer;
+	step = inputObj.step;
+	alpha = inputObj.alpha;
+	type = inputObj.type;
 
-	m_isInit = a_inputObj.m_isInit;
+	isInit = inputObj.isInit;
 
-	m_pSprData = a_inputObj.m_pSprData;
-	m_pfMove = a_inputObj.m_pfMove;
+	pSprData = inputObj.pSprData;
+	pfMove = inputObj.pfMove;
 
-	m_setAlpha = a_inputObj.m_setAlpha;
-	m_isHitAble = a_inputObj.m_isHitAble;
+	setAlpha = inputObj.setAlpha;
+	isHitAble = inputObj.isHitAble;
+
+	//memcpy(this, &inputObj, sizeof(OBJ2D));
+	//pSprData = inputObj.pSprData;
+	//pfMove = inputObj.pfMove;
 }
 
-OBJ2D::OBJ2D(const OBJ2D& a_inputObj)
+OBJ2D::OBJ2D(const OBJ2D& inputObj)
 {
-	memberCopy(a_inputObj);
+	memberCopy(inputObj);
 }
 
 OBJ2D::~OBJ2D() 
@@ -48,61 +52,61 @@ OBJ2D::~OBJ2D()
 	clear();
 }
 
-const OBJ2D& OBJ2D::operator=(const OBJ2D& a_right)
+const OBJ2D& OBJ2D::operator=(const OBJ2D& right)
 {
-	memberCopy(a_right);
+	memberCopy(right);
 	return *this;
 }
 
 
 void OBJ2D::clear() 
 {
-	m_pfMove = nullptr;
-	m_pSprData = nullptr;
-	m_pos = m_initPos = m_setPos = Vector3(0, 0, 0);
-	m_speed = m_speedAcc = m_speedMax = m_size = Vector3(0, 0, 0);
-	m_timer = 0;
-	m_step = 0;
-	m_custom.clear();
-	m_custom3d.clear();
+	pfMove = nullptr;
+	pSprData = nullptr;
+	pos = initPos = setPos = Vector3(0, 0, 0);
+	speed = speedAcc = speedMax = size = Vector3(0, 0, 0);
+	timer = 0;
+	step = 0;
+	transform2D.clear();
+	transform.clear();
 
-	m_alpha = 255;
-	m_isInit = false;
+	alpha = 255;
+	isInit = false;
 
-	m_type = 0;
-	m_setAlpha = 255;
+	type = 0;
+	setAlpha = 255;
 }
 
 void OBJ2D::update()
 {
-	if (m_pfMove){
-		(this->*m_pfMove)();
+	if (pfMove){
+		(this->*pfMove)();
 	}
-	//m_pos.y = m_initPos.y - SCROLL_Y;
+	//pos.y = initPos.y - SCROLL_Y;
 }
 
 void OBJ2D::draw() 
 {
-	if (m_pSprData)
+	if (pSprData)
 	{
-		if (m_alpha > 255) {
-			m_alpha = 255;
+		if (alpha > 255) {
+			alpha = 255;
 		}
-		if (m_alpha < 0) {
-			m_alpha = 0;
+		if (alpha < 0) {
+			alpha = 0;
 		}
-		m_custom.rgba = m_custom.rgba >> 8 << 8 | m_alpha;
-		//m_pSprData->draw(m_pos.x, m_pos.y, &m_custom);
-		m_pSprData->draw(m_pos, &m_custom, &m_custom3d);
+		transform2D.rgba = transform2D.rgba >> 8 << 8 | alpha;
+		//pSprData->draw(pos.x, pos.y, &transform2D);
+		pSprData->draw(pos, transform2D, transform);
 	}
 
 }
 
-int OBJ2D::searchSet(OBJ2D** a_ppBegin, int a_max) 
+int OBJ2D::searchSet(OBJ2D** ppBegin, int max) 
 {
-	for (int i = 0; i < a_max; i++)
+	for (int i = 0; i < max; i++)
 	{
-		if (a_ppBegin[i] && a_ppBegin[i]->m_isInit) {
+		if (ppBegin[i] && ppBegin[i]->isInit) {
 			continue;
 		}
 		return i;
@@ -119,18 +123,18 @@ OBJ2DEX::OBJ2DEX()
 	clear();
 }
 
-void OBJ2DEX::memberCopy(const OBJ2DEX& a_inputObj)
+void OBJ2DEX::memberCopy(const OBJ2DEX& inputObj)
 {
-	OBJ2D::memberCopy(a_inputObj);
-	m_aframe = a_inputObj.m_aframe;
-	m_animeNO = a_inputObj.m_animeNO;
-	m_animeCounter = a_inputObj.m_animeCounter;
-	m_pAnimeData = a_inputObj.m_pAnimeData;
+	OBJ2D::memberCopy(inputObj);
+	aframe = inputObj.aframe;
+	animeNO = inputObj.animeNO;
+	animeCounter = inputObj.animeCounter;
+	pAnimeData = inputObj.pAnimeData;
 }
 
-OBJ2DEX::OBJ2DEX(const OBJ2DEX& a_inputObj):OBJ2D(a_inputObj)
+OBJ2DEX::OBJ2DEX(const OBJ2DEX& inputObj):OBJ2D(inputObj)
 {
-	memberCopy(a_inputObj);
+	memberCopy(inputObj);
 }
 
 OBJ2DEX::~OBJ2DEX()
@@ -138,35 +142,35 @@ OBJ2DEX::~OBJ2DEX()
 	clear();
 }
 
-const OBJ2DEX& OBJ2DEX::operator=(const OBJ2DEX& a_right)
+const OBJ2DEX& OBJ2DEX::operator=(const OBJ2DEX& right)
 {
-	memberCopy(a_right);
+	memberCopy(right);
 	return *this;
 }
 
 void OBJ2DEX::clear() 
 {
 	OBJ2D::clear();
-	m_aframe = 0;
-	m_animeNO = 0;
-	m_animeCounter = 0;
-	m_pAnimeData = nullptr;
+	aframe = 0;
+	animeNO = 0;
+	animeCounter = 0;
+	pAnimeData = nullptr;
 }
 
 void OBJ2DEX::animation() 
 {
-	if (m_pAnimeData)
+	if (pAnimeData)
 	{
-		m_pSprData = &(m_pAnimeData[m_animeNO]);
-		++m_aframe;
-		if (m_aframe > (m_pAnimeData[m_animeNO]).frameNum)
+		pSprData = &(pAnimeData[animeNO]);
+		++aframe;
+		if (aframe > (pAnimeData[animeNO]).frameNum)
 		{
-			m_aframe = 0;
-			m_animeNO++;
-			if ((m_pAnimeData[m_animeNO]).texNO < 0)
+			aframe = 0;
+			animeNO++;
+			if ((pAnimeData[animeNO]).texNO < 0)
 			{
-				++m_animeCounter;
-				m_animeNO = 0;
+				++animeCounter;
+				animeNO = 0;
 			}
 		}
 	}
@@ -180,16 +184,16 @@ void OBJ2DEX::update()
 void OBJ2DEX::draw() 
 {
 	OBJ2D::draw();
-	/*if (m_pSprData)
+	/*if (pSprData)
 	{
-		if (m_alpha > 255) {
-			m_alpha = 255;
+		if (alpha > 255) {
+			alpha = 255;
 		}
-		if (m_alpha < 0) {
-			m_alpha = 0;
+		if (alpha < 0) {
+			alpha = 0;
 		}
-		m_custom.rgba = m_custom.rgba >> 8 << 8 | m_alpha;
-		m_pSprData->draw(m_pos, &m_custom);
+		transform2D.rgba = transform2D.rgba >> 8 << 8 | alpha;
+		pSprData->draw(pos, &transform2D);
 	}*/
 }
 
@@ -205,32 +209,32 @@ void ObjManager::init()
 
 }
 
-void ObjManager::update(int a_liveInPagination) {
+void ObjManager::update(int liveInPagination) {
 
 	// 描画順番を並び替え　pos.z : 小さい順から描画していく 
 	//OBJ2D* temp = nullptr;
 
 	//for (int i = 1; i < OBJ_MAX_NUM; i++)
 	//{
-	//	if (m_ppObjs[i - 1] && m_ppObjs[i] && (m_ppObjs[i - 1]->m_liveInPagination == m_ppObjs[i]->m_liveInPagination))
+	//	if (ppObjs[i - 1] && ppObjs[i] && (ppObjs[i - 1]->liveInPagination == ppObjs[i]->liveInPagination))
 	//	{
-	//		if (m_ppObjs[i - 1]->m_pos.z > m_ppObjs[i]->m_pos.z)
+	//		if (ppObjs[i - 1]->pos.z > ppObjs[i]->pos.z)
 	//		{
 	//			int j = i;
 	//			do
 	//			{
-	//				temp = m_ppObjs[j - 1];
-	//				m_ppObjs[j - 1] = m_ppObjs[j];
-	//				m_ppObjs[j] = temp;
+	//				temp = ppObjs[j - 1];
+	//				ppObjs[j - 1] = ppObjs[j];
+	//				ppObjs[j] = temp;
 	//				j--;
-	//			} while (j > 0 && m_ppObjs[j - 1]->m_pos.z < m_ppObjs[j]->m_pos.z);
+	//			} while (j > 0 && ppObjs[j - 1]->pos.z < ppObjs[j]->pos.z);
 	//		}
 	//	}
 	//}
 
 }
 
-void ObjManager::draw(int a_liveInPagination)
+void ObjManager::draw(int liveInPagination)
 {
 
 }

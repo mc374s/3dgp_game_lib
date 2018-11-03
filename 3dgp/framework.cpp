@@ -4,6 +4,8 @@
 
 #include "Scene.h"
 
+#include "PrimitiveBatch.h"
+
 
 CameraData e_mainCamera;
 std::unique_ptr<DirectX::Keyboard> e_pKeyboard = std::make_unique<Keyboard>();
@@ -29,10 +31,10 @@ int e_renderTargetHeight = SCREEN_HEIGHT;
 
 //ID3D11RenderTargetView* framework::s_pRenderTargetView = NULL;
 
-bool framework::initialize(HWND hwnd)
+bool framework::initialize(HWND _hwnd)
 {
 	//MessageBox(0, L"Initializer called", L"framework", MB_OK);
-	m_hWnd = hwnd;
+	hwnd = _hwnd;
 	DXGI_SWAP_CHAIN_DESC descSwapChain;
 	ZeroMemory(&descSwapChain, sizeof(descSwapChain));
 	descSwapChain.BufferCount = 1;
@@ -42,11 +44,11 @@ bool framework::initialize(HWND hwnd)
 	descSwapChain.BufferDesc.RefreshRate.Numerator = 60;
 	descSwapChain.BufferDesc.RefreshRate.Denominator = 1;
 	descSwapChain.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	descSwapChain.OutputWindow = m_hWnd;
+	descSwapChain.OutputWindow = hwnd;
 	descSwapChain.SampleDesc.Count = 1;
 	descSwapChain.SampleDesc.Quality = 0;
 	descSwapChain.Windowed = TRUE;
-	m_isFullScreen = !descSwapChain.Windowed;
+	isFullScreen = !descSwapChain.Windowed;
 
 #ifdef _DEBUG
 	//createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
@@ -77,24 +79,25 @@ bool framework::initialize(HWND hwnd)
 
 	for (UINT driverTypeIndex = 0; driverTypeIndex < numDriverTypes; driverTypeIndex++)
 	{
-		m_driverType = driverTypes[driverTypeIndex];
-		hr = D3D11CreateDeviceAndSwapChain(NULL, m_driverType, NULL, createDeviceFlags, featureLevels, numFeatureLevels,
-			D3D11_SDK_VERSION, &descSwapChain, &m_pSwapChain, &s_pDevice, &m_featureLevel, &s_pDeviceContext);
-		if (SUCCEEDED(hr))
+		driverType = driverTypes[driverTypeIndex];
+		hr = D3D11CreateDeviceAndSwapChain(NULL, driverType, NULL, createDeviceFlags, featureLevels, numFeatureLevels,
+			D3D11_SDK_VERSION, &descSwapChain, &pSwapChain, &s_pDevice, &featureLevel, &s_pDeviceContext);
+		if (SUCCEEDED(hr)) {
 			break;
+		}
 	}
 	if (FAILED(hr)) {
 		MessageBox(0, L"D3D11CreateDevice Failed.", L"framework", MB_OK);
 		exit(-1);
 	}
-	if (m_featureLevel != D3D_FEATURE_LEVEL_11_0) {
+	if (featureLevel != D3D_FEATURE_LEVEL_11_0) {
 		//MessageBox(0, L"Direct3D Feature Level 11 unsupported.", 0, 0);
 		return false;
 	}
 
 	// Create a render target view
 	ID3D11Texture2D* pBackBuffer = NULL;
-	hr = m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
+	hr = pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
 	if (FAILED(hr)) {
 		MessageBox(0, L"GetBuffer Failed.", L"framework", MB_OK);
 		return false;
@@ -125,7 +128,7 @@ bool framework::initialize(HWND hwnd)
 	descDepthStencil.CPUAccessFlags = 0;
 	descDepthStencil.MiscFlags = 0;
 
-	hr = s_pDevice->CreateTexture2D(&descDepthStencil, NULL, &m_pDepthStencilResource);
+	hr = s_pDevice->CreateTexture2D(&descDepthStencil, NULL, &pDepthStencilResource);
 	if (FAILED(hr)) {
 		MessageBox(0, L"CreateTexture2D Failed.", L"framework", MB_OK);
 		exit(-1);
@@ -137,7 +140,7 @@ bool framework::initialize(HWND hwnd)
 	descDepthStencilView.Format = descDepthStencil.Format;
 	descDepthStencilView.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	descDepthStencilView.Texture2D.MipSlice = 0;
-	hr = s_pDevice->CreateDepthStencilView(m_pDepthStencilResource, &descDepthStencilView, &s_pDepthStencilView);
+	hr = s_pDevice->CreateDepthStencilView(pDepthStencilResource, &descDepthStencilView, &s_pDepthStencilView);
 	if (FAILED(hr)) {
 		MessageBox(0, L"CreateTexture2DResource Failed.", L"framework", MB_OK);
 		return false;
@@ -151,7 +154,7 @@ bool framework::initialize(HWND hwnd)
 	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
 
-	hr = s_pDevice->CreateDepthStencilState(&depthStencilDesc, &m_pDepthStencilState);
+	hr = s_pDevice->CreateDepthStencilState(&depthStencilDesc, &pDepthStencilState);
 
 	// Setup the viewport
 	D3D11_VIEWPORT vp;
@@ -170,31 +173,26 @@ bool framework::initialize(HWND hwnd)
 	// Initialzie the blending
 	MyBlending::initialize(s_pDevice);
 
-	m_pPrimitive3D[0] = new Primitive3D(s_pDevice);
-	m_pPrimitive3D[0]->initialize(s_pDevice, GEOMETRY_CUBE);
-	m_pPrimitive3D[1] = new Primitive3D(s_pDevice);
-	m_pPrimitive3D[1]->initialize(s_pDevice, GEOMETRY_CYLINDER, 2, 24);
-
-	for (auto &p : m_pRenderTargets) {
-		p = new RenderTarget(s_pDevice, 900, 950);
-	}
+	pPrimitive3D[0] = new Primitive3D(s_pDevice);
+	pPrimitive3D[0]->initialize(s_pDevice, GEOMETRY_CUBE);
+	pPrimitive3D[1] = new Primitive3D(s_pDevice);
+	pPrimitive3D[1]->initialize(s_pDevice, GEOMETRY_CYLINDER, 2, 24);
 
 	initSprString(s_pDevice);
-
 
 	return true;
 }
 
-void framework::setFPSLimitation(int a_FPS)
+void framework::setFPSLimitation(int limation)
 {
-	m_minFrameTime = 1.0 / (double)a_FPS;
+	minFrameTime = 1.0 / (double)limation;
 }
 
 int framework::run()
 {
 	MSG msg = {};
 
-	/*if (!initialize(m_hWnd))
+	/*if (!initialize(hwnd))
 	{
 	MessageBox(0, L"run: Iniialize FAILED", 0, 0);
 	return 0;
@@ -210,17 +208,17 @@ int framework::run()
 	//////////////////////////////////////////////////////////////////////
 	// FPS locker
 	DWORD sleepTime;
-	if (QueryPerformanceFrequency(&m_timeFreq) == false)
+	if (QueryPerformanceFrequency(&timeFreq) == false)
 	{
 		MessageBox(0, L"This Device is too old, QueryPerformanceFrequency failed", L"framework", MB_OK);
 		exit(-1);
 	}
-	QueryPerformanceCounter(&m_timeStart);
+	QueryPerformanceCounter(&timeStart);
 	//////////////////////////////////////////////////////////////////////
 
 	while (WM_QUIT != msg.message)
 	{
-		//QueryPerformanceFrequency(&m_timeFreq);
+		//QueryPerformanceFrequency(&timeFreq);
 		e_isAnyKeyDown = false;
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
@@ -231,11 +229,11 @@ int framework::run()
 		{
 			//////////////////////////////////////////////////////////////////////
 			// FPS locker
-			QueryPerformanceCounter(&m_timeEnd);
-			m_frameTime = static_cast<double>(m_timeEnd.QuadPart - m_timeStart.QuadPart) / static_cast<double>(m_timeFreq.QuadPart);
-			if (m_frameTime < m_minFrameTime) { // 時間に余裕がある
-												// ミリ秒に変換
-				sleepTime = static_cast<DWORD>((m_minFrameTime - m_frameTime) * 1000);
+			QueryPerformanceCounter(&timeEnd);
+			frameTime = static_cast<double>(timeEnd.QuadPart - timeStart.QuadPart) / static_cast<double>(timeFreq.QuadPart);
+			if (frameTime < minFrameTime) { // 時間に余裕がある
+				// ミリ秒に変換
+				sleepTime = static_cast<DWORD>((minFrameTime - frameTime) * 1000);
 
 				timeBeginPeriod(1);		// 分解能を上げる(こうしないとSleepの精度はガタガタ)
 				Sleep(sleepTime);
@@ -244,7 +242,7 @@ int framework::run()
 										// 次週に持ち越し(こうしないとfpsが変になる?)
 				continue;
 			}
-			m_timeStart = m_timeEnd;
+			timeStart = timeEnd;
 			//////////////////////////////////////////////////////////////////////
 
 
@@ -255,19 +253,19 @@ int framework::run()
 			PAD_TRACKER.Update(GAME_PAD);
 
 			//preTime = timeGetTime();
-			m_timer.tick();
+			timer.tick();
 
 
 			MFAudioCheckLoops();
-			if (m_isFocused)
+			if (isFocused)
 			{
-				update(m_timer.time_interval());
-				render(m_timer.time_interval());
+				update(timer.time_interval());
+				render(timer.time_interval());
 			}
 
 			calculate_frame_stats();
 
-			m_minFrameTime = MIN_FRAME_TIME_DAFAULT;
+			minFrameTime = MIN_FRAME_TIME_DAFAULT;
 			if (KEY_BOARD.LeftControl)
 			{
 				setFPSLimitation(5);
@@ -276,21 +274,16 @@ int framework::run()
 			{
 				setFPSLimitation(2000);
 			}
-
-			//while ((timeGetTime() - preTime) * 6 < 100 /*0.0 / 60.0*/) {
-			//	Sleep(1);		// フレーム時間を越えるまで待つ
-			//}
-
 		}
 
 	}
 	return static_cast<int>(msg.wParam);
 }
 
-LRESULT CALLBACK framework::handle_message(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
+LRESULT CALLBACK framework::handle_message(HWND _hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	//if (wparam == ABN_FULLSCREENAPP){
-	//	m_isFullScreen = !m_isFullScreen;
+	//	isFullScreen = !isFullScreen;
 	//}
 	switch (msg)
 	{
@@ -298,8 +291,8 @@ LRESULT CALLBACK framework::handle_message(HWND hwnd, UINT msg, WPARAM wparam, L
 	{
 		PAINTSTRUCT ps;
 		HDC hdc;
-		hdc = BeginPaint(hwnd, &ps);
-		EndPaint(hwnd, &ps);
+		hdc = BeginPaint(_hwnd, &ps);
+		EndPaint(_hwnd, &ps);
 		break;
 	}
 	case WM_ACTIVATEAPP:
@@ -308,7 +301,7 @@ LRESULT CALLBACK framework::handle_message(HWND hwnd, UINT msg, WPARAM wparam, L
 		break;
 	case WM_KEYDOWN:
 		if (wparam == VK_ESCAPE) {
-			PostMessage(hwnd, WM_CLOSE, 0, 0);
+			PostMessage(_hwnd, WM_CLOSE, 0, 0);
 		}
 	case WM_SYSKEYDOWN:
 	case WM_KEYUP:
@@ -324,26 +317,26 @@ LRESULT CALLBACK framework::handle_message(HWND hwnd, UINT msg, WPARAM wparam, L
 		break;
 	case WM_ENTERSIZEMOVE:
 		// WM_EXITSIZEMOVE is sent when the user grabs the resize bars.
-		m_timer.stop();
+		timer.stop();
 		break;
 	case WM_EXITSIZEMOVE:
 		// WM_EXITSIZEMOVE is sent when the user releases the resize bars.
 		// Here we reset everything based on the new window dimensions.
-		m_timer.start();
+		timer.start();
 		break;
 	case WM_KILLFOCUS:
-		m_isFocused = false;
+		isFocused = false;
 		e_pGamePad->Suspend();
 		break;
 	case WM_SETFOCUS:
-		m_isFocused = true;
+		isFocused = true;
 		e_pGamePad->Resume();
 		break;
 	case WM_SIZE:
-		m_isFullScreen = !m_isFullScreen;
+		isFullScreen = !isFullScreen;
 		break;
 	default:
-		return DefWindowProc(hwnd, msg, wparam, lparam);
+		return DefWindowProc(_hwnd, msg, wparam, lparam);
 	}
 	return 0;
 }
@@ -359,7 +352,7 @@ void framework::calculate_frame_stats()
 	frames++;
 
 	// Compute averages over one second period.
-	if ((m_timer.time_stamp() - time_tlapsed) >= 1.0f)
+	if ((timer.time_stamp() - time_tlapsed) >= 1.0f)
 	{
 		float fps = static_cast<float>(frames); // fps = frameCnt / 1
 		float mspf = 1000.0f / fps;
@@ -369,7 +362,7 @@ void framework::calculate_frame_stats()
 		outs << "Untitled" << "  FPS : " << fps /*<< " / " << "Frame Time : " << mspf << " (ms)"*/;
 		/*outs.precision(4);
 		outs<< " #Blending Mode: " << strBlendMode[blendMode] << " #Alpha: " << alpha << " / 255.0f ( " << alpha / 255.0f * 100 << "% )";*/
-		SetWindowTextA(m_hWnd, outs.str().c_str());
+		SetWindowTextA(hwnd, outs.str().c_str());
 
 		// Reset for next average.
 		frames = 0;
@@ -382,102 +375,56 @@ void framework::update(float elapsed_time/*Elapsed seconds from last frame*/)
 	if (s_pScene)
 	{
 		s_pScene->update(/*elapsed_time*/);
-		if (s_pScene->m_pNextScene)
+		if (s_pScene->pNextScene)
 		{
-			s_pScene = s_pScene->m_pNextScene;
+			s_pScene = s_pScene->pNextScene;
 			//s_pScene->update(/*elapsed_time*/);
 		}
 	}
+
+	// Charactor Surround Camera for debug
+	static float aXY = -XM_PIDIV2, aZY = XM_1DIVPI;
+	static float d = XM_PI;
+	static bool isCharactorSurroundCameraOn = false;
+	if (KEY_TRACKER.pressed.D1)
+	{
+		isCharactorSurroundCameraOn = !isCharactorSurroundCameraOn;
+		if (!isCharactorSurroundCameraOn)
+		{
+			aXY = -XM_PIDIV2;
+			aZY = XM_1DIVPI;
+			d = XM_PI;
+		}
+	}
+	if (isCharactorSurroundCameraOn)
+	{
+		if (KEY_BOARD.J) {
+			aXY -= 0.01f;
+		}
+		if (KEY_BOARD.L) {
+			aXY += 0.01f;
+		}
+		if (KEY_BOARD.I) {
+			aZY += 0.01f;
+		}
+		if (KEY_BOARD.K) {
+			aZY -= 0.01f;
+		}
+		if (KEY_BOARD.O) {
+			d += 0.05f;
+		}
+		if (KEY_BOARD.U) {
+			d -= 0.05f;
+		}
+		e_mainCamera.upDirection = { sinf(aZY)*sinf(aXY), cosf(aZY), sinf(aZY)*cosf(aXY), 0 };
+		e_mainCamera.eyePosition = { -fabs(d)*cosf(aZY)*sinf(aXY), fabs(d)*sinf(aZY)/* + 310 / (float)SCREEN_WIDTH*/, -fabs(d)*cosf(aZY)*cosf(aXY),0 };
+	}
+
 }
 
 void framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 {
-
-	// Test variables
-	static double time;
-	static Transform custom3DTemp;
-	static XMFLOAT3 position(0, 0, 0);
-	static float mX = 0, mY = 0, mZ = 0;
-	static float aXY = -XM_PIDIV2, aZY = XM_1DIVPI;
-	static float d = XM_PI;
-	static float hClosed = -2.0f;
-	static XMFLOAT3 focusPos = { 0,0 + 600 / (float)SCREEN_WIDTH,0 };
-	if (GetAsyncKeyState('J') < 0) {
-		aXY -= 0.01f;
-	}
-	if (GetAsyncKeyState('L') < 0) {
-		aXY += 0.01f;
-	}
-	if (GetAsyncKeyState('I') < 0) {
-		aZY += 0.01f;
-	}
-	if (GetAsyncKeyState('K') < 0) {
-		aZY -= 0.01f;
-	}
-	if (GetAsyncKeyState('O') < 0) {
-		d += 0.05f;
-	}
-	if (GetAsyncKeyState('U') < 0) {
-		d -= 0.05f;
-	}
-	e_mainCamera.upDirection = { sinf(aZY)*sinf(aXY), cosf(aZY), sinf(aZY)*cosf(aXY), 0 };
-	e_mainCamera.eyePosition = { -fabs(d)*cosf(aZY)*sinf(aXY), fabs(d)*sinf(aZY)/* + 310 / (float)SCREEN_WIDTH*/, -fabs(d)*cosf(aZY)*cosf(aXY),0 };
-
-	if (GetAsyncKeyState('1') < 0) {
-		e_mainCamera.eyePosition = { 2, 0, 0, 0 };
-	}
-	if (GetAsyncKeyState('2') < 0) {
-		e_mainCamera.upDirection = { 0, 0, 1, 0 };
-		e_mainCamera.eyePosition = { 0, 1, 0, 0 };
-	}
-	if (GetAsyncKeyState('3') < 0) {
-		e_mainCamera.eyePosition = { 0, 0, 2, 0 };
-	}
-	if (GetAsyncKeyState('0') < 0) {
-		mX = mY = mZ = 0;
-		//a = 0.0f;
-		//h = -0.15f;
-		custom3DTemp.clear();
-	}
-
-	if (GetAsyncKeyState('W') < 0) {
-		custom3DTemp.eulerAngle.y += 1;
-	}
-	if (GetAsyncKeyState('S') < 0) {
-		custom3DTemp.eulerAngle.y -= 1;
-	}
-	if (GetAsyncKeyState('A') < 0) {
-		custom3DTemp.eulerAngle.x += 1;
-	}
-	if (GetAsyncKeyState('D') < 0) {
-		custom3DTemp.eulerAngle.x -= 1;
-	}
-	if (GetAsyncKeyState('Q') < 0) {
-		custom3DTemp.eulerAngle.z += 1;
-	}
-	if (GetAsyncKeyState('E') < 0) {
-		custom3DTemp.eulerAngle.z -= 1;
-	}
-	if (GetAsyncKeyState('Z') < 0) {
-		position.x -= 10;
-	}
-	if (GetAsyncKeyState('X') < 0) {
-		position.x += 10;
-	}
-	if (GetAsyncKeyState('C') < 0) {
-		position.y += 10;
-	}
-	if (GetAsyncKeyState('V') < 0) {
-		position.y -= 10;
-	}
-	if (GetAsyncKeyState('B') < 0) {
-		position.z += 10;
-	}
-	if (GetAsyncKeyState('N') < 0) {
-		position.z -= 10;
-	}
-
-	e_mainCamera.focusPosition = { focusPos.x,focusPos.y,focusPos.z,0 };
+	//e_mainCamera.focusPosition = { focusPos.x,focusPos.y,focusPos.z,0 };
 
 	// Change the blending mode 
 	if (GetAsyncKeyState(VK_SPACE) < 0)
@@ -499,7 +446,7 @@ void framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	s_pDeviceContext->ClearRenderTargetView(s_pRenderTargetView, ClearColor);
 	s_pDeviceContext->ClearDepthStencilView(s_pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-	s_pDeviceContext->OMSetDepthStencilState(m_pDepthStencilState, 1);
+	s_pDeviceContext->OMSetDepthStencilState(pDepthStencilState, 1);
 
 	MyBlending::setMode(s_pDeviceContext, BLEND_ALPHA);
 	if (s_pScene)
@@ -508,41 +455,47 @@ void framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	}
 
 	MyBlending::setMode(s_pDeviceContext, BLEND_NONE);
-	m_pPrimitive3D[0]->drawCube(s_pDeviceContext, XMFLOAT3(1024+5, 0, 0), XMFLOAT3(2048, 10, 10), 0xFF0000FF);
-	m_pPrimitive3D[0]->drawCube(s_pDeviceContext, XMFLOAT3(0, 1024-5, 0), XMFLOAT3(10, 2048, 10), 0x00FF00FF);
-	m_pPrimitive3D[0]->drawCube(s_pDeviceContext, XMFLOAT3(0, 0, 1024+5), XMFLOAT3(10, 10, 2048), 0x0000FFFF);
-	//m_pPrimitive3D[1]->drawCylinder(s_pDeviceContext, XMFLOAT3(-310, 0, 10 + 0), XMFLOAT3(620, 700, 20), &custom3DTemp);
+
+	
+	pPrimitive3D[0]->drawCube(s_pDeviceContext, XMFLOAT3(1024+5, 0, 0), XMFLOAT3(2048, 10, 10), 0xFF0000FF);
+	pPrimitive3D[0]->drawCube(s_pDeviceContext, XMFLOAT3(0, 1024-5, 0), XMFLOAT3(10, 2048, 10), 0x00FF00FF);
+	pPrimitive3D[0]->drawCube(s_pDeviceContext, XMFLOAT3(0, 0, 1024+5), XMFLOAT3(10, 10, 2048), 0x0000FFFF);
+	//pPrimitive3D[1]->drawCylinder(s_pDeviceContext, XMFLOAT3(-310, 0, 10 + 0), XMFLOAT3(620, 700, 20), &custom3DTemp);
 
 	char buf[256];
-	sprintf_s(buf, "mainCamera: \nPosX: %lf \nPosY: %lf \nPosZ: %lf \nDistance: %lf \n", 
-		e_mainCamera.eyePosition.vector4_f32[0], e_mainCamera.eyePosition.vector4_f32[1], e_mainCamera.eyePosition.vector4_f32[2], d);
+	sprintf_s(buf, "mainCamera: \nPosX: %lf \nPosY: %lf \nPosZ: %lf \nDistance: %lf \n",
+		e_mainCamera.eyePosition.vector4_f32[0], e_mainCamera.eyePosition.vector4_f32[1], e_mainCamera.eyePosition.vector4_f32[2], -1);
 	MyBlending::setMode(s_pDeviceContext, BLEND_ALPHA);
 	drawSprString(s_pDeviceContext, 0, 0, buf);
 
-	if (m_isFullScreen) {
+	if (KEY_TRACKER.pressed.I)
+	{
+		isFullScreen = !isFullScreen;
+	}
+
+	if (isFullScreen) {
 		// 垂直同期ON
-		m_pSwapChain->Present(1, 0);
+		pSwapChain->Present(1, 0);
 	}
 	else {
 		// 垂直同期OFF
-		m_pSwapChain->Present(0, 0);
+		pSwapChain->Present(0, 0);
 	}
 
 
 	// For FullScreen Mode, Synchronize presentation for 1 vertical blanks
-	//m_pSwapChain->Present(1, 0);
+	//pSwapChain->Present(1, 0);
 
 	// For Windowed Mode 
-	//m_pSwapChain->Present(0, 0);
+	//pSwapChain->Present(0, 0);
 }
 
 void framework::release()
 {
-	SAFE_RELEASE(m_pBlendState);
+	SAFE_RELEASE(pBlendState);
 	SAFE_RELEASE(s_pDepthStencilView);
 	SAFE_RELEASE(s_pRenderTargetView);
-	SAFE_RELEASE(m_pDepthStencilResource);
-	SAFE_RELEASE(m_pSwapChain);
+	SAFE_RELEASE(pSwapChain);
 
 	if (s_pDeviceContext) {
 		s_pDeviceContext->ClearState();
@@ -550,20 +503,22 @@ void framework::release()
 		s_pDeviceContext->Release();
 		//MessageBox(0, L"DeviceContext Released", L"framework", MB_OK);
 	}
+
+	
 	SAFE_RELEASE(s_pDevice);
-	SAFE_RELEASE(m_pDepthStencilResource);
-	SAFE_RELEASE(m_pDepthStencilState);
+	SAFE_RELEASE(pDepthStencilResource);
+	SAFE_RELEASE(pDepthStencilState);
+	
+	
+
+	SAFE_RELEASE(pD3dDebug);
 
 	MyBlending::release();
 
 	releaseSprString();
 
-	for (auto &p : m_pPrimitive3D)
+	for (auto &p : pPrimitive3D)
 	{
-		delete p;
-		p = NULL;
-	}
-	for (auto &p : m_pRenderTargets) {
 		delete p;
 		p = NULL;
 	}

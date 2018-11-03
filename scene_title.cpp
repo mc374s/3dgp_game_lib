@@ -12,7 +12,7 @@
 
 #include "player.h"
 
-Player g_player;
+
 
 //void loadTextureProgress()
 //{
@@ -23,6 +23,21 @@ Player g_player;
 //	pMFAudioManager->loadAudios(audio_data);			// 音声データの一括ロード
 //}
 
+void loadMeshesProgress(void(*callback)(),int *progress)
+{
+	pMeshManager->loadMeshes(e_sequencedFbxFiles, progress);
+	if (callback)
+	{
+		callback();
+	}
+}
+
+void loadeMessage() {
+	MessageBox(0, L"Meshes loaded!", L"loadeMessage()", MB_OK);
+}
+
+int progress = 0;
+
 SceneTitle::SceneTitle()
 {
 	Scene::init();
@@ -32,38 +47,41 @@ SceneTitle::SceneTitle()
 	/*std::thread loadThread_2(loadAudioProgress);
 	loadThread_2.detach();*/
 	// pMFAudioManager->loadAudios(audio_data);
-	m_pBG = new OBJ2D;
-	m_pBG->m_pSprData = &e_sprTitleBG;
-	m_pBG->m_custom.scaleX = m_pBG->m_custom.scaleY = 1280.0f / 1920.0f;
-	//m_bg.m_pos = { SCREEN_WIDTH / 2,SCREEN_HEIGHT / 2,0 };
+	pBG = new OBJ2D;
+	pBG->pSprData = &e_sprTitleBG;
+	pBG->transform2D.scaleX = pBG->transform2D.scaleY = 1280.0f / 1920.0f;
+	//bg.pos = { SCREEN_WIDTH / 2,SCREEN_HEIGHT / 2,0 };
 
 	//pObjManager->init();
 	//pPlayerManager->init();
-	//pPlayerManager->m_pPlayerTsuta->m_isOnLeftPage = false;
+	//pPlayerManager->pPlayerTsuta->isOnLeftPage = false;
 	//changeScene(SCENE_MAIN);
 
-	pMeshManager->loadMeshes(e_sequencedFbxFiles);
 
-	g_player.init();
+	std::thread loadThread(loadMeshesProgress, nullptr, &progress);
+	loadThread.detach();
+
+	pPlayerManager->init();
+
 
 }
 
 SceneTitle::~SceneTitle() {
-	if (m_pNextScene)
+	if (pNextScene)
 	{
 		//delete nextScene;
-		m_pNextScene = nullptr;
+		pNextScene = nullptr;
 	}
-	SAFE_DELETE(m_pBG);
+	SAFE_DELETE(pBG);
 }
 
 void SceneTitle::update()
 {
-	switch (m_step) {
+	switch (step) {
 	case STEP::INIT:
 
 		MFAudioPlay(BGM_TITLE, true);
-		m_step = STEP::BEGIN;
+		step = STEP::BEGIN;
 		//break;
 
 	case STEP::BEGIN:
@@ -75,56 +93,27 @@ void SceneTitle::update()
 			break;
 		}
 
-		g_player.update();
+		pPlayerManager->update();
 
 		break;
 	default:
 		break;
 	}
+
 }
 
 void SceneTitle::draw()
 {
 	View::clear();
 
-	m_pBG->draw();
+	pBG->draw();
 
 	e_fbxItemFloor.draw();
 	
-	g_player.draw();
+	//static OBJ3D temp = g_player;
 
-	/*static int fbxNO = 0;
-	if (KEY_TRACKER.pressed.Space)
-	{
-		fbxNO >= FBX_FILE_NO::ITEM_SWORD ? fbxNO = 0 : ++fbxNO;
-	}
 
-	if (KEY_TRACKER.pressed.W)
-	{
-		e_fbxPlayerWalk.preSetTransform.position.y += 1;
-	}
-	if (KEY_TRACKER.pressed.S)
-	{
-		e_fbxPlayerWalk.preSetTransform.position.y -= 1;
-	}
-
-	switch (fbxNO)
-	{
-	case FBX_FILE_NO::PLAYER_WALK:
-		e_fbxPlayerWalk.draw();
-		break;
-	case FBX_FILE_NO::PLAYER_RUN:
-		e_fbxPlayerRun.draw();
-		break;
-	case FBX_FILE_NO::PLAYER_JUMP:
-		e_fbxPlayerJump.draw();
-		break;
-	case FBX_FILE_NO::ITEM_SWORD:
-		e_fbxItemSword.draw();
-		break;
-	default:
-		break;
-	}*/
+	pPlayerManager->draw();
 
 
 
@@ -132,6 +121,10 @@ void SceneTitle::draw()
 
 	drawString(SCREEN_WIDTH / 2, 100, "SCENE TITLE", 0xFFFFFFFF, STR_CENTER, 48, 48);
 	drawString(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 200, "Push [ENTER] to next scene", 0xFFFFFFFF, STR_CENTER);
+
+	char buf[256];
+	sprintf_s(buf, "Loading Progress: %d %%", progress);
+	drawString(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 100, buf, 0xFF0000FF, STR_CENTER);
 
 #endif //  DEBUG
 

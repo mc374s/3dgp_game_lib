@@ -6,28 +6,25 @@
 
 #include "skinned_mesh.h"
 
+#include <fstream>
 
-void SPRITE_DATA::draw(float _x, float _y, CUSTOM *_custom) {
+
+void SPRITE_DATA::draw(float x, float y,const Transform2D& transform2D) {
 	if (texNO >= 0 && texNO < TEX_MAX && pTextureManager->textureAt(texNO) && pTextureManager->textureAt(texNO)->img)
 	{
-		if (_custom) {
-			pTextureManager->textureAt(texNO)->img->render(framework::s_pDeviceContext, _x + ofsX, _y + ofsY, _custom->scaleX*width, _custom->scaleY*height, left, top, width, height, _custom->rgba, _custom->angle, _custom->centRotate, _custom->centX, _custom->centY, _custom->reflectX, _custom->scaleMode);
-		}
-		else {
-			pTextureManager->textureAt(texNO)->img->render(framework::s_pDeviceContext, _x + ofsX, _y + ofsY, width, height, left, top, width, height, 0xFFFFFFFF, 0.0f);
-		}
+		pTextureManager->textureAt(texNO)->img->render(framework::s_pDeviceContext, x + ofsX, y + ofsY, transform2D.scaleX*width, transform2D.scaleY*height, left, top, width, height, transform2D.rgba, transform2D.angle, transform2D.centRotate, transform2D.centX, transform2D.centY, transform2D.reflectX, transform2D.scaleMode);
 	}
 }
 
-void SPRITE_DATA::draw(Vector3 &a_pos, CUSTOM *a_pCustom, Transform *a_pCustom3d) {
+void SPRITE_DATA::draw(Vector3 &pos, const Transform2D& transform2D, const Transform& transfrom) {
 	if (texNO >= 0 && texNO < TEX_MAX && pTextureManager->textureAt(texNO) && pTextureManager->textureAt(texNO)->img) {
 		if (pTextureManager->textureAt(texNO)->doProjection)
 		{
-			pTextureManager->textureAt(texNO)->img->render3D(framework::s_pDeviceContext, a_pos.x + ofsX, a_pos.y + ofsY, a_pCustom->scaleX*width, a_pCustom->scaleY*height, left, top, width, height, a_pCustom->rgba, a_pCustom->angle, a_pCustom->centRotate, a_pCustom->centX, a_pCustom->centY, a_pCustom->reflectX, a_pCustom->scaleMode, a_pCustom3d);
+			pTextureManager->textureAt(texNO)->img->render3D(framework::s_pDeviceContext, pos.x + ofsX, pos.y + ofsY, transform2D.scaleX*width, transform2D.scaleY*height, left, top, width, height, transform2D.rgba, transform2D.angle, transform2D.centRotate, transform2D.centX, transform2D.centY, transform2D.reflectX, transform2D.scaleMode, transfrom);
 		}
 		else
 		{
-			draw(a_pos.x, a_pos.y, a_pCustom);
+			draw(pos.x, pos.y, transform2D);
 		}
 	}
 }
@@ -41,12 +38,12 @@ void TextureManager::loadTextures(LOAD_TEXTURE data[])
 	}
 }
 
-void TextureManager::loadTexture(LOAD_TEXTURE _data[], int a_textureNO)
+void TextureManager::loadTexture(LOAD_TEXTURE data[], int textureNO)
 {
-	if (_data[a_textureNO].texNO != -1 || _data[a_textureNO].fileName != NULL)
+	if (data[textureNO].texNO != -1 || data[textureNO].fileName != NULL)
 	{
-		_data[a_textureNO].img = new Sprite(framework::s_pDevice, _data[a_textureNO].fileName, _data[a_textureNO].doProjection);
-		pTextures[a_textureNO] = &_data[a_textureNO];
+		data[textureNO].img = new Sprite(framework::s_pDevice, data[textureNO].fileName, data[textureNO].doProjection);
+		pTextures[textureNO] = &data[textureNO];
 	}
 }
 
@@ -115,56 +112,56 @@ int  basicInput()
 	return command;
 }
 
-void drawString(int _x, int _y, char *_buf, UINTCOLOR _color, int _format, int _sizeX, int _sizeY, float _angle)
+void drawString(int x, int y, char *buf, UINTCOLOR color, int format, int sizeX, int sizeY, float angle)
 {
-	drawSprString(framework::s_pDeviceContext, _x, _y, _buf, _color, _format, _sizeX, _sizeY, _angle);
+	drawSprString(framework::s_pDeviceContext, x, y, buf, color, format, sizeX, sizeY, angle);
 }
 
-void drawRectangle(int _x, int _y, int _w, int _h, float _angle, UINTCOLOR _color)
+void drawRectangle(int x, int y, int w, int h, float angle, UINTCOLOR color)
 {
 	static Sprite rect(framework::s_pDevice);
-	//MyBlending::setMode(framework::m_pDeviceContext, BLEND_REPLACE);
-	rect.render(framework::s_pDeviceContext, _x, _y, _w, _h, _angle, _color);
-	//MyBlending::setMode(framework::m_pDeviceContext, BLEND_ALPHA);
+	//MyBlending::setMode(framework::pDeviceContext, BLEND_REPLACE);
+	rect.render(framework::s_pDeviceContext, x, y, w, h, angle, color);
+	//MyBlending::setMode(framework::pDeviceContext, BLEND_ALPHA);
 }
 
 
 ///////////////////////////////////////////////////////////////
 // Class View
-View::View(int a_viewWidth, int a_viewHeight) :m_doReflection(false)
+View::View(int viewWidth, int viewHeight) :doReflection(false)
 {
-	m_pRenderTarget = new RenderTarget(framework::s_pDevice, a_viewWidth, a_viewHeight);
-	m_custom3d.clear();
+	pRenderTarget = new RenderTarget(framework::s_pDevice, viewWidth, viewHeight);
+	transform.clear();
 }
 
-View::View(float a_drawX, float a_drawY, float a_drawWidth, float a_drawHeight, float a_srcX, float a_srcY, float a_srcWidth, float a_srcHeight, float a_rotateAngle, UINTCOLOR a_blendColor, bool a_doReflection):
-m_drawX(a_drawX), m_drawY(a_drawY), m_drawWidth(a_drawWidth), m_drawHeight(a_drawHeight), 
-m_srcX(a_srcX), m_srcY(a_srcY), m_srcWidth(a_srcWidth), m_srcHeight(a_srcHeight),
-m_rotateAngle(a_rotateAngle),
-m_blendColor(a_blendColor),
-m_doReflection(a_doReflection)
+View::View(float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, float rotateAngle, UINTCOLOR blendColor, bool doReflection):
+drawX(drawX), drawY(drawY), drawWidth(drawWidth), drawHeight(drawHeight), 
+srcX(srcX), srcY(srcY), srcWidth(srcWidth), srcHeight(srcHeight),
+rotateAngle(rotateAngle),
+blendColor(blendColor),
+doReflection(doReflection)
 {
-	m_pRenderTarget = new RenderTarget(framework::s_pDevice, a_drawWidth, a_drawHeight);
-	m_custom3d.clear();
+	pRenderTarget = new RenderTarget(framework::s_pDevice, drawWidth, drawHeight);
+	transform.clear();
 }
 
 View::~View()
 {
-	if (m_pRenderTarget)
+	if (pRenderTarget)
 	{
-		delete m_pRenderTarget;
-		m_pRenderTarget = NULL;
+		delete pRenderTarget;
+		pRenderTarget = NULL;
 	}
 }
 
-void View::set(float a_drawX, float a_drawY, float a_drawWidth, float a_drawHeight, float a_srcX, float a_srcY, float a_srcWidth, float a_srcHeight, float a_rotateAngle, UINTCOLOR a_blendColor, bool a_doReflection)
+void View::set(float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, float rotateAngle, UINTCOLOR blendColor, bool doReflection)
 {
-	m_pRenderTarget->render3D(framework::s_pDeviceContext, a_drawX, a_drawY, a_drawWidth, a_drawHeight, a_srcX, a_srcY, a_srcWidth, a_srcHeight, a_rotateAngle, a_blendColor, &m_custom3d, a_doReflection);
+	pRenderTarget->render3D(framework::s_pDeviceContext, drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, rotateAngle, blendColor, transform, doReflection);
 }
 
 void View::set()
 {
-	m_pRenderTarget->render3D(framework::s_pDeviceContext, m_drawX, m_drawY, m_drawWidth, m_drawHeight, m_srcX, m_srcY, m_srcWidth, m_srcHeight, m_rotateAngle, m_blendColor, &m_custom3d, m_doReflection);
+	pRenderTarget->render3D(framework::s_pDeviceContext, drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, rotateAngle, blendColor, transform, doReflection);
 }
 
 void View::clear()
@@ -180,24 +177,24 @@ void View::clear()
 ///////////////////////////////////////////////////////////
 
 // Class Cube
-Cube::Cube(const XMFLOAT3 &a_position, const XMFLOAT3 &a_size, const UINTCOLOR &a_blendColor) :m_position(a_position), m_size(a_size), m_blendColor(a_blendColor)
+Cube::Cube(const XMFLOAT3 &position, const XMFLOAT3 &size, const UINTCOLOR &blendColor) :position(position), size(size), blendColor(blendColor)
 {
-	m_pPrimitive = new Primitive3D(framework::s_pDevice);
-	m_pPrimitive->initialize(framework::s_pDevice, GEOMETRY_CUBE);
+	pPrimitive = new Primitive3D(framework::s_pDevice);
+	pPrimitive->initialize(framework::s_pDevice, GEOMETRY_CUBE);
 }
 
 Cube::~Cube()
 {
-	if (m_pPrimitive)
+	if (pPrimitive)
 	{
-		delete m_pPrimitive;
-		m_pPrimitive = NULL;
+		delete pPrimitive;
+		pPrimitive = NULL;
 	}
 }
 
 void Cube::draw()
 {
-	m_pPrimitive->drawCube(framework::s_pDeviceContext, m_position, m_size, m_blendColor, &m_custom3d);
+	pPrimitive->drawCube(framework::s_pDeviceContext, position, size, blendColor, transform);
 }
 
 ////////////////////////////////////////////////////////////
@@ -215,8 +212,7 @@ void MeshManager::loadMesh(MeshFile data[], int fileNO)
 {
 	if (data[fileNO].fileNO != -1 || data[fileNO].path != NULL)
 	{
-		meshes[fileNO] = new MeshFile();
-		*meshes[fileNO] = data[fileNO];
+		meshes[fileNO] = new MeshFile(data[fileNO].fileNO, data[fileNO].path);
 		meshes[fileNO]->data = new SkinnedMesh(framework::s_pDevice, data[fileNO].path);
 	}
 }
@@ -225,9 +221,45 @@ void MeshManager::loadMeshes(MeshFile data[])
 {
 	for (int i = data[0].fileNO; data[i].fileNO != -1 || data[i].path != NULL; i++)
 	{
-		meshes[i] = new MeshFile();
-		*meshes[i] = data[i];
+		meshes[i] = new MeshFile(data[i].fileNO, data[i].path);
 		meshes[i]->data = new SkinnedMesh(framework::s_pDevice, data[i].path);
+	}
+}
+
+void MeshManager::loadMeshes(MeshFile data[], int *progress)
+{
+	*progress = 0;
+	//LARGE_INTEGER meshesSize;
+	//meshesSize.QuadPart = 0;
+	//LARGE_INTEGER loadedMeshSize;
+	//loadedMeshSize.QuadPart = 0;
+	//LARGE_INTEGER fileSize;
+	//fileSize.QuadPart = 0;
+	int meshesSize = 0;
+	int loadedMeshSize = 0;
+	int fileSize = 0;
+	
+	for (int i = data[0].fileNO; data[i].fileNO != -1 || data[i].path != NULL; i++)
+	{
+		std::fstream file(data[i].path, std::ios::in);
+		file.seekg(0, std::ios::end);
+		meshesSize += file.tellg();
+		//GetFileSizeEx(data[i].path, &fileSize);
+		//meshesSize.QuadPart += fileSize.QuadPart;
+
+	}
+
+	for (int i = data[0].fileNO; data[i].fileNO != -1 || data[i].path != NULL; i++)
+	{
+		meshes[i] = new MeshFile(data[i].fileNO, data[i].path);
+		meshes[i]->data = new SkinnedMesh(framework::s_pDevice, data[i].path);
+		std::fstream file(data[i].path, std::ios::in);
+		file.seekg(0, std::ios::end);
+		loadedMeshSize+= file.tellg();
+		*progress = loadedMeshSize / (float)meshesSize * 100;
+		/*GetFileSizeEx(data[i].path, &fileSize);
+		loadedMeshSize.QuadPart += fileSize.QuadPart;
+		*progress = loadedMeshSize.QuadPart / meshesSize.QuadPart * 100;*/
 	}
 }
 
@@ -250,6 +282,7 @@ void MeshManager::releaseMeshes()
 		if (meshes[i])
 		{
 			delete meshes[i]->data;
+			delete meshes[i];
 			ZeroMemory(meshes[i], sizeof(*meshes[i]));
 		}
 	}

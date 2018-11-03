@@ -49,17 +49,17 @@ namespace RM {
 
 	public:
 		// 画像データの管理
-		friend int loadShaderResourceView(ID3D11Device* a_pDevice, char* a_pFilename, ID3D11Resource** a_ppOutResource, ID3D11ShaderResourceView** a_ppOutSRV);
-		friend void releaseShaderResourceView(ID3D11ShaderResourceView* a_pInSRV);
+		friend int loadShaderResourceView(ID3D11Device* pDevice, char* pFilename, ID3D11Resource** ppOutResource, ID3D11ShaderResourceView** ppOutSRV);
+		friend void releaseShaderResourceView(ID3D11ShaderResourceView* pInSRV);
 
 		// バーティクスシェーダーソースの管理
-		friend int loadVertexShader(ID3D11Device* a_pDevice, char* a_pFilename, D3D11_INPUT_ELEMENT_DESC* a_pInLayoutElements, int a_elementsNum, ID3D11VertexShader** a_ppOutVertexShader, ID3D11InputLayout** a_ppOutInputLayout);
+		friend int loadVertexShader(ID3D11Device* pDevice, char* pFilename, D3D11_INPUT_ELEMENT_DESC* pInLayoutElements, int elementsNum, ID3D11VertexShader** ppOutVertexShader, ID3D11InputLayout** ppOutInputLayout);
 
-		friend void releaseVertexShader(ID3D11VertexShader* a_pInVertexShader, ID3D11InputLayout* a_pInInputLayout);
+		friend void releaseVertexShader(ID3D11VertexShader* pInVertexShader, ID3D11InputLayout* pInInputLayout);
 
 		// ピクセルシェーダーデータの管理
-		friend int loadPixelShader(ID3D11Device* a_pDevice, char* a_pFilename, ID3D11PixelShader** a_ppOut);
-		friend void releasePixelShader(ID3D11PixelShader* a_pIn);
+		friend int loadPixelShader(ID3D11Device* pDevice, char* pFilename, ID3D11PixelShader** ppOut);
+		friend void releasePixelShader(ID3D11PixelShader* pIn);
 	};// class ResourcesManager
 	/*///////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 

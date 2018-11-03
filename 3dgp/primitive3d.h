@@ -38,43 +38,43 @@ private:
 private:
 
 	HRESULT hr;
-	//ID3D11ShaderResourceView*	m_pShaderResourceView;
-	ID3D11VertexShader*			m_pVertexShader;
-	ID3D11InputLayout*			m_pInputLayout;
-	ID3D11PixelShader*			m_pPixelShader;
+	//ID3D11ShaderResourceView*	pShaderResourceView;
+	ID3D11VertexShader*			pVertexShader;
+	ID3D11InputLayout*			pInputLayout;
+	ID3D11PixelShader*			pPixelShader;
 	
-	ID3D11Buffer*				m_pVertexBuffer;
-	ID3D11Buffer*				m_pIndexBuffer;
-	ID3D11Buffer*				m_pConstantBuffer;
-	ID3D11RasterizerState*		m_pWireRasterizerState;
-	ID3D11RasterizerState*		m_pFillRasterizerState;
-	ID3D11DepthStencilState*	m_pDepthStencilState;
+	ID3D11Buffer*				pVertexBuffer;
+	ID3D11Buffer*				pIndexBuffer;
+	ID3D11Buffer*				pConstantBuffer;
+	ID3D11RasterizerState*		pWireRasterizerState;
+	ID3D11RasterizerState*		pFillRasterizerState;
+	ID3D11DepthStencilState*	pDepthStencilState;
 	
-	vertex3D *m_pVertices;
-	WORD *m_pIndices;
-	UINT m_indexCount;
-	UINT m_vertexCount;
-	UINT m_latitudeNum;
-	UINT m_longitudeNum;
+	vertex3D *pVertices;
+	WORD *pIndices;
+	UINT indexNum;
+	UINT vertexNum;
+	UINT latitudeNum;
+	UINT longitudeNum;
 
 public:
-	Primitive3D(ID3D11Device *a_pDevice);
+	Primitive3D(ID3D11Device *pDevice);
 	virtual ~Primitive3D();
 
-	virtual void initialize(ID3D11Device *a_pDevice, const int &a_type = GEOMETRY_CUBE, const int &a_latitudeNum = 2, const int &a_longitudeNum = 6);
+	virtual void initialize(ID3D11Device *pDevice, const int &type = GEOMETRY_CUBE, const int &latitudeNum = 2, const int &longitudeNum = 6);
 
-	template <size_t a_vertexNum,size_t a_indexNum>
-	void createBuffers(ID3D11Device *a_pDevice, vertex3D (&a_pVertices)[a_vertexNum], WORD (&a_pIndices)[a_indexNum]) {
-		createBuffers(a_pDevice, a_pVertices, a_vertexNum, a_pIndices, a_indexNum);
+	template <size_t vertexNum,size_t indexNum>
+	void createBuffers(ID3D11Device *pDevice, vertex3D (&pVertices)[vertexNum], WORD (&pIndices)[indexNum]) {
+		createBuffers(pDevice, pVertices, vertexNum, pIndices, indexNum);
 	};
-	void createBuffers(ID3D11Device *a_pDevice, vertex3D *a_pVertices, int a_vertexNum, WORD *a_pIndices, int a_indexNum);
+	void createBuffers(ID3D11Device *pDevice, vertex3D *pVertices, int vertexNum, WORD *pIndices, int indexNum);
 
-	inline XMFLOAT3 toNDC(const XMFLOAT3 &a_inputCoord);
-	void setProjection(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const XMFLOAT4 &a_materialColor = XMFLOAT4(1, 1, 1, 1), const Transform* a_pCustom3D = nullptr);
-	void render(ID3D11DeviceContext *a_pDeviceContext, bool a_doFill);
+	inline XMFLOAT3 toNDC(const XMFLOAT3 &inputCoord);
+	void setProjection(ID3D11DeviceContext *pDeviceContext, const XMFLOAT3 &position, const XMFLOAT4 &materialColor = XMFLOAT4(1, 1, 1, 1), const Transform& transform = Transform::initialValue());
+	void render(ID3D11DeviceContext *pDeviceContext, bool doFill);
 
-	void drawCube(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const XMFLOAT3 &a_size, const UINTCOLOR &a_blendColor = 0xFFFFFFFF, const Transform* a_pCustom3D = nullptr);
-	void drawCylinder(ID3D11DeviceContext *a_pDeviceContext, const XMFLOAT3 &a_position, const XMFLOAT3 &a_size,const Transform* a_pCustom3D = nullptr);
+	void drawCube(ID3D11DeviceContext *pDeviceContext, const XMFLOAT3 &position, const XMFLOAT3 &size, const UINTCOLOR &blendColor = 0xFFFFFFFF, const Transform& transform = Transform::initialValue());
+	void drawCylinder(ID3D11DeviceContext *pDeviceContext, const XMFLOAT3 &position, const XMFLOAT3 &size, const Transform& transform = Transform::initialValue());
 };
 
 

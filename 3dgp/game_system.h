@@ -4,77 +4,8 @@
 
 #include <cmath>
 #include "sprite_string.h"
-
-//*****************************************************************************
-//		３Ｄベクトル
-//*****************************************************************************
-//------------------------------------------------------
-//	３Ｄベクトル基本構造体
-//------------------------------------------------------
-typedef struct Vector {
-	float	x, y, z;
-} Vector;
-
-//------------------------------------------------------
-//	３Ｄベクトル構造体
-//------------------------------------------------------
-typedef struct Vector3 : public Vector
-{
-public:
-	//	コンストラクタ
-	Vector3() {};
-	inline Vector3(float x, float y, float z) { this->x = x, this->y = y, this->z = z; }
-	inline Vector3(const Vector& v) { this->x = v.x, this->y = v.y, this->z = v.z; }
-
-	//	距離計算
-	inline float Length() { return sqrtf(x*x + y*y + z*z); }
-	inline float LengthSq() { return x*x + y*y + z*z; }
-
-	//	正規化
-	void Normalize()
-	{
-		float l = Length();
-		if (fabsf(l - 0.0f) > FLT_EPSILON) { x /= l; y /= l; z /= l; }
-	}
-
-	//	オペレーター
-	inline Vector3& operator = (const Vector& v) { x = v.x; y = v.y; z = v.z; return *this; }
-	inline Vector3& operator += (const Vector3& v) { x += v.x; y += v.y; z += v.z; return *this; }
-	inline Vector3& operator -= (const Vector3& v) { x -= v.x; y -= v.y; z -= v.z; return *this; }
-	inline Vector3& operator *= (float v) { x *= v; y *= v; z *= v; return *this; }
-	inline Vector3& operator /= (float v) { x /= v; y /= v; z /= v; return *this; }
-
-	inline Vector3 operator + () const { Vector3 ret(x, y, z); return ret; }
-	inline Vector3 operator - () const { Vector3 ret(-x, -y, -z); return ret; }
-
-	inline Vector3 operator + (const Vector3& v) const { return Vector3(x + v.x, y + v.y, z + v.z); }
-	inline Vector3 operator - (const Vector3& v) const { return Vector3(x - v.x, y - v.y, z - v.z); }
-	inline Vector3 operator * (float v) const { Vector3 ret(x*v, y*v, z*v); return ret; }
-	inline Vector3 operator / (float v) const { Vector3 ret(x / v, y / v, z / v); return ret; }
-
-	bool operator == (const Vector3& v) const { return (fabsf(x - v.x) < FLT_EPSILON) && (fabsf(y - v.y) < FLT_EPSILON) && (fabsf(z - v.z) < FLT_EPSILON); }
-	bool operator != (const Vector3& v) const { return (fabsf(x - v.x) > FLT_EPSILON) || (fabsf(y - v.y) > FLT_EPSILON) || (fabsf(z - v.z) > FLT_EPSILON); }
-
-} Vector3;
-
-//------------------------------------------------------
-//	外積
-//------------------------------------------------------
-inline void Vector3Cross(Vector& out, Vector& v1, Vector& v2)
-{
-	out.x = v1.y*v2.z - v1.z*v2.y;
-	out.y = v1.z*v2.x - v1.x*v2.z;
-	out.z = v1.x*v2.y - v1.y*v2.x;
-}
-
-//------------------------------------------------------
-//	内積
-//------------------------------------------------------
-inline float Vector3Dot(Vector& v1, Vector& v2)
-{
-	return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z;
-}
-
+#include "SimpleMath.h"
+using namespace DirectX::SimpleMath;
 
 //*****************************************************************************************************************************
 //
@@ -138,11 +69,11 @@ struct LOAD_TEXTURE
 	char	*fileName;
 	bool	doProjection;	// 3d空間で描画するかどうか
 	Sprite* img;
-	LOAD_TEXTURE(int a_texNum, char *a_pFileName, bool a_doProjection = false) :texNO(a_texNum), fileName(a_pFileName), doProjection(a_doProjection) {};
+	LOAD_TEXTURE(int texNum, char *pFileName, bool doProjection = false) :texNO(texNum), fileName(pFileName), doProjection(doProjection) {};
 };
 
 
-struct CUSTOM
+struct Transform2D
 {
 	float	scaleX, scaleY;
 	float	angle;
@@ -153,18 +84,17 @@ struct CUSTOM
 
 	UINTCOLOR rgba;
 
-	CUSTOM(float _scaleX = 1.0f, float _scaleY = 1.0f, float _angle = .0f, bool _reflectX = false, bool _centRotate = true, float _centX = .0f, float _centY = .0f, int _scaleMode = 0, UINTCOLOR _rgba = 0xFFFFFFFF)
-	{
-		scaleX = _scaleX;
-		scaleY = _scaleY;
-		angle = _angle;
-		reflectX = _reflectX;
-		centRotate = _centRotate;
-		centX = _centX;
-		centY = _centY;
-		scaleMode = _scaleMode;
-		rgba = _rgba;
-	};
+	Transform2D(float scaleX = 1.0f, float scaleY = 1.0f, float angle = .0f, bool reflectX = false, bool centRotate = true, float centX = .0f, float centY = .0f, int scaleMode = 0, UINTCOLOR rgba = 0xFFFFFFFF) :
+		scaleX(scaleX),
+		scaleY(scaleY),
+		angle(angle),
+		reflectX(reflectX),
+		centRotate(centRotate),
+		centX(centX),
+		centY(centY),
+		scaleMode(scaleMode),
+		rgba(rgba)
+	{};
 
 	void clear()
 	{
@@ -179,6 +109,12 @@ struct CUSTOM
 		rgba = 0xFFFFFFFF;
 	};
 
+	static Transform2D initialValue() 
+	{
+		Transform2D clearedValue;
+		clearedValue.clear();
+		return clearedValue;
+	}
 };
 
 struct SPRITE_DATA
@@ -188,20 +124,20 @@ struct SPRITE_DATA
 	float	width, height;
 	float	ofsX, ofsY;
 	int	frameNum;
-	SPRITE_DATA(int _texNum = -1, float _left = 0, float _top = 0, float _width = 0, float _height = 0, float _ofsX = 0, float _ofsY = 0, int _frameNum = 1) {
-		texNO = _texNum;
-		left = _left;
-		top = _top;
-		width = _width;
-		height = _height;
-		ofsX = _ofsX;
-		ofsY = _ofsY;
-		frameNum = _frameNum;
-	};
-	void draw(Vector3 &a_pos, CUSTOM *a_pCustom = nullptr, Transform *a_pCustom3d = nullptr);
-	void draw(float _x, float _y, CUSTOM *_custom = nullptr);
-	void copy(const SPRITE_DATA* a_rhv) {
-		left = a_rhv->left; top = a_rhv->top; width = a_rhv->width; height = a_rhv->height; ofsX = a_rhv->ofsX; ofsY = a_rhv->ofsY;
+	SPRITE_DATA(int texNum = -1, float left = 0, float top = 0, float width = 0, float height = 0, float ofsX = 0, float ofsY = 0, int frameNum = 1) :
+		texNO(texNum),
+		left(left),
+		top(top),
+		width(width),
+		height(height),
+		ofsX(ofsX),
+		ofsY(ofsY),
+		frameNum(frameNum)
+	{};
+	void draw(Vector3 &pos, const Transform2D& transform2d = Transform2D::initialValue(), const Transform& transform=Transform::initialValue());
+	void draw(float x, float y, const Transform2D& transform2d = Transform2D::initialValue());
+	void copy(const SPRITE_DATA* rhv) {
+		left = rhv->left; top = rhv->top; width = rhv->width; height = rhv->height; ofsX = rhv->ofsX; ofsY = rhv->ofsY;
 		//return *this;
 	};
 
@@ -211,12 +147,12 @@ typedef SPRITE_DATA SPRITE_LEFTTOP;
 
 struct SPRITE_CENTER : public SPRITE_DATA
 {
-	SPRITE_CENTER(int texNO, float left, float top, float width, float height, int _frameNum = 1) : SPRITE_DATA(texNO, left, top, width, height, -width / 2, -height / 2, _frameNum) {};
+	SPRITE_CENTER(int texNO, float left, float top, float width, float height, int frameNum = 1) : SPRITE_DATA(texNO, left, top, width, height, -width / 2, -height / 2, frameNum) {};
 };
 
 struct SPRITE_BOTTOM : public SPRITE_DATA
 {
-	SPRITE_BOTTOM(int texNO, float left, float top, float width, float height, int _frameNum = 1) : SPRITE_DATA(texNO, left, top, width, height, -width / 2, -height, _frameNum) {};
+	SPRITE_BOTTOM(int texNO, float left, float top, float width, float height, int frameNum = 1) : SPRITE_DATA(texNO, left, top, width, height, -width / 2, -height, frameNum) {};
 };
 
 
@@ -232,8 +168,8 @@ private:
 
 
 public:
-	void loadTextures(LOAD_TEXTURE _data[]);
-	void loadTexture(LOAD_TEXTURE _data[], int a_textureNO);
+	void loadTextures(LOAD_TEXTURE data[]);
+	void loadTexture(LOAD_TEXTURE data[], int textureNO);
 	const LOAD_TEXTURE* textureAt(int fileNO);
 
 
@@ -250,9 +186,9 @@ public:
 
 int basicInput();
 
-void drawString(int a_posX = 0, int a_posY = 0, char *a_pTextBuf = nullptr, UINTCOLOR a_textColor = 0xFFFFFFFF, int _format = STR_LEFT, int a_characterSizeX = 32, int a_characterSizeY = 32, float a_characterRotateAngle = .0f);
+void drawString(int posX = 0, int posY = 0, char *pTextBuf = nullptr, UINTCOLOR textColor = 0xFFFFFFFF, int format = STR_LEFT, int characterSizeX = 32, int characterSizeY = 32, float characterRotateAngle = .0f);
 
-void drawRectangle(int a_leftTopX, int a_leftTopY, int a_width, int a_height, float a_rotateAngle = 0.0, UINTCOLOR a_fillColor = 0xFFFFFFFF);
+void drawRectangle(int leftTopX, int leftTopY, int width, int height, float rotateAngle = 0.0, UINTCOLOR fillColor = 0xFFFFFFFF);
 
 
 
@@ -261,24 +197,24 @@ class RenderTarget;
 class View
 {
 private:
-	RenderTarget *m_pRenderTarget;
-	int m_drawX, m_drawY, m_drawWidth, m_drawHeight, m_srcX, m_srcY, m_srcWidth, m_srcHeight;
-	float m_rotateAngle;
-	UINTCOLOR m_blendColor;
+	RenderTarget *pRenderTarget;
+	int drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight;
+	float rotateAngle;
+	UINTCOLOR blendColor;
 
 
 public:
 
-	View(int a_viewWidth, int a_viewHeight);
-	View(float a_drawX, float a_drawY, float a_drawWidth, float a_drawHeight, float a_srcX = .0f, float a_srcY = .0f, float a_srcWidth = .0f, float a_srcHeight = .0f, float a_rotateAngle = .0f, UINTCOLOR a_blendColor = 0xFFFFFFFF, bool a_doReflection = false);
+	View(int viewWidth, int viewHeight);
+	View(float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, float rotateAngle = .0f, UINTCOLOR blendColor = 0xFFFFFFFF, bool doReflection = false);
 	~View();
 
-	bool m_doReflection;
-	Transform m_custom3d;
+	bool doReflection;
+	Transform transform;
 
 	void set();
 	// View, looks like a 3D textured sprite
-	void set(float a_drawX, float a_drawY, float a_drawWidth, float a_drawHeight, float a_srcX = .0f, float a_srcY = .0f, float a_srcWidth = .0f, float a_srcHeight = .0f, float a_rotateAngle = .0f, UINTCOLOR a_blendColor = 0xFFFFFFFF, bool a_doReflection = false);
+	void set(float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, float rotateAngle = .0f, UINTCOLOR blendColor = 0xFFFFFFFF, bool doReflection = false);
 
 	// Reset ViewPort to real screen
 	static void clear();
@@ -290,14 +226,14 @@ class Primitive3D;
 class Cube
 {
 private:
-	Primitive3D *m_pPrimitive;
+	Primitive3D *pPrimitive;
 public:
-	Cube(const XMFLOAT3 &a_position, const XMFLOAT3 &a_size, const UINTCOLOR &a_blendColor);
+	Cube(const XMFLOAT3 &position, const XMFLOAT3 &size, const UINTCOLOR &blendColor);
 	~Cube();
-	XMFLOAT3	m_position;
-	XMFLOAT3	m_size;
-	UINTCOLOR	m_blendColor;
-	Transform	m_custom3d;
+	XMFLOAT3	position;
+	XMFLOAT3	size;
+	UINTCOLOR	blendColor;
+	Transform	transform;
 
 	void draw();
 
@@ -311,11 +247,16 @@ class SkinnedMesh;
 
 struct MeshFile
 {
-	int fileNO;
-	char* path;
-	SkinnedMesh* data;
+	int fileNO = -1;
+	char* path = nullptr;
+	SkinnedMesh* data = nullptr;
 	MeshFile() {};
 	MeshFile(int fileNO, char* filePath) :fileNO(fileNO), path(filePath) {};
+	/*const MeshFile& operator=(const MeshFile& rhv) {
+		path = rhv.path;
+		return *this;
+	};*/
+	
 };
 
 
@@ -347,6 +288,7 @@ private:
 
 public:
 	void loadMeshes(MeshFile sequencedData[]);
+	void loadMeshes(MeshFile sequencedData[],int *progress);
 	void loadMesh(MeshFile sequencedData[], int fileNO);
 
 	const MeshFile* meshAt(int fileNO);
@@ -361,5 +303,7 @@ public:
 };
 
 #define pMeshManager (MeshManager::getInstance())
+
+
 
 #endif // !_GAME_SYSTEM_H_

@@ -148,9 +148,9 @@ extern DirectX::GamePad::ButtonStateTracker PAD_TRACKER;
 
 extern bool e_isAnyKeyDown;
 
-inline void setCamera(const CameraData &a_cameraData)
+inline void setCamera(const CameraData &cameraData)
 {
-	e_mainCamera = a_cameraData;
+	e_mainCamera = cameraData;
 };
 
 
@@ -159,56 +159,56 @@ typedef UINT UINTCOLOR;
 extern int e_renderTargetWidth;
 extern int e_renderTargetHeight;
 
-inline void setRenderTargetWH(int a_width, int a_height)
+inline void setRenderTargetWH(int width, int height)
 {
-	e_renderTargetWidth = a_width;
-	e_renderTargetHeight = a_height;
+	e_renderTargetWidth = width;
+	e_renderTargetHeight = height;
 	//e_renderTargetWidth = SCREEN_WIDTH;
 	//e_renderTargetHeight = SCREEN_HEIGHT;
 }
 
 // 
-inline XMFLOAT3 toNDC_RT(XMFLOAT3 a_coord, bool a_doProjection = false)
+inline XMFLOAT3 toNDC_RT(XMFLOAT3 coord, bool doProjection = false)
 {
 	float x, y, z = 0;
 
 	// Different Coordinate System
-	if (a_doProjection)
+	if (doProjection)
 	{	// 2D with projection
-		x = a_coord.x / (float)SCREEN_WIDTH;
-		y = a_coord.y / (float)SCREEN_WIDTH;
-		z = a_coord.z / (float)SCREEN_WIDTH;
+		x = coord.x / (float)SCREEN_WIDTH;
+		y = coord.y / (float)SCREEN_WIDTH;
+		z = coord.z / (float)SCREEN_WIDTH;
 	}
 	else
 	{	// 2D without projection
-		x = 2.0f*a_coord.x / e_renderTargetWidth - 1.0f;
-		y = 1.0f - 2.0f*a_coord.y / e_renderTargetHeight;
+		x = 2.0f*coord.x / e_renderTargetWidth - 1.0f;
+		y = 1.0f - 2.0f*coord.y / e_renderTargetHeight;
 	}
 
 	return XMFLOAT3(x, y, z);
 }
 
-inline XMFLOAT4 toNDColor(UINTCOLOR a_inColor)
+inline XMFLOAT4 toNDColor(UINTCOLOR inColor)
 {
 	float red, green, blue, alph;
-	/*red		= (a_inColor >> 24 & 0xFF) / 255.0f;
-	green	= (a_inColor >> 16 & 0xFF) / 255.0f;
-	blue	= (a_inColor >> 8 & 0xFF) / 255.0f;
-	alph	= (a_inColor & 0xFF) / 255.0f;*/
+	/*red		= (inColor >> 24 & 0xFF) / 255.0f;
+	green	= (inColor >> 16 & 0xFF) / 255.0f;
+	blue	= (inColor >> 8 & 0xFF) / 255.0f;
+	alph	= (inColor & 0xFF) / 255.0f;*/
 
-	/*red = a_inColor >> 24 & 0xFF;
-	green = a_inColor >> 16 & 0xFF;
-	blue = a_inColor >> 8 & 0xFF;
-	alph = a_inColor & 0xFF;
+	/*red = inColor >> 24 & 0xFF;
+	green = inColor >> 16 & 0xFF;
+	blue = inColor >> 8 & 0xFF;
+	alph = inColor & 0xFF;
 	red /= 255.0f;
 	green /= 255.0f;
 	blue /= 255.0f;
 	alph /= 255.0f;*/
 
-	red = (a_inColor & 0xFF000000) / (float)0xFF000000;
-	green = (a_inColor & 0xFF0000) / (float)0xFF0000;
-	blue = (a_inColor & 0xFF00) / (float)0xFF00;
-	alph = (a_inColor & 0xFF) / (float)0xFF;
+	red = (inColor & 0xFF000000) / (float)0xFF000000;
+	green = (inColor & 0xFF0000) / (float)0xFF0000;
+	blue = (inColor & 0xFF00) / (float)0xFF00;
+	alph = (inColor & 0xFF) / (float)0xFF;
 
 	return XMFLOAT4(red, green, blue, alph);
 }
