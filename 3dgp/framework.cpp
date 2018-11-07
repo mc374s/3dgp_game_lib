@@ -457,9 +457,9 @@ void framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	MyBlending::setMode(s_pDeviceContext, BLEND_NONE);
 
 	
-	pPrimitive3D[0]->drawCube(s_pDeviceContext, XMFLOAT3(1024+5, 0, 0), XMFLOAT3(2048, 10, 10), 0xFF0000FF);
-	pPrimitive3D[0]->drawCube(s_pDeviceContext, XMFLOAT3(0, 1024-5, 0), XMFLOAT3(10, 2048, 10), 0x00FF00FF);
-	pPrimitive3D[0]->drawCube(s_pDeviceContext, XMFLOAT3(0, 0, 1024+5), XMFLOAT3(10, 10, 2048), 0x0000FFFF);
+	pPrimitive3D[0]->drawCube(s_pDeviceContext, XMFLOAT3(1, 0, 0), XMFLOAT3(2, 0.01, 0.01), 0xFF0000FF);
+	pPrimitive3D[0]->drawCube(s_pDeviceContext, XMFLOAT3(0, 1, 0), XMFLOAT3(0.01, 2, 0.01), 0x00FF00FF);
+	pPrimitive3D[0]->drawCube(s_pDeviceContext, XMFLOAT3(0, 0, 1), XMFLOAT3(0.01, 0.01, 2), 0x0000FFFF);
 	//pPrimitive3D[1]->drawCylinder(s_pDeviceContext, XMFLOAT3(-310, 0, 10 + 0), XMFLOAT3(620, 700, 20), &custom3DTemp);
 
 	char buf[256];

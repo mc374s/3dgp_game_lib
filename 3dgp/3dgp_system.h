@@ -20,10 +20,7 @@
 
 #include <mfplay.h>
 
-#include <DirectXMath.h>
-#include "WICTextureLoader.h"
-#include "Keyboard.h"
-#include "GamePad.h"
+#include "pch.h"
 
 #include "misc.h"
 #include "high_resolution_timer.h"

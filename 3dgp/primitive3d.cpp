@@ -381,7 +381,7 @@ void Primitive3D::setProjection(ID3D11DeviceContext *pDeviceContext, const XMFLO
 void Primitive3D::drawCube(ID3D11DeviceContext *pDeviceContext, const XMFLOAT3 &position, const XMFLOAT3 &size, const UINTCOLOR &blendColor, const Transform& transform)
 {
 	//return;
-	int x = position.x, y = position.y, z = position.z;
+	float x = position.x, y = position.y, z = position.z;
 	float w = size.x, h = size.y, d = size.z;
 	float wHalf = w / 2.0f, hHalf = h / 2.0f, dHalf = d / 2.0f;
 	XMFLOAT4 ndColor = toNDColor(blendColor);

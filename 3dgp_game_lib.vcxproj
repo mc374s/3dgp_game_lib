@@ -83,13 +83,14 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>.\3dgp\DirectXTK-master\Inc;.\3dgp\FBXSDK\2016.1.2\include</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -169,6 +170,7 @@
     <ClInclude Include="numbers.h" />
     <ClInclude Include="obj2d.h" />
     <ClInclude Include="obj3d.h" />
+    <ClInclude Include="pch.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="scene_main.h" />
     <ClInclude Include="scene_title.h" />
@@ -181,6 +183,9 @@
     <ClCompile Include="3dgp\game_system.cpp" />
     <ClCompile Include="3dgp\main.cpp" />
     <ClCompile Include="3dgp\mf_audio.cpp" />
+    <ClCompile Include="3dgp\pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="3dgp\primitive3d.cpp" />
     <ClCompile Include="3dgp\render_target.cpp" />
     <ClCompile Include="3dgp\resources_manager.cpp" />

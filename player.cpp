@@ -18,6 +18,7 @@ void Player::init()
 	speedAcc.x = P_WALK_SPEED;
 	speedMax.x = P_WALK_SPEED_MAX;
 	meshData = &e_fbxPlayerWalk;
+	
 }
 
 void Player::update()
@@ -46,7 +47,6 @@ void Player::update()
 		break;
 	}
 
-
 	if (speed.x > speedMax.x)
 	{
 		speed.x = speedMax.x;
@@ -55,28 +55,47 @@ void Player::update()
 	{
 		speed.x = -speedMax.x;
 	}
-	
 
-	transform.position.y += (-1);
-	if (transform.position.y < 0)
-	{
-		transform.position.y = 0;
-	}
-
-	if (fabsf(speed.x - 0.0f) > FLT_EPSILON)
+	if (fabsf(speed.x - 0.0f) > FLT_EPSILON && fabsf(speed.y - 0.0f) < FLT_EPSILON)
 	{
 		meshData = &e_fbxPlayerWalk;
 	}
-	if (keyCode & PAD_TRG1)
-	{
-		//meshData = &e_fbxPlayerJump;z
-		//transform.position.y += 1000;
-	}
-	
-
 	transform.position.x += speed.x;
 
+	static int frame = 0;
+	if (keyCode & PAD_TRG1)
+	{
+		meshData = &e_fbxPlayerJump;
+		++frame;
+	}
+	if (frame > 0)
+	{
+		++frame;
+		if (frame == 24)
+		{
+			speed.y += P_JUMP_V0;
+		}
+		if (frame == 60)
+		{
+			speed.y = 0;
+		}
+		if (frame >= 84)
+		{
+			frame = 0;
+			meshData = &e_fbxPlayerWalk;
+		}
 
+	}
+	speed.y -= P_GF;
+	transform.position.y += speed.y;
+
+	if (transform.position.y < 0)
+	{
+		transform.position.y = 0;
+		speed.y = 0;
+	}
+
+	
 	e_mainCamera.upDirection = { 0,1,0, 0 };
 	e_mainCamera.eyePosition = { transform.position.x, transform.position.y + 0.5f,transform.position.z - 3.0f,0 };
 	e_mainCamera.focusPosition = { transform.position.x, transform.position.y + 0.5f, transform.position.z,0 };

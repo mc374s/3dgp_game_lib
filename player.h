@@ -7,6 +7,10 @@
 #define P_WALK_SPEED_MAX (0.03)
 #define P_RUN_SPEED (0.05)
 #define P_RUN_SPEED_MAX (0.1)
+#define P_GS (9.8f)
+#define P_GF (0.0027f) //P_GS/3600.0f
+#define P_JUMP_HEIGHT (5.0f)
+#define P_JUMP_V0 (9.9f/60.0f) //sqrt(2*P_GF*P_JUMP_HEIGHT)
 
 
 class Player : public OBJ3D
