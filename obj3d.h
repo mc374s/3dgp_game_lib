@@ -31,6 +31,8 @@ public:
 	int type;
 	bool isInit;
 	//void(*pfMove)();
+	int frame;
+
 	void(OBJ3D::*moveFunc)();
 
 

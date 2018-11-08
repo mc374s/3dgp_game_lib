@@ -56,13 +56,13 @@ void Player::update()
 		speed.x = -speedMax.x;
 	}
 
-	if (fabsf(speed.x - 0.0f) > FLT_EPSILON && fabsf(speed.y - 0.0f) < FLT_EPSILON)
+	/*if (fabsf(speed.x - 0.0f) > FLT_EPSILON)
 	{
+		frame = 0;
 		meshData = &e_fbxPlayerWalk;
-	}
+	}*/
 	transform.position.x += speed.x;
 
-	static int frame = 0;
 	if (keyCode & PAD_TRG1)
 	{
 		meshData = &e_fbxPlayerJump;
@@ -71,15 +71,27 @@ void Player::update()
 	if (frame > 0)
 	{
 		++frame;
+		if (frame < 24)
+		{
+			transform.position.x -= speed.x;
+		}
 		if (frame == 24)
 		{
 			speed.y += P_JUMP_V0;
 		}
-		if (frame == 60)
+		if (frame > 36 && speed.y > 0)
 		{
-			speed.y = 0;
+			frame = 36;
 		}
-		if (frame >= 84)
+		if (frame > 60 && speed.y < 0)
+		{
+			frame = 60;
+		}
+		if (frame > 72)
+		{
+			transform.position.x -= speed.x;
+		}
+		if (frame > 83)
 		{
 			frame = 0;
 			meshData = &e_fbxPlayerWalk;

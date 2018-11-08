@@ -108,7 +108,7 @@ void SceneTitle::draw()
 
 	pBG->draw();
 
-	//e_fbxItemFloor.draw();
+	e_fbxItemFloor.draw();
 	//e_fbxItemBox.draw();
 	
 	//static OBJ3D temp = g_player;

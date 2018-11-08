@@ -22,7 +22,7 @@ extern MeshData e_fbxPlayerWalk;
 extern MeshData e_fbxPlayerJump;
 
 //extern MeshData e_fbxItemSword;
-//extern MeshData e_fbxItemFloor;
+extern MeshData e_fbxItemFloor;
 //extern MeshData e_fbxItemBox;
 
 

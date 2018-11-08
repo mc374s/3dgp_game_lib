@@ -544,7 +544,7 @@ void SkinnedMesh::render(ID3D11DeviceContext *pDeviceContext, bool doFill, const
 	}
 }
 
-void SkinnedMesh::setProjection(ID3D11DeviceContext *pDeviceContext, const Transform &preSetTransform, const Transform& transform, const XMMATRIX& globalTransform, SkeletalAnimation& skeletalAnimation, float elapsedTime)
+void SkinnedMesh::setProjection(ID3D11DeviceContext *pDeviceContext, const Transform &preSetTransform, const Transform& transform, const XMMATRIX& globalTransform, SkeletalAnimation& skeletalAnimation, const int& animationFrame, float elapsedTime)
 {
 	static XMFLOAT3 position, rotationAxis;
 	//position = toNDC(transform.position + preSetTransform.position);
@@ -589,7 +589,15 @@ void SkinnedMesh::setProjection(ID3D11DeviceContext *pDeviceContext, const Trans
 
 	//Play Fbx Animation
 	if (skeletalAnimation.size() > 0) {
-		size_t frame = skeletalAnimation.animationTick / skeletalAnimation.samplingTime;
+		if (animationFrame == 0)
+		{
+			frame = skeletalAnimation.animationTick / skeletalAnimation.samplingTime;
+		}
+		else
+		{
+			frame = animationFrame;
+		}
+		
 		if (frame > skeletalAnimation.size() - 1) {
 			frame = 0;
 			skeletalAnimation.animationTick = 0;
@@ -609,11 +617,11 @@ void SkinnedMesh::setProjection(ID3D11DeviceContext *pDeviceContext, const Trans
 }
 
 
-void SkinnedMesh::drawMesh(ID3D11DeviceContext *pDeviceContext, const Transform& preSetTransform, const Transform& transform, float elapsedTime)
+void SkinnedMesh::drawMesh(ID3D11DeviceContext *pDeviceContext, const Transform& preSetTransform, const Transform& transform, const int& animationFrame, float elapsedTime)
 {
 	for (Mesh &mesh : meshesList)
 	{
-		setProjection(pDeviceContext, preSetTransform, transform, mesh.globalTransform, mesh.skeletalAnimation, elapsedTime);
+		setProjection(pDeviceContext, preSetTransform, transform, mesh.globalTransform, mesh.skeletalAnimation, animationFrame, elapsedTime);
 		render(pDeviceContext, true, mesh);
 	}
 }

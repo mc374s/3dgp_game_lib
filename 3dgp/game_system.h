@@ -270,7 +270,7 @@ struct MeshData
 		preSetTransform.position = preSetPosition;
 		preSetTransform.eulerAngle = preSetEulerAngle;
 	};
-	void draw(const Transform &transform = Transform::initialValue());
+	void draw(const Transform &transform = Transform::initialValue(), const int& frame = 0);
 
 };
 

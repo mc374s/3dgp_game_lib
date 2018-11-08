@@ -201,10 +201,10 @@ void Cube::draw()
 
 // Skinned Mesh Data Management
 
-void MeshData::draw(const Transform &transform)
+void MeshData::draw(const Transform &transform, const int& frame)
 {
 	if (fileNO >= 0 && fileNO < MAX_MESH_FILE_NUM && pMeshManager->meshAt(fileNO) && pMeshManager->meshAt(fileNO)->data) {
-		pMeshManager->meshAt(fileNO)->data->drawMesh(framework::s_pDeviceContext, preSetTransform, transform);
+		pMeshManager->meshAt(fileNO)->data->drawMesh(framework::s_pDeviceContext, preSetTransform, transform, frame);
 	}
 }
 

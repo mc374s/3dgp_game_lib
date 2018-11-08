@@ -60,6 +60,7 @@ void OBJ3D::clear()
 	speed = speedAcc = speedMax = size = Vector3(0, 0, 0);
 	timer = 0;
 	step = 0;
+	frame = 0;
 	transform.clear();
 
 	isInit = false;
@@ -79,7 +80,7 @@ void OBJ3D::draw()
 {
 	if (meshData)
 	{
-		meshData->draw(transform);
+		meshData->draw(transform, frame);
 	}
 
 }

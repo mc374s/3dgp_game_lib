@@ -112,16 +112,18 @@ private:
 
 
 public:
+	int frame = 0;
+
 	SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const bool exchangeYandZ = false);
 	virtual ~SkinnedMesh();
 	
 	void createBuffers(ID3D11Device *pDevice, ID3D11Buffer** ppVertexBuffer, ID3D11Buffer** ppIndexBuffer, vertex3D *pVertices, int vertexNum, WORD *pIndices, int indexNum);
 
 	inline XMFLOAT3 toNDC(XMFLOAT3 input);
-	void setProjection(ID3D11DeviceContext *pDeviceContext, const Transform& preSetTransform = Transform::initialValue(), const Transform& transform = Transform::initialValue(), const XMMATRIX &globalTransform = XMMatrixIdentity(), SkeletalAnimation &skeletalAnimation = SkeletalAnimation(), float elapsedTime = 1 / 60.0f/*UNIT.23*/);
+	void setProjection(ID3D11DeviceContext *pDeviceContext, const Transform& preSetTransform = Transform::initialValue(), const Transform& transform = Transform::initialValue(), const XMMATRIX &globalTransform = XMMatrixIdentity(), SkeletalAnimation &skeletalAnimation = SkeletalAnimation(), const int& animationFrame = 0, float elapsedTime = 1 / 60.0f/*UNIT.23*/);
 	void render(ID3D11DeviceContext *pDeviceContext, bool doFill, const Mesh &mesh);
 
-	void drawMesh(ID3D11DeviceContext *pDeviceContext, const Transform& preSetTransform = Transform::initialValue(), const Transform& transform = Transform::initialValue(), float elapsedTime = 1 / 60.0f/*UNIT.23*/);
+	void drawMesh(ID3D11DeviceContext *pDeviceContext, const Transform& preSetTransform = Transform::initialValue(), const Transform& transform = Transform::initialValue(), const int& animationFrame = 0, float elapsedTime = 1 / 60.0f/*UNIT.23*/);
 };
 
 
