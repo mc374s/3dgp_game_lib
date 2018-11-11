@@ -6,7 +6,7 @@
 //
 //******************************************************************************
 
-#include "3dgp/mf_audio.h"
+#include "../3dgp/mf_audio.h"
 #include "sound_data.h"
 
 RESOURCE_DATA audio_data[] = {

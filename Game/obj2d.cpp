@@ -7,7 +7,7 @@
 // Class OBJ2D Function
 OBJ2D::OBJ2D() 
 {
-	clear();
+	Clear();
 }
 
 void OBJ2D::memberCopy(const OBJ2D& inputObj)
@@ -49,7 +49,7 @@ OBJ2D::OBJ2D(const OBJ2D& inputObj)
 
 OBJ2D::~OBJ2D() 
 {
-	clear();
+	Clear();
 }
 
 const OBJ2D& OBJ2D::operator=(const OBJ2D& right)
@@ -59,7 +59,7 @@ const OBJ2D& OBJ2D::operator=(const OBJ2D& right)
 }
 
 
-void OBJ2D::clear() 
+void OBJ2D::Clear() 
 {
 	pfMove = nullptr;
 	pSprData = nullptr;
@@ -67,8 +67,8 @@ void OBJ2D::clear()
 	speed = speedAcc = speedMax = size = Vector3(0, 0, 0);
 	timer = 0;
 	step = 0;
-	transform2D.clear();
-	transform.clear();
+	transform2D.Clear();
+	transform.Clear();
 
 	alpha = 255;
 	isInit = false;
@@ -77,7 +77,7 @@ void OBJ2D::clear()
 	setAlpha = 255;
 }
 
-void OBJ2D::update()
+void OBJ2D::Update()
 {
 	if (pfMove){
 		(this->*pfMove)();
@@ -85,7 +85,7 @@ void OBJ2D::update()
 	//pos.y = initPos.y - SCROLL_Y;
 }
 
-void OBJ2D::draw() 
+void OBJ2D::Draw() 
 {
 	if (pSprData)
 	{
@@ -97,7 +97,7 @@ void OBJ2D::draw()
 		}
 		transform2D.rgba = transform2D.rgba >> 8 << 8 | alpha;
 		//pSprData->draw(pos.x, pos.y, &transform2D);
-		pSprData->draw(pos, transform2D, transform);
+		pSprData->Draw(pos, transform2D, transform);
 	}
 
 }
@@ -120,7 +120,7 @@ int OBJ2D::searchSet(OBJ2D** ppBegin, int max)
 
 OBJ2DEX::OBJ2DEX()
 {
-	clear();
+	Clear();
 }
 
 void OBJ2DEX::memberCopy(const OBJ2DEX& inputObj)
@@ -139,7 +139,7 @@ OBJ2DEX::OBJ2DEX(const OBJ2DEX& inputObj):OBJ2D(inputObj)
 
 OBJ2DEX::~OBJ2DEX()
 {
-	clear();
+	Clear();
 }
 
 const OBJ2DEX& OBJ2DEX::operator=(const OBJ2DEX& right)
@@ -148,9 +148,9 @@ const OBJ2DEX& OBJ2DEX::operator=(const OBJ2DEX& right)
 	return *this;
 }
 
-void OBJ2DEX::clear() 
+void OBJ2DEX::Clear() 
 {
-	OBJ2D::clear();
+	OBJ2D::Clear();
 	aframe = 0;
 	animeNO = 0;
 	animeCounter = 0;
@@ -176,14 +176,14 @@ void OBJ2DEX::animation()
 	}
 }
 
-void OBJ2DEX::update()
+void OBJ2DEX::Update()
 {
-	OBJ2D::update();
+	OBJ2D::Update();
 }
 
-void OBJ2DEX::draw() 
+void OBJ2DEX::Draw() 
 {
-	OBJ2D::draw();
+	OBJ2D::Draw();
 	/*if (pSprData)
 	{
 		if (alpha > 255) {
@@ -193,7 +193,7 @@ void OBJ2DEX::draw()
 			alpha = 0;
 		}
 		transform2D.rgba = transform2D.rgba >> 8 << 8 | alpha;
-		pSprData->draw(pos, &transform2D);
+		pSprData->Draw(pos, &transform2D);
 	}*/
 }
 
@@ -209,7 +209,7 @@ void ObjManager::init()
 
 }
 
-void ObjManager::update(int liveInPagination) {
+void ObjManager::Update(int liveInPagination) {
 
 	// 描画順番を並び替え　pos.z : 小さい順から描画していく 
 	//OBJ2D* temp = nullptr;
@@ -234,7 +234,7 @@ void ObjManager::update(int liveInPagination) {
 
 }
 
-void ObjManager::draw(int liveInPagination)
+void ObjManager::Draw(int liveInPagination)
 {
 
 }

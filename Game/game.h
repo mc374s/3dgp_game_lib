@@ -2,12 +2,12 @@
 #define	_GAME_H_
 
 
-#include "./3dgp/3dgp_system.h"
-#include "./3dgp/framework.h"
-#include "./3dgp/mf_audio.h"
-#include "./3dgp/game_system.h"
-#include "./3dgp/template.h"
-#include "./3dgp/scene.h"
+#include "../3dgp/3dgp.h"
+#include "../3dgp/framework.h"
+#include "../3dgp/mf_audio.h"
+#include "../3dgp/game_system.h"
+#include "../3dgp/template.h"
+#include "../3dgp/scene.h"
 
 #define DEBUG
 

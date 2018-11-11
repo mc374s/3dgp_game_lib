@@ -9,27 +9,37 @@
 #include <fstream>
 
 
-void SPRITE_DATA::draw(float x, float y,const Transform2D& transform2D) {
+void SPRITE_DATA::Draw(float x, float y,const Transform2D& transform2D) {
 	if (texNO >= 0 && texNO < TEX_MAX && pTextureManager->textureAt(texNO) && pTextureManager->textureAt(texNO)->img)
 	{
-		pTextureManager->textureAt(texNO)->img->render(framework::s_pDeviceContext, x + ofsX, y + ofsY, transform2D.scaleX*width, transform2D.scaleY*height, left, top, width, height, transform2D.rgba, transform2D.angle, transform2D.centRotate, transform2D.centX, transform2D.centY, transform2D.reflectX, transform2D.scaleMode);
+		pTextureManager->textureAt(texNO)->img->Render(framework::s_pDeviceContext, x + ofsX, y + ofsY, transform2D.scaleX*width, transform2D.scaleY*height, left, top, width, height, transform2D.rgba, transform2D.angle, transform2D.centRotate, transform2D.centX, transform2D.centY, transform2D.reflectX, transform2D.scaleMode);
 	}
 }
 
-void SPRITE_DATA::draw(Vector3 &pos, const Transform2D& transform2D, const Transform& transfrom) {
+void SPRITE_DATA::Draw(Vector3 &pos, const Transform2D& transform2D, const Transform& transform) {
 	if (texNO >= 0 && texNO < TEX_MAX && pTextureManager->textureAt(texNO) && pTextureManager->textureAt(texNO)->img) {
 		if (pTextureManager->textureAt(texNO)->doProjection)
 		{
-			pTextureManager->textureAt(texNO)->img->render3D(framework::s_pDeviceContext, pos.x + ofsX, pos.y + ofsY, transform2D.scaleX*width, transform2D.scaleY*height, left, top, width, height, transform2D.rgba, transform2D.angle, transform2D.centRotate, transform2D.centX, transform2D.centY, transform2D.reflectX, transform2D.scaleMode, transfrom);
+			static XMMATRIX world, view, projection;
+			//world = view = projection = DirectX::XMMatrixIdentity();
+			const XMVECTORF32 translate = { transform.position.x, transform.position.y, transform.position.z };
+			const XMVECTORF32 scale = { transform.scaling.x, transform.scaling.y, transform.scaling.z };
+			XMVECTOR rotate = XMQuaternionRotationRollPitchYaw(transform.eulerDegreeAngle.x, transform.eulerDegreeAngle.y, transform.eulerDegreeAngle.z);
+
+			world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), scale, g_XMZero, rotate, translate);
+			view = DirectX::XMMatrixLookAtLH(e_mainCamera.eyePosition, e_mainCamera.focusPosition, e_mainCamera.upDirection);
+			projection = DirectX::XMMatrixPerspectiveFovLH(XM_PIDIV4, SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.01f, 100.0f);
+
+			pTextureManager->textureAt(texNO)->img->Render3D(framework::s_pDeviceContext, world, view, projection, pos.x + ofsX, pos.y + ofsY, transform2D.scaleX*width, transform2D.scaleY*height, left, top, width, height, transform2D.rgba, transform2D.angle, transform2D.centRotate, transform2D.centX, transform2D.centY, transform2D.reflectX, transform2D.scaleMode);
 		}
 		else
 		{
-			draw(pos.x, pos.y, transform2D);
+			Draw(pos.x, pos.y, transform2D);
 		}
 	}
 }
 
-void TextureManager::loadTextures(LOAD_TEXTURE data[])
+void TextureManager::LoadTextures(LOAD_TEXTURE data[])
 {
 	for (int i = data[0].texNO; data[i].texNO != -1 || data[i].fileName != NULL; i++)
 	{
@@ -38,7 +48,7 @@ void TextureManager::loadTextures(LOAD_TEXTURE data[])
 	}
 }
 
-void TextureManager::loadTexture(LOAD_TEXTURE data[], int textureNO)
+void TextureManager::LoadTexture(LOAD_TEXTURE data[], int textureNO)
 {
 	if (data[textureNO].texNO != -1 || data[textureNO].fileName != NULL)
 	{
@@ -59,7 +69,7 @@ const LOAD_TEXTURE* TextureManager::textureAt(int fileNO)
 	}
 }
 
-void TextureManager::releaseTexture()
+void TextureManager::ReleaseTexture()
 {
 	int i;
 	for (i = 0; i < TEX_MAX; i++)
@@ -74,7 +84,7 @@ void TextureManager::releaseTexture()
 }
 
 
-int  basicInput()
+int  BasicInput()
 {
 	int command = 0x0;
 
@@ -112,16 +122,16 @@ int  basicInput()
 	return command;
 }
 
-void drawString(int x, int y, char *buf, UINTCOLOR color, int format, int sizeX, int sizeY, float angle)
+void DrawString(int x, int y, char *buf, UINTCOLOR color, int format, int sizeX, int sizeY, float angle)
 {
-	drawSprString(framework::s_pDeviceContext, x, y, buf, color, format, sizeX, sizeY, angle);
+	SpriteString::DrawString(framework::s_pDeviceContext, x, y, buf, color, format, sizeX, sizeY, angle);
 }
 
-void drawRectangle(int x, int y, int w, int h, float angle, UINTCOLOR color)
+void DrawRectangle(int x, int y, int w, int h, float angle, UINTCOLOR color)
 {
 	static Sprite rect(framework::s_pDevice);
 	//MyBlending::setMode(framework::pDeviceContext, BLEND_REPLACE);
-	rect.render(framework::s_pDeviceContext, x, y, w, h, angle, color);
+	rect.Render(framework::s_pDeviceContext, x, y, w, h, angle, color);
 	//MyBlending::setMode(framework::pDeviceContext, BLEND_ALPHA);
 }
 
@@ -131,7 +141,7 @@ void drawRectangle(int x, int y, int w, int h, float angle, UINTCOLOR color)
 View::View(int viewWidth, int viewHeight) :doReflection(false)
 {
 	pRenderTarget = new RenderTarget(framework::s_pDevice, viewWidth, viewHeight);
-	transform.clear();
+	transform.Clear();
 }
 
 View::View(float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, float rotateAngle, UINTCOLOR blendColor, bool doReflection):
@@ -142,7 +152,7 @@ blendColor(blendColor),
 doReflection(doReflection)
 {
 	pRenderTarget = new RenderTarget(framework::s_pDevice, drawWidth, drawHeight);
-	transform.clear();
+	transform.Clear();
 }
 
 View::~View()
@@ -154,17 +164,37 @@ View::~View()
 	}
 }
 
-void View::set(float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, float rotateAngle, UINTCOLOR blendColor, bool doReflection)
+void View::Set(float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, float rotateAngle, UINTCOLOR blendColor, bool doReflection)
 {
-	pRenderTarget->render3D(framework::s_pDeviceContext, drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, rotateAngle, blendColor, transform, doReflection);
+	static XMMATRIX world, view, projection;
+	//world = view = projection = DirectX::XMMatrixIdentity();
+	const XMVECTORF32 translate = { transform.position.x, transform.position.y, transform.position.z };
+	const XMVECTORF32 scale = { transform.scaling.x, transform.scaling.y, transform.scaling.z };
+	XMVECTOR rotate = XMQuaternionRotationRollPitchYaw(transform.eulerDegreeAngle.x, transform.eulerDegreeAngle.y, transform.eulerDegreeAngle.z);
+
+	world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), scale, g_XMZero, rotate, translate);
+	view = DirectX::XMMatrixLookAtLH(e_mainCamera.eyePosition, e_mainCamera.focusPosition, e_mainCamera.upDirection);
+	projection = DirectX::XMMatrixPerspectiveFovLH(XM_PIDIV4, SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.01f, 100.0f);
+
+	pRenderTarget->Draw(framework::s_pDeviceContext, world, view, projection, drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, rotateAngle, blendColor, doReflection);
 }
 
-void View::set()
+void View::Set()
 {
-	pRenderTarget->render3D(framework::s_pDeviceContext, drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, rotateAngle, blendColor, transform, doReflection);
+	static XMMATRIX world, view, projection;
+	//world = view = projection = DirectX::XMMatrixIdentity();
+	const XMVECTORF32 translate = { transform.position.x, transform.position.y, transform.position.z };
+	const XMVECTORF32 scale = { transform.scaling.x, transform.scaling.y, transform.scaling.z };
+	XMVECTOR rotate = XMQuaternionRotationRollPitchYaw(transform.eulerDegreeAngle.x, transform.eulerDegreeAngle.y, transform.eulerDegreeAngle.z);
+
+	world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), scale, g_XMZero, rotate, translate);
+	view = DirectX::XMMatrixLookAtLH(e_mainCamera.eyePosition, e_mainCamera.focusPosition, e_mainCamera.upDirection);
+	projection = DirectX::XMMatrixPerspectiveFovLH(XM_PIDIV4, SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.01f, 100.0f);
+
+	pRenderTarget->Draw(framework::s_pDeviceContext, world, view, projection, drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, rotateAngle, blendColor, doReflection);
 }
 
-void View::clear()
+void View::Clear()
 {
 	framework::s_pDeviceContext->OMSetRenderTargets(1, &framework::s_pRenderTargetView, framework::s_pDepthStencilView);
 
@@ -180,7 +210,7 @@ void View::clear()
 Cube::Cube(const XMFLOAT3 &position, const XMFLOAT3 &size, const UINTCOLOR &blendColor) :position(position), size(size), blendColor(blendColor)
 {
 	pPrimitive = new Primitive3D(framework::s_pDevice);
-	pPrimitive->initialize(framework::s_pDevice, GEOMETRY_CUBE);
+	pPrimitive->Initialize(framework::s_pDevice, GEOMETRY_CUBE);
 }
 
 Cube::~Cube()
@@ -192,23 +222,39 @@ Cube::~Cube()
 	}
 }
 
-void Cube::draw()
+void Cube::Draw()
 {
-	pPrimitive->drawCube(framework::s_pDeviceContext, position, size, blendColor, transform);
+	//pPrimitive->drawCube(framework::s_pDeviceContext, position, size, blendColor, transform);
 }
 
 ////////////////////////////////////////////////////////////
 
 // Skinned Mesh Data Management
 
-void MeshData::draw(const Transform &transform, const int& frame)
+void MeshData::Draw(const Transform &transform, const int& frame)
 {
 	if (fileNO >= 0 && fileNO < MAX_MESH_FILE_NUM && pMeshManager->meshAt(fileNO) && pMeshManager->meshAt(fileNO)->data) {
-		pMeshManager->meshAt(fileNO)->data->drawMesh(framework::s_pDeviceContext, preSetTransform, transform, frame);
+		// TODO: Use Matrix in Scene
+
+		Vector3 positionAdd = preSetTransform.position + transform.position;
+		Vector3 scaleMul = preSetTransform.scaling * transform.scaling;
+		Vector3 rotateAdd = (preSetTransform.eulerDegreeAngle + transform.eulerDegreeAngle)*0.01745f;
+
+		static XMMATRIX world, view, projection;
+		//world = view = projection = DirectX::XMMatrixIdentity();
+		const XMVECTORF32 translate = { positionAdd.x, positionAdd.y, positionAdd.z };
+		const XMVECTORF32 scale = { scaleMul.x, scaleMul.y, scaleMul.z };
+		XMVECTOR rotate = XMQuaternionRotationRollPitchYaw(rotateAdd.x, rotateAdd.y, rotateAdd.z);
+
+		world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), scale, g_XMZero, rotate, translate);
+		view = DirectX::XMMatrixLookAtLH(e_mainCamera.eyePosition, e_mainCamera.focusPosition, e_mainCamera.upDirection);
+		projection = DirectX::XMMatrixPerspectiveFovLH(XM_PIDIV4, SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.01f, 100.0f);
+
+		pMeshManager->meshAt(fileNO)->data->Draw(framework::s_pDeviceContext, world, view, projection, false, frame);
 	}
 }
 
-void MeshManager::loadMesh(MeshFile data[], int fileNO)
+void MeshManager::LoadMesh(MeshFile data[], int fileNO)
 {
 	if (data[fileNO].fileNO != -1 || data[fileNO].path != NULL)
 	{
@@ -217,7 +263,7 @@ void MeshManager::loadMesh(MeshFile data[], int fileNO)
 	}
 }
 
-void MeshManager::loadMeshes(MeshFile data[])
+void MeshManager::LoadMeshes(MeshFile data[])
 {
 	for (int i = data[0].fileNO; data[i].fileNO != -1 || data[i].path != NULL; i++)
 	{
@@ -226,7 +272,7 @@ void MeshManager::loadMeshes(MeshFile data[])
 	}
 }
 
-void MeshManager::loadMeshes(MeshFile data[], int *progress)
+void MeshManager::LoadMeshes(MeshFile data[], int *progress)
 {
 	*progress = 0;
 	//LARGE_INTEGER meshesSize;
@@ -275,7 +321,7 @@ const MeshFile* MeshManager::meshAt(int fileNO)
 	}
 }
 
-void MeshManager::releaseMeshes()
+void MeshManager::ReleaseMeshes()
 {
 	for (int i = 0; i < MAX_MESH_FILE_NUM; i++)
 	{

@@ -17,8 +17,8 @@ public:
 	~SceneMain();
 
 	void init();
-	void update();
-	void draw();
+	void Update();
+	void Draw();
 
 	bool pause();
 	void gameMain();

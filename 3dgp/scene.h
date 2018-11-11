@@ -23,10 +23,10 @@ public:
 		pNextScene = nullptr;
 	};
 	/*virtual void update(float _elapsedTime = .0f) {};
-	virtual void draw(float _elapsedTime = .0f) {};*/
+	virtual void Draw(float _elapsedTime = .0f) {};*/
 
-	virtual void update() {};
-	virtual void draw() {};
+	virtual void Update() {};
+	virtual void Draw() {};
 
 	virtual void changeScene(Scene* pNextScene) {
 		pNextScene->pNextScene = nullptr;

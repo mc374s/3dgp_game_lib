@@ -1,11 +1,11 @@
-﻿#include "3dgp_system.h"
+﻿#include "3dgp.h"
 
 #include "framework.h"
 
-#include "../game.h"
-#include "../sound_data.h"
-#include "../sprite_data.h"
-#include "../scene_title.h"
+#include "../Game/game.h"
+#include "../Game/sound_data.h"
+#include "../Game/sprite_data.h"
+#include "../Game/scene_title.h"
 #include <thread>
 
 LRESULT CALLBACK fnWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
@@ -59,7 +59,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, LPWSTR cmd_line
 
 	framework f(hwnd);
 	srand(unsigned int(time(NULL)));
-	pTextureManager->loadTextures(e_loadTexture);		// 2D画像の一括ロード
+	pTextureManager->LoadTextures(e_loadTexture);		// 2D画像の一括ロード
 
 	framework::changeScene(SCENE_TITLE);
 
@@ -67,5 +67,5 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, LPWSTR cmd_line
 	ShowWindow(hwnd, cmd_show);
 	SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(&f));
 
-	return f.run();
+	return f.Run();
 }

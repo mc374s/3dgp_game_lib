@@ -64,7 +64,7 @@ int MyBlending::s_blendMode[BLEND_MODE_MAX][6] = {
 
 };
 
-void MyBlending::initialize(ID3D11Device *pDevice)
+void MyBlending::Initialize(ID3D11Device *pDevice)
 {
 
 	D3D11_BLEND_DESC blendDesc;
@@ -107,7 +107,7 @@ void MyBlending::setMode(ID3D11DeviceContext* &pDeviceContext, int mode)
 	}
 }
 
-void MyBlending::release()
+void MyBlending::Release()
 {
 	for (int i = 0; i < BLEND_MODE_MAX; i++)
 	{

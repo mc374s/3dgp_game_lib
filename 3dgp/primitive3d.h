@@ -1,9 +1,7 @@
 #ifndef _PRIMITIVE3D_H_
 #define _PRIMITIVE3D_H_
 
-#include "3dgp_system.h"
-
-using namespace DirectX;
+#include "3dgp.h"
 
 enum GEOMETRY_TYPE
 {
@@ -17,9 +15,6 @@ class Primitive3D
 private:
 	struct vertex3D
 	{
-		//XMFLOAT3 position = { 1.0f,1.0f,1.0f };
-		//XMFLOAT4 color = { 1.0f,1.0f,1.0f,1.0f };
-		//XMFLOAT3 normal = { 1.0f,1.0f,1.0f };
 		XMFLOAT3 position;
 		XMFLOAT4 color;
 		XMFLOAT3 normal;
@@ -38,7 +33,6 @@ private:
 private:
 
 	HRESULT hr;
-	//ID3D11ShaderResourceView*	pShaderResourceView;
 	ID3D11VertexShader*			pVertexShader;
 	ID3D11InputLayout*			pInputLayout;
 	ID3D11PixelShader*			pPixelShader;
@@ -57,24 +51,21 @@ private:
 	UINT latitudeNum;
 	UINT longitudeNum;
 
+	template <size_t vertexNum, size_t indexNum>
+	void CreateBuffers(ID3D11Device *pDevice, vertex3D(&pVertices)[vertexNum], WORD(&pIndices)[indexNum]) {
+		CreateBuffers(pDevice, pVertices, vertexNum, pIndices, indexNum);
+	};
+	void CreateBuffers(ID3D11Device *pDevice, vertex3D *pVertices, int vertexNum, WORD *pIndices, int indexNum);
+
+	void Render(ID3D11DeviceContext *pDeviceContext, bool doFill);
+
 public:
 	Primitive3D(ID3D11Device *pDevice);
 	virtual ~Primitive3D();
 
-	virtual void initialize(ID3D11Device *pDevice, const int &type = GEOMETRY_CUBE, const int &latitudeNum = 2, const int &longitudeNum = 6);
+	virtual void Initialize(ID3D11Device *pDevice, const int &type = GEOMETRY_CUBE, const int &latitudeNum = 2, const int &longitudeNum = 6);
 
-	template <size_t vertexNum,size_t indexNum>
-	void createBuffers(ID3D11Device *pDevice, vertex3D (&pVertices)[vertexNum], WORD (&pIndices)[indexNum]) {
-		createBuffers(pDevice, pVertices, vertexNum, pIndices, indexNum);
-	};
-	void createBuffers(ID3D11Device *pDevice, vertex3D *pVertices, int vertexNum, WORD *pIndices, int indexNum);
-
-	inline XMFLOAT3 toNDC(const XMFLOAT3 &inputCoord);
-	void setProjection(ID3D11DeviceContext *pDeviceContext, const XMFLOAT3 &position, const XMFLOAT4 &materialColor = XMFLOAT4(1, 1, 1, 1), const Transform& transform = Transform::initialValue());
-	void render(ID3D11DeviceContext *pDeviceContext, bool doFill);
-
-	void drawCube(ID3D11DeviceContext *pDeviceContext, const XMFLOAT3 &position, const XMFLOAT3 &size, const UINTCOLOR &blendColor = 0xFFFFFFFF, const Transform& transform = Transform::initialValue());
-	void drawCylinder(ID3D11DeviceContext *pDeviceContext, const XMFLOAT3 &position, const XMFLOAT3 &size, const Transform& transform = Transform::initialValue());
+	void Draw(ID3D11DeviceContext *pDeviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, const UINTCOLOR &blendColor = 0xFFFFFFFF);
 };
 
 

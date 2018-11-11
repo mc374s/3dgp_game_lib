@@ -1,9 +1,6 @@
-﻿#include <iostream>
+﻿#include "sprite.h"
 
-#include "sprite.h"
-//#define _CRT_SECURE_NO_WARNINGS
-
-bool Sprite::initialize(ID3D11Device* pDevice)
+bool Sprite::Initialize(ID3D11Device* pDevice)
 {
 	vertexCount = 4 /*sizeof(vertices) / sizeof(vertex)*/;
 
@@ -58,7 +55,7 @@ bool Sprite::initialize(ID3D11Device* pDevice)
 
 Sprite::Sprite(ID3D11Device* pDevice)
 {
-	initialize(pDevice);
+	Initialize(pDevice);
 
 	D3D11_INPUT_ELEMENT_DESC layoutDesc[] =
 	{
@@ -66,8 +63,8 @@ Sprite::Sprite(ID3D11Device* pDevice)
 		{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 12,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
-	RM::loadVertexShader(pDevice, "Data/Shader/texture_off_2d_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &pVertexShader, &pInputLayout);
-	RM::loadPixelShader(pDevice, "Data/Shader/texture_off_ps.cso", &pPixelShader);
+	RM::LoadVertexShader(pDevice, "./Data/Shader/texture_off_2d_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &pVertexShader, &pInputLayout);
+	RM::LoadPixelShader(pDevice, "./Data/Shader/texture_off_ps.cso", &pPixelShader);
 
 	pShaderResourceView = NULL;
 
@@ -76,7 +73,7 @@ Sprite::Sprite(ID3D11Device* pDevice)
 
 Sprite::Sprite(ID3D11Device* pDevice, char* pFilename/*Texture file name*/, bool doProjection)
 {
-	initialize(pDevice);
+	Initialize(pDevice);
 	doProjection = doProjection;
 
 
@@ -89,7 +86,7 @@ Sprite::Sprite(ID3D11Device* pDevice, char* pFilename/*Texture file name*/, bool
 			{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 28,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "NORMAL",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 36,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		};
-		RM::loadVertexShader(pDevice, "Data/Shader/texture_on_3d_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &pVertexShader, &pInputLayout);
+		RM::LoadVertexShader(pDevice, "./Data/Shader/texture_on_3d_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &pVertexShader, &pInputLayout);
 	}
 	else {
 		D3D11_INPUT_ELEMENT_DESC layoutDesc[] =
@@ -98,12 +95,12 @@ Sprite::Sprite(ID3D11Device* pDevice, char* pFilename/*Texture file name*/, bool
 			{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 12,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 28,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		};
-		RM::loadVertexShader(pDevice, "Data/Shader/texture_on_2d_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &pVertexShader, &pInputLayout);
+		RM::LoadVertexShader(pDevice, "./Data/Shader/texture_on_2d_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &pVertexShader, &pInputLayout);
 	}
-	RM::loadPixelShader(pDevice, "Data/Shader/texture_on_ps.cso", &pPixelShader);
+	RM::LoadPixelShader(pDevice, "./Data/Shader/texture_on_ps.cso", &pPixelShader);
 
 	ID3D11Resource* resource = NULL;
-	RM::loadShaderResourceView(pDevice, pFilename, &resource, &pShaderResourceView);
+	RM::LoadShaderResourceView(pDevice, &pShaderResourceView, pFilename, &resource);
 
 
 	// TEXTURE2D_DESC Initialize
@@ -185,12 +182,12 @@ Sprite::~Sprite()
 	SAFE_RELEASE(pDepthStencilState);
 	SAFE_RELEASE(pVSProjectionCBuffer);
 
-	RM::releasePixelShader(pPixelShader);
-	RM::releaseVertexShader(pVertexShader, pInputLayout);
-	RM::releaseShaderResourceView(pShaderResourceView);
+	RM::ReleasePixelShader(pPixelShader);
+	RM::ReleaseVertexShader(pVertexShader, pInputLayout);
+	RM::ReleaseShaderResourceView(pShaderResourceView);
 }
 
-void Sprite::render(ID3D11DeviceContext* pDeviceContext)
+void Sprite::Render(ID3D11DeviceContext* pDeviceContext)
 {
 
 	UINT pStrides = sizeof(vertex);
@@ -208,7 +205,7 @@ void Sprite::render(ID3D11DeviceContext* pDeviceContext)
 
 }
 
-void Sprite::render(ID3D11DeviceContext* pDeviceContext, vertex pCoordNDC[])
+void Sprite::Render(ID3D11DeviceContext* pDeviceContext, vertex pCoordNDC[])
 {
 
 	D3D11_MAPPED_SUBRESOURCE mappedSubRec;
@@ -221,11 +218,11 @@ void Sprite::render(ID3D11DeviceContext* pDeviceContext, vertex pCoordNDC[])
 	memcpy(mappedSubRec.pData, pCoordNDC, sizeof(vertex)*vertexCount);
 	pDeviceContext->Unmap(pVertexBuffer, 0);
 
-	render(pDeviceContext);
+	Render(pDeviceContext);
 
 }
 
-void Sprite::render(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float rotateAngle, UINTCOLOR blendColor)
+void Sprite::Render(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float rotateAngle, UINTCOLOR blendColor)
 {
 	XMFLOAT4 colorNDC;
 	colorNDC = toNDColor(blendColor);
@@ -240,14 +237,14 @@ void Sprite::render(ID3D11DeviceContext* pDeviceContext, float drawX, float draw
 	float angleRadian = rotateAngle * 0.01745/*(M_PI / 180,0f)*/;
 	for (int i = 0; i < vertexCount; i++)
 	{
-		vertices[i].position = rotationZ(vertices[i].position, angleRadian, center);
+		vertices[i].position = RotationZ(vertices[i].position, angleRadian, center);
 		vertices[i].position = toNDC_RT(vertices[i].position);
 	}
 
-	render(pDeviceContext, vertices);
+	Render(pDeviceContext, vertices);
 }
 
-void Sprite::render(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, UINTCOLOR blendColor, float rotateAngle, bool doCenterRotation, float rotatePosX, float rotatePosY, bool doReflection, int scaleMode)
+void Sprite::Render(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, UINTCOLOR blendColor, float rotateAngle, bool doCenterRotation, float rotatePosX, float rotatePosY, bool doReflection, int scaleMode)
 {
 	if ((int)srcWidth == 0 || (int)srcHeight == 0)
 	{
@@ -332,9 +329,9 @@ void Sprite::render(ID3D11DeviceContext* pDeviceContext, float drawX, float draw
 	float angleRadian = rotateAngle * 0.01745/*(M_PI / 180,0f)*/;
 	for (int i = 0; i < vertexCount; i++)
 	{
-		vertices[i].position = rotationZ(vertices[i].position, angleRadian, center);
+		vertices[i].position = RotationZ(vertices[i].position, angleRadian, center);
 		vertices[i].position = toNDC_RT(vertices[i].position, doProjection);
-		vertices[i].texcoord = toNDC_UV(vertices[i].texcoord);
+		vertices[i].texcoord = ToNDC_UV(vertices[i].texcoord);
 		vertices[i].normal.x = 0.0f;
 		vertices[i].normal.y = 0.0f;
 		vertices[i].normal.z = -1.0f;
@@ -343,61 +340,31 @@ void Sprite::render(ID3D11DeviceContext* pDeviceContext, float drawX, float draw
 	pDeviceContext->PSSetShaderResources(0, 1, &pShaderResourceView);
 	pDeviceContext->PSSetSamplers(0, 1, &pSamplerState);
 
-	render(pDeviceContext, vertices);
+	Render(pDeviceContext, vertices);
 }
 
-void Sprite::setProjection(ID3D11DeviceContext *pDeviceContext, const XMFLOAT3 &position, const Transform& transform)
+
+void Sprite::Render3D(ID3D11DeviceContext* pDeviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, UINTCOLOR blendColor, float rotateAngle, bool doCenterRotation, float rotatePosX, float rotatePosY, bool doReflection, int scaleMode)
 {
-	static XMFLOAT3 positionNDC, rotationAxisNDC;
-	positionNDC = toNDC_RT(transform.position, doProjection);
-	rotationAxisNDC = toNDC_RT(transform.rotationAxis, doProjection);
-	static XMMATRIX S, R, T, W, V, P, WVP;
-	S = R = T = W = V = P = WVP = DirectX::XMMatrixIdentity();
-	//S = DirectX::XMMatrixScaling(transform.scaling.x, transform.scaling.y, transform.scaling.z);
-	////R = DirectX::XMMatrixRotationAxis(XMVectorSet(rotationAxisNDC.x, rotationAxisNDC.y, rotationAxisNDC.z, 0), transform.rotateAngle*0.01745329251);
-	//R = DirectX::XMMatrixRotationRollPitchYaw(transform.eulerAngle.y*0.01745, transform.eulerAngle.x*0.01745, transform.eulerAngle.z*0.01745);
-	//T = DirectX::XMMatrixTranslation(positionNDC.x, positionNDC.y, positionNDC.z);
-	//W = S*R*T;
-	//R = DirectX::XMMatrixRotationAxis(XMVectorSet(rotationAxisNDC.x, rotationAxisNDC.y, rotationAxisNDC.z, 0), transform2D3D->angle*0.01745329251);
-	R = DirectX::XMMatrixRotationAxis(XMVectorSet(0, 1, 0, 0), transform.eulerAngle.x*0.01745)
-		*DirectX::XMMatrixRotationAxis(XMVectorSet(1, 0, 0, 0), transform.eulerAngle.y*0.01745)
-		*DirectX::XMMatrixRotationAxis(XMVectorSet(0, 0, 1, 0), transform.eulerAngle.z*0.01745);
-	//R = DX::XMMatrixRotationRollPitchYaw(transform.eulerAngle.y*0.01745, transform.eulerAngle.x*0.01745, transform.eulerAngle.z*0.01745);
-	S = DirectX::XMMatrixScaling(transform.scaling.x, transform.scaling.y, transform.scaling.z);
-	T = DirectX::XMMatrixTranslation(positionNDC.x, positionNDC.y, positionNDC.z);
-	W = T*R*S;
-
-	V = DirectX::XMMatrixLookAtLH(e_mainCamera.eyePosition, e_mainCamera.focusPosition, e_mainCamera.upDirection);
-	P = DirectX::XMMatrixPerspectiveFovLH(XM_PIDIV4, SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.01f, 100.0f);
-	WVP = W*V*P;
-	/*W = DirectX::XMMatrixTranspose(W);
-	V = DirectX::XMMatrixTranspose(V);
-	P = DirectX::XMMatrixTranspose(P);*/
-
-	PROJECTION_CBUFFER updateCbuffer;
-	updateCbuffer.world = W;
-	updateCbuffer.view = V;
-	updateCbuffer.projection = P;
-	updateCbuffer.worldViewProjection = WVP;
+	static PROJECTION_CBUFFER updateCbuffer;
+	updateCbuffer.world = world;
+	updateCbuffer.view = view;
+	updateCbuffer.projection = projection;
+	updateCbuffer.worldViewProjection = world*view*projection;
 	//updateCbuffer.lightDirection = XMFLOAT4(0.0f, -1.0f, 0.0f, 0.0f);
-	static XMVECTOR lightDirection = { 0.0f,0.0f,1.0f,0.0f };
+	updateCbuffer.lightDirection = { view._13, view._23, view._33, 1 };
 	//lightDirection = e_mainCamera.focusPosition - e_mainCamera.eyePosition;
-	updateCbuffer.lightDirection = XMFLOAT4(lightDirection.vector4_f32);
-	updateCbuffer.materialColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	updateCbuffer.materialColor = { 1,1,1,1 };
 
 	pDeviceContext->UpdateSubresource(pVSProjectionCBuffer, 0, NULL, &updateCbuffer, 0, 0);
 	pDeviceContext->VSSetConstantBuffers(0, 1, &pVSProjectionCBuffer);
-}
 
-void Sprite::render3D(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, UINTCOLOR blendColor, float rotateAngle, bool doCenterRotation, float rotatePosX, float rotatePosY, bool doReflection, int scaleMode, const Transform& transform)
-{
-	setProjection(pDeviceContext, XMFLOAT3(0, 0, 0), transform);
-	render(pDeviceContext, drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, blendColor, rotateAngle, doCenterRotation, rotatePosX, rotatePosY, doReflection, scaleMode);
+	Render(pDeviceContext, drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, blendColor, rotateAngle, doCenterRotation, rotatePosX, rotatePosY, doReflection, scaleMode);
 }
 
 
 // Screen coordinate to UV NDC coordinate
-XMFLOAT2 Sprite::toNDC_UV(XMFLOAT2 coord)
+XMFLOAT2 Sprite::ToNDC_UV(XMFLOAT2 coord)
 {
 	float x, y;
 	float imgWidth, imgHeight;
@@ -409,7 +376,7 @@ XMFLOAT2 Sprite::toNDC_UV(XMFLOAT2 coord)
 	return XMFLOAT2(x, y);
 }
 
-XMFLOAT3 Sprite::rotationZ(XMFLOAT3 coord, float rotateAngle, XMFLOAT3 centerCoord)
+XMFLOAT3 Sprite::RotationZ(XMFLOAT3 coord, float rotateAngle, XMFLOAT3 centerCoord)
 {
 	XMFLOAT3 P, Pr;
 	P.x = coord.x - centerCoord.x;

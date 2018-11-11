@@ -38,10 +38,10 @@ public:
 
 	bool isInit;
 
-	virtual void clear();
-	virtual void update();
+	virtual void Clear();
+	virtual void Update();
 
-	virtual void draw();
+	virtual void Draw();
 
 	static int searchSet(OBJ2D** ppBegin, int max);
 
@@ -68,12 +68,12 @@ public:
 	const OBJ2DEX& operator=(const OBJ2DEX& right);
 
 
-	virtual void clear();
+	virtual void Clear();
 
-	virtual void update();
+	virtual void Update();
 	virtual void animation();
 
-	virtual void draw();
+	virtual void Draw();
 
 };
 
@@ -99,8 +99,8 @@ private:
 
 public:
 	void init();
-	void update(int liveInPagination = 1);
-	void draw(int liveInPagination = 1);
+	void Update(int liveInPagination = 1);
+	void Draw(int liveInPagination = 1);
 
 	ObjManager() {};
 	~ObjManager();

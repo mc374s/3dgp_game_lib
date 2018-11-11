@@ -36,10 +36,10 @@ public:
 	void(OBJ3D::*moveFunc)();
 
 
-	virtual void clear();
-	virtual void update();
+	virtual void Clear();
+	virtual void Update();
 
-	virtual void draw();
+	virtual void Draw();
 
 	static int searchSet(OBJ3D** begin, int max);
 

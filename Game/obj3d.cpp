@@ -5,7 +5,7 @@
 // Class OBJ3D Function
 OBJ3D::OBJ3D()
 {
-	clear();
+	Clear();
 }
 
 void OBJ3D::memberCopy(const OBJ3D& inputObj)
@@ -43,7 +43,7 @@ OBJ3D::OBJ3D(const OBJ3D& inputObj)
 
 OBJ3D::~OBJ3D()
 {
-	clear();
+	Clear();
 }
 
 const OBJ3D& OBJ3D::operator=(const OBJ3D& rhv)
@@ -53,7 +53,7 @@ const OBJ3D& OBJ3D::operator=(const OBJ3D& rhv)
 }
 
 
-void OBJ3D::clear()
+void OBJ3D::Clear()
 {
 	moveFunc = nullptr;
 	meshData = nullptr;
@@ -61,14 +61,14 @@ void OBJ3D::clear()
 	timer = 0;
 	step = 0;
 	frame = 0;
-	transform.clear();
+	transform.Clear();
 
 	isInit = false;
 
 	type = 0;
 }
 
-void OBJ3D::update()
+void OBJ3D::Update()
 {
 	if (moveFunc) {
 		(this->*moveFunc)();
@@ -76,11 +76,11 @@ void OBJ3D::update()
 	//pos.y = initPos.y - SCROLL_Y;
 }
 
-void OBJ3D::draw()
+void OBJ3D::Draw()
 {
 	if (meshData)
 	{
-		meshData->draw(transform, frame);
+		meshData->Draw(transform, frame);
 	}
 
 }

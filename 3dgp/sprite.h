@@ -1,10 +1,7 @@
 #ifndef _SPRITE_H_
 #define _SPRITE_H_
 
-#define _USE_MATH_DEFINES
-
-
-#include "3dgp_system.h"
+#include "3dgp.h"
 
 enum SCALE_MODE
 {
@@ -61,25 +58,24 @@ private:
 
 	bool doProjection;
 
+	bool Initialize(ID3D11Device* pDevice);
+
+	XMFLOAT2 ToNDC_UV(XMFLOAT2 coord);
+	XMFLOAT3 RotationZ(XMFLOAT3 coord, float angle, XMFLOAT3 center);
 
 public:
 
 	Sprite(ID3D11Device* pDevice);
 	Sprite(ID3D11Device* pDevice, char* pFilename/*Texture file name*/, bool doProjection = false);
 	~Sprite();
-	bool initialize(ID3D11Device* pDevice);
 
-	XMFLOAT2 toNDC_UV(XMFLOAT2 coord);
-	XMFLOAT3 rotationZ(XMFLOAT3 coord, float angle, XMFLOAT3 center);
 
-	void render(ID3D11DeviceContext* pDeviceContext);
-	void render(ID3D11DeviceContext* pDeviceContext, vertex pCoordNDC[]);
-	void render(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float rotateAngle = 0.0, UINTCOLOR blendColor = 0xFFFFFFFF);
-	void render(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, UINTCOLOR blendColor = 0xFFFFFFFF, float rotateAngle = .0f, bool doCenterRotation = true, float rotatePosX = .0f, float rotatePosY = .0f, bool doReflection = false, int scaleMode = LEFTTOP);
+	void Render(ID3D11DeviceContext* pDeviceContext);
+	void Render(ID3D11DeviceContext* pDeviceContext, vertex pCoordNDC[]);
+	void Render(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float rotateAngle = 0.0, UINTCOLOR blendColor = 0xFFFFFFFF);
+	void Render(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, UINTCOLOR blendColor = 0xFFFFFFFF, float rotateAngle = .0f, bool doCenterRotation = true, float rotatePosX = .0f, float rotatePosY = .0f, bool doReflection = false, int scaleMode = LEFTTOP);
 
-	void setProjection(ID3D11DeviceContext *pDeviceContext, const XMFLOAT3 &position, const Transform& transform = Transform::initialValue());
-
-	void render3D(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, UINTCOLOR blendColor = 0xFFFFFFFF, float rotateAngle = .0f, bool doCenterRotation = true, float rotatePosX = .0f, float rotatePosY = .0f, bool doReflection = false, int scaleMode = LEFTTOP, const Transform& transform = Transform::initialValue());
+	void Render3D(ID3D11DeviceContext* pDeviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, UINTCOLOR blendColor = 0xFFFFFFFF, float rotateAngle = .0f, bool doCenterRotation = true, float rotatePosX = .0f, float rotatePosY = .0f, bool doReflection = false, int scaleMode = LEFTTOP);
 
 
 };

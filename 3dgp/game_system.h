@@ -3,6 +3,7 @@
 
 
 #include <cmath>
+#include "resources_manager.h"
 #include "sprite_string.h"
 #include "SimpleMath.h"
 using namespace DirectX::SimpleMath;
@@ -96,7 +97,7 @@ struct Transform2D
 		rgba(rgba)
 	{};
 
-	void clear()
+	void Clear()
 	{
 		scaleX = 1.0f;
 		scaleY = 1.0f;
@@ -109,12 +110,33 @@ struct Transform2D
 		rgba = 0xFFFFFFFF;
 	};
 
-	static Transform2D initialValue() 
-	{
-		Transform2D clearedValue;
-		clearedValue.clear();
-		return clearedValue;
-	}
+	static Transform2D& initialValue() {
+		static Transform2D initialValue;
+		return initialValue;
+	};
+
+	//static Transform2D initialValue;
+};
+
+
+struct Transform
+{
+	Vector3 position;
+	Vector3 scaling;
+	Vector3 eulerDegreeAngle;
+
+	Transform() :position(0, 0, 0), scaling(1, 1, 1), eulerDegreeAngle(0, 0, 0) {};
+
+	void Clear() {
+		position = Vector3::Zero;
+		scaling = Vector3::One;
+		eulerDegreeAngle = Vector3::Zero;
+	};
+
+	static Transform& initialValue() {
+		static Transform initialValue;
+		return initialValue;
+	};
 };
 
 struct SPRITE_DATA
@@ -134,9 +156,9 @@ struct SPRITE_DATA
 		ofsY(ofsY),
 		frameNum(frameNum)
 	{};
-	void draw(Vector3 &pos, const Transform2D& transform2d = Transform2D::initialValue(), const Transform& transform=Transform::initialValue());
-	void draw(float x, float y, const Transform2D& transform2d = Transform2D::initialValue());
-	void copy(const SPRITE_DATA* rhv) {
+	void Draw(Vector3 &pos, const Transform2D& transform2d = Transform2D::initialValue(), const Transform& transform=Transform::initialValue());
+	void Draw(float x, float y, const Transform2D& transform2d = Transform2D::initialValue());
+	void Copy(const SPRITE_DATA* rhv) {
 		left = rhv->left; top = rhv->top; width = rhv->width; height = rhv->height; ofsX = rhv->ofsX; ofsY = rhv->ofsY;
 		//return *this;
 	};
@@ -163,17 +185,17 @@ private:
 
 	TextureManager() {};
 	~TextureManager() {
-		releaseTexture();
+		ReleaseTexture();
 	};
 
 
 public:
-	void loadTextures(LOAD_TEXTURE data[]);
-	void loadTexture(LOAD_TEXTURE data[], int textureNO);
+	void LoadTextures(LOAD_TEXTURE data[]);
+	void LoadTexture(LOAD_TEXTURE data[], int textureNO);
 	const LOAD_TEXTURE* textureAt(int fileNO);
 
 
-	void releaseTexture();
+	void ReleaseTexture();
 
 	static TextureManager* getInstance() {
 		static TextureManager instance;
@@ -184,11 +206,11 @@ public:
 
 #define pTextureManager (TextureManager::getInstance())
 
-int basicInput();
+int BasicInput();
 
-void drawString(int posX = 0, int posY = 0, char *pTextBuf = nullptr, UINTCOLOR textColor = 0xFFFFFFFF, int format = STR_LEFT, int characterSizeX = 32, int characterSizeY = 32, float characterRotateAngle = .0f);
+void DrawString(int posX = 0, int posY = 0, char *pTextBuf = nullptr, UINTCOLOR textColor = 0xFFFFFFFF, int format = STR_LEFT, int characterSizeX = 32, int characterSizeY = 32, float characterRotateAngle = .0f);
 
-void drawRectangle(int leftTopX, int leftTopY, int width, int height, float rotateAngle = 0.0, UINTCOLOR fillColor = 0xFFFFFFFF);
+void DrawRectangle(int leftTopX, int leftTopY, int width, int height, float rotateAngle = 0.0, UINTCOLOR fillColor = 0xFFFFFFFF);
 
 
 
@@ -212,12 +234,12 @@ public:
 	bool doReflection;
 	Transform transform;
 
-	void set();
+	void Set();
 	// View, looks like a 3D textured sprite
-	void set(float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, float rotateAngle = .0f, UINTCOLOR blendColor = 0xFFFFFFFF, bool doReflection = false);
+	void Set(float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, float rotateAngle = .0f, UINTCOLOR blendColor = 0xFFFFFFFF, bool doReflection = false);
 
 	// Reset ViewPort to real screen
-	static void clear();
+	static void Clear();
 };
 
 
@@ -235,7 +257,7 @@ public:
 	UINTCOLOR	blendColor;
 	Transform	transform;
 
-	void draw();
+	void Draw();
 
 };
 
@@ -264,13 +286,16 @@ struct MeshData
 {
 	int fileNO;
 	Transform preSetTransform;
-	MeshData(int fileNO, XMFLOAT3 preSetScale = XMFLOAT3(1, 1, 1), XMFLOAT3 preSetPosition = XMFLOAT3(0, 0, 0), XMFLOAT3 preSetEulerAngle = XMFLOAT3(0, 0, 0))
-		:fileNO(fileNO) {
+	MeshData(int fileNO, 
+		XMFLOAT3 preSetScale = XMFLOAT3(1, 1, 1), 
+		XMFLOAT3 preSetPosition = XMFLOAT3(0, 0, 0), 
+		XMFLOAT3 preSetEulerDegreeAngle = XMFLOAT3(0, 0, 0)):fileNO(fileNO) 
+	{
 		preSetTransform.scaling = preSetScale;
 		preSetTransform.position = preSetPosition;
-		preSetTransform.eulerAngle = preSetEulerAngle;
+		preSetTransform.eulerDegreeAngle = preSetEulerDegreeAngle;
 	};
-	void draw(const Transform &transform = Transform::initialValue(), const int& frame = 0);
+	void Draw(const Transform &transform = Transform::initialValue(), const int& frame = 0);
 
 };
 
@@ -283,17 +308,17 @@ private:
 
 	MeshManager() {};
 	~MeshManager() {
-		releaseMeshes();
+		ReleaseMeshes();
 	};
 
 public:
-	void loadMeshes(MeshFile sequencedData[]);
-	void loadMeshes(MeshFile sequencedData[],int *progress);
-	void loadMesh(MeshFile sequencedData[], int fileNO);
+	void LoadMeshes(MeshFile sequencedData[]);
+	void LoadMeshes(MeshFile sequencedData[],int *progress);
+	void LoadMesh(MeshFile sequencedData[], int fileNO);
 
 	const MeshFile* meshAt(int fileNO);
 
-	void releaseMeshes();
+	void ReleaseMeshes();
 
 	static MeshManager* getInstance() {
 		static MeshManager instance;
@@ -303,7 +328,6 @@ public:
 };
 
 #define pMeshManager (MeshManager::getInstance())
-
 
 
 #endif // !_GAME_SYSTEM_H_

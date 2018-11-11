@@ -1,13 +1,10 @@
 ﻿#ifndef _SKINEED_MESH_H_
 #define _SKINNED_MESH_H_
 
-#include "3dgp_system.h"
-
-#include <vector>
-
-
 #define MAX_BONE_INFLUENCES (4)
 #define MAX_BONES (32)
+
+#include "3dgp.h"
 
 class SkinnedMesh
 {
@@ -72,19 +69,15 @@ private:
 		ID3D11Buffer* indexBuffer;
 		std::vector<Subset> subsetsList;
 		XMMATRIX globalTransform = XMMatrixIdentity();
-		// Unit.22
-		//std::vector<Bone> skeletal;
-		// Unit.23
 		SkeletalAnimation skeletalAnimation;
 	};
 
 private:
-	//ID3D11Buffer*				pVertexBuffer;
-	//ID3D11Buffer*				pIndexBuffer;
 	ID3D11Buffer*				pConstantBuffer;
 	ID3D11RasterizerState*		pWireRasterizerState;
 	ID3D11RasterizerState*		pFillRasterizerState;
 	ID3D11DepthStencilState*	pDepthStencilState;
+	ID3D11SamplerState*			pSamplerState;
 
 	int indexCount;
 	int vertexCount;
@@ -92,15 +85,10 @@ private:
 	int longitudeNum;
 
 	HRESULT hr;
-	//ID3D11ShaderResourceView*	pShaderResourceView;
 	ID3D11VertexShader*			pVertexShader;
 	ID3D11InputLayout*			pInputLayout;
 	ID3D11PixelShader*			pPixelShader;
 
-	ID3D11SamplerState*			pSamplerState;
-
-	//Material diffuse;
-	//std::vector<Subset> subsetsList;
 
 	std::vector<Mesh> meshesList;
 	XMMATRIX coordinateConversion = {
@@ -110,20 +98,24 @@ private:
 		0.0f, 0.0f, 0.0f, 1.0f,
 	};
 
+	void CreateBuffers(ID3D11Device *pDevice, ID3D11Buffer** ppVertexBuffer, ID3D11Buffer** ppIndexBuffer, vertex3D *pVertices, int vertexNum, WORD *pIndices, int indexNum);
 
 public:
 	int frame = 0;
 
-	SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const bool exchangeYandZ = false);
+	SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const bool exchangeAxisYwithAxisZ = false);
 	virtual ~SkinnedMesh();
-	
-	void createBuffers(ID3D11Device *pDevice, ID3D11Buffer** ppVertexBuffer, ID3D11Buffer** ppIndexBuffer, vertex3D *pVertices, int vertexNum, WORD *pIndices, int indexNum);
 
-	inline XMFLOAT3 toNDC(XMFLOAT3 input);
-	void setProjection(ID3D11DeviceContext *pDeviceContext, const Transform& preSetTransform = Transform::initialValue(), const Transform& transform = Transform::initialValue(), const XMMATRIX &globalTransform = XMMatrixIdentity(), SkeletalAnimation &skeletalAnimation = SkeletalAnimation(), const int& animationFrame = 0, float elapsedTime = 1 / 60.0f/*UNIT.23*/);
-	void render(ID3D11DeviceContext *pDeviceContext, bool doFill, const Mesh &mesh);
+	//
+	//Set Shaders and States
+	//
+	void Render(ID3D11DeviceContext *pDeviceContext, bool isWireframe, const Mesh &mesh);
 
-	void drawMesh(ID3D11DeviceContext *pDeviceContext, const Transform& preSetTransform = Transform::initialValue(), const Transform& transform = Transform::initialValue(), const int& animationFrame = 0, float elapsedTime = 1 / 60.0f/*UNIT.23*/);
+	//
+	//param(animationFrame) Set to 0 means always loop this fbx animation
+	//param(elapsedTime) How many ms this frame used
+	//
+	void Draw(ID3D11DeviceContext *pDeviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, bool isWireframe = false, const int& animationFrame = 0, float elapsedTime = 1 / 60.0f);
 };
 
 

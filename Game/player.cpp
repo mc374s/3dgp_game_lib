@@ -5,7 +5,7 @@
 
 Player::Player()
 {
-	clear();
+	Clear();
 }
 
 Player::~Player()
@@ -14,26 +14,26 @@ Player::~Player()
 
 void Player::init()
 {
-	clear();
+	Clear();
 	speedAcc.x = P_WALK_SPEED;
 	speedMax.x = P_WALK_SPEED_MAX;
 	meshData = &e_fbxPlayerWalk;
 	
 }
 
-void Player::update()
+void Player::Update()
 {
-	keyCode = basicInput();
+	keyCode = BasicInput();
 
 	switch (keyCode & (PAD_LEFT | PAD_RIGHT))
 	{
 	case PAD_LEFT:
 		speed.x -= speedAcc.x;
-		transform.eulerAngle.y = 180;
+		transform.eulerDegreeAngle.y = 180;
 		break;
 	case PAD_RIGHT:
 		speed.x += speedAcc.x;
-		transform.eulerAngle.y = 0;
+		transform.eulerDegreeAngle.y = 0;
 		break;
 	default:
 		if (speed.x > 0) {
@@ -115,14 +115,14 @@ void Player::update()
 	//e_mainCamera.toNDC();
 }
 
-void Player::draw()
+void Player::Draw()
 {
-	OBJ3D::draw();
+	OBJ3D::Draw();
 #ifdef DEBUG
 	char buf[256];
 	sprintf_s(buf, "Player:\nPosX:%lf \nPosY:%lf \nPosZ:%lf \n",
 		transform.position.x, transform.position.y, transform.position.z);
-	drawString(0, 300, buf);
+	DrawString(0, 300, buf);
 
 #endif // DEBUG
 
@@ -150,18 +150,18 @@ void PlayerManager::init()
 	}
 }
 
-void PlayerManager::update()
+void PlayerManager::Update()
 {
 	if (pPlayer)
 	{
-		pPlayer->update();
+		pPlayer->Update();
 	}
 }
 
-void PlayerManager::draw()
+void PlayerManager::Draw()
 {
 	if (pPlayer)
 	{
-		pPlayer->draw();
+		pPlayer->Draw();
 	}
 }

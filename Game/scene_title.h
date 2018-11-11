@@ -12,8 +12,8 @@ public:
 	SceneTitle();
 	~SceneTitle();
 
-	void update();
-	void draw();
+	void Update();
+	void Draw();
 
 };
 

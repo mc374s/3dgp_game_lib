@@ -9,8 +9,9 @@
 #define P_RUN_SPEED_MAX (0.1)
 #define P_GS (9.8f)
 #define P_GF (0.0027f) //P_GS/3600.0f
-#define P_JUMP_HEIGHT (5.0f)
-#define P_JUMP_V0 (9.9f/60.0f) //sqrt(2*P_GF*P_JUMP_HEIGHT)
+#define P_JUMP_HEIGHT (1.5f)
+//#define P_JUMP_V0 (9.9f/60.0f) //sqrt(2*P_GF*(5.0f))
+#define P_JUMP_V0 (sqrt(2.0f*P_GF*P_JUMP_HEIGHT))
 
 
 class Player : public OBJ3D
@@ -26,8 +27,8 @@ public:
 	~Player();
 
 	void init();
-	void update();
-	void draw();
+	void Update();
+	void Draw();
 
 };
 
@@ -43,8 +44,8 @@ public:
 	~PlayerManager();
 
 	void init();
-	void update();
-	void draw();
+	void Update();
+	void Draw();
 
 };
 

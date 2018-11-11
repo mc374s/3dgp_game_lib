@@ -31,10 +31,10 @@ int e_renderTargetHeight = SCREEN_HEIGHT;
 
 //ID3D11RenderTargetView* framework::s_pRenderTargetView = NULL;
 
-bool framework::initialize(HWND _hwnd)
+bool framework::Initialize(HWND _hwnd)
 {
 	//MessageBox(0, L"Initializer called", L"framework", MB_OK);
-	hwnd = _hwnd;
+	outputWindow = _hwnd;
 	DXGI_SWAP_CHAIN_DESC descSwapChain;
 	ZeroMemory(&descSwapChain, sizeof(descSwapChain));
 	descSwapChain.BufferCount = 1;
@@ -44,7 +44,7 @@ bool framework::initialize(HWND _hwnd)
 	descSwapChain.BufferDesc.RefreshRate.Numerator = 60;
 	descSwapChain.BufferDesc.RefreshRate.Denominator = 1;
 	descSwapChain.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	descSwapChain.OutputWindow = hwnd;
+	descSwapChain.OutputWindow = outputWindow;
 	descSwapChain.SampleDesc.Count = 1;
 	descSwapChain.SampleDesc.Quality = 0;
 	descSwapChain.Windowed = TRUE;
@@ -171,14 +171,14 @@ bool framework::initialize(HWND _hwnd)
 	s_pDevice->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM/*DXGI_FORMAT_R32G32B32A32_FLOAT*//*DXGI_FORMAT_R8G8B8A8_UNORM*/, 4, &m4xMsaaQuality);
 
 	// Initialzie the blending
-	MyBlending::initialize(s_pDevice);
+	MyBlending::Initialize(s_pDevice);
 
 	pPrimitive3D[0] = new Primitive3D(s_pDevice);
-	pPrimitive3D[0]->initialize(s_pDevice, GEOMETRY_CUBE);
+	pPrimitive3D[0]->Initialize(s_pDevice, GEOMETRY_CUBE);
 	pPrimitive3D[1] = new Primitive3D(s_pDevice);
-	pPrimitive3D[1]->initialize(s_pDevice, GEOMETRY_CYLINDER, 2, 24);
+	pPrimitive3D[1]->Initialize(s_pDevice, GEOMETRY_CYLINDER, 2, 24);
 
-	initSprString(s_pDevice);
+	SpriteString::Initialize(s_pDevice);
 
 	return true;
 }
@@ -188,13 +188,13 @@ void framework::setFPSLimitation(int limation)
 	minFrameTime = 1.0 / (double)limation;
 }
 
-int framework::run()
+int framework::Run()
 {
 	MSG msg = {};
 
 	/*if (!initialize(hwnd))
 	{
-	MessageBox(0, L"run: Iniialize FAILED", 0, 0);
+	MessageBox(0, L"Run: Iniialize FAILED", 0, 0);
 	return 0;
 	}*/
 	srand((unsigned int)time(NULL));
@@ -259,8 +259,8 @@ int framework::run()
 			MFAudioCheckLoops();
 			if (isFocused)
 			{
-				update(timer.time_interval());
-				render(timer.time_interval());
+				Update(timer.time_interval());
+				Render(timer.time_interval());
 			}
 
 			calculate_frame_stats();
@@ -356,13 +356,10 @@ void framework::calculate_frame_stats()
 	{
 		float fps = static_cast<float>(frames); // fps = frameCnt / 1
 		float mspf = 1000.0f / fps;
-		std::ostringstream outs;
-		outs.precision(6);
-		//outs << "FPS : " << fps << " / " << "Frame Time : " << mspf << " (ms)";
-		outs << "Untitled" << "  FPS : " << fps /*<< " / " << "Frame Time : " << mspf << " (ms)"*/;
-		/*outs.precision(4);
-		outs<< " #Blending Mode: " << strBlendMode[blendMode] << " #Alpha: " << alpha << " / 255.0f ( " << alpha / 255.0f * 100 << "% )";*/
-		SetWindowTextA(hwnd, outs.str().c_str());
+
+		static char buf[256] = "";
+		sprintf_s(buf, "Untitled FPS: %.0f / FrameTime: %.6f(ms)", fps, frameTime * 1000);
+		SetWindowTextA(outputWindow, buf);
 
 		// Reset for next average.
 		frames = 0;
@@ -370,11 +367,11 @@ void framework::calculate_frame_stats()
 	}
 }
 
-void framework::update(float elapsed_time/*Elapsed seconds from last frame*/)
+void framework::Update(float elapsed_time/*Elapsed seconds from last frame*/)
 {
 	if (s_pScene)
 	{
-		s_pScene->update(/*elapsed_time*/);
+		s_pScene->Update(/*elapsed_time*/);
 		if (s_pScene->pNextScene)
 		{
 			s_pScene = s_pScene->pNextScene;
@@ -386,6 +383,7 @@ void framework::update(float elapsed_time/*Elapsed seconds from last frame*/)
 	static float aXY = -XM_PIDIV2, aZY = XM_1DIVPI;
 	static float d = XM_PI;
 	static bool isCharactorSurroundCameraOn = false;
+	static CameraData oldCamera;
 	if (KEY_TRACKER.pressed.D1)
 	{
 		isCharactorSurroundCameraOn = !isCharactorSurroundCameraOn;
@@ -394,6 +392,11 @@ void framework::update(float elapsed_time/*Elapsed seconds from last frame*/)
 			aXY = -XM_PIDIV2;
 			aZY = XM_1DIVPI;
 			d = XM_PI;
+			e_mainCamera = oldCamera;
+		}
+		else
+		{
+			oldCamera = e_mainCamera;
 		}
 	}
 	if (isCharactorSurroundCameraOn)
@@ -422,7 +425,7 @@ void framework::update(float elapsed_time/*Elapsed seconds from last frame*/)
 
 }
 
-void framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
+void framework::Render(float elapsed_time/*Elapsed seconds from last frame*/)
 {
 	//e_mainCamera.focusPosition = { focusPos.x,focusPos.y,focusPos.z,0 };
 
@@ -451,22 +454,24 @@ void framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	MyBlending::setMode(s_pDeviceContext, BLEND_ALPHA);
 	if (s_pScene)
 	{
-		s_pScene->draw(/*elapsed_time*/);
+		s_pScene->Draw(/*elapsed_time*/);
 	}
 
 	MyBlending::setMode(s_pDeviceContext, BLEND_NONE);
 
 	
-	pPrimitive3D[0]->drawCube(s_pDeviceContext, XMFLOAT3(1, 0, 0), XMFLOAT3(2, 0.01, 0.01), 0xFF0000FF);
-	pPrimitive3D[0]->drawCube(s_pDeviceContext, XMFLOAT3(0, 1, 0), XMFLOAT3(0.01, 2, 0.01), 0x00FF00FF);
-	pPrimitive3D[0]->drawCube(s_pDeviceContext, XMFLOAT3(0, 0, 1), XMFLOAT3(0.01, 0.01, 2), 0x0000FFFF);
+	//pPrimitive3D[0]->Draw(s_pDeviceContext, XMMatrixIdentity(), XMFLOAT3(2.0f, 0.01f, 0.01f), 0xFF0000FF);
+	//pPrimitive3D[0]->Draw(s_pDeviceContext, XMMatrixIdentity(), XMFLOAT3(0.01f, 2.0f, 0.01f), 0x00FF00FF);
+	//spPrimitive3D[0]->Draw(s_pDeviceContext, XMMatrixIdentity(), XMFLOAT3(0.01f, 0.01f, 2.0f), 0x0000FFFF);
 	//pPrimitive3D[1]->drawCylinder(s_pDeviceContext, XMFLOAT3(-310, 0, 10 + 0), XMFLOAT3(620, 700, 20), &custom3DTemp);
 
+	// -5F
 	char buf[256];
-	sprintf_s(buf, "mainCamera: \nPosX: %lf \nPosY: %lf \nPosZ: %lf \nDistance: %lf \n",
-		e_mainCamera.eyePosition.vector4_f32[0], e_mainCamera.eyePosition.vector4_f32[1], e_mainCamera.eyePosition.vector4_f32[2], -1);
+	sprintf_s(buf, "mainCamera: \nPosX: %f \nPosY: %f \nPosZ: %lf \nDistance: %f \n",
+		e_mainCamera.eyePosition.vector4_f32[0], e_mainCamera.eyePosition.vector4_f32[1], e_mainCamera.eyePosition.vector4_f32[2],
+		XMVector3Length(e_mainCamera.eyePosition - e_mainCamera.focusPosition).vector4_f32[0]);
 	MyBlending::setMode(s_pDeviceContext, BLEND_ALPHA);
-	drawSprString(s_pDeviceContext, 0, 0, buf);
+	SpriteString::DrawString(s_pDeviceContext, 0, 0, buf);
 
 	if (KEY_TRACKER.pressed.I)
 	{
@@ -490,7 +495,7 @@ void framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	//pSwapChain->Present(0, 0);
 }
 
-void framework::release()
+void framework::Release()
 {
 	SAFE_RELEASE(pBlendState);
 	SAFE_RELEASE(s_pDepthStencilView);
@@ -509,13 +514,10 @@ void framework::release()
 	SAFE_RELEASE(pDepthStencilResource);
 	SAFE_RELEASE(pDepthStencilState);
 	
-	
 
-	SAFE_RELEASE(pD3dDebug);
+	MyBlending::Release();
 
-	MyBlending::release();
-
-	releaseSprString();
+	SpriteString::Release();
 
 	for (auto &p : pPrimitive3D)
 	{

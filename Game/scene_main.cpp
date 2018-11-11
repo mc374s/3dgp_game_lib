@@ -33,7 +33,7 @@ SceneMain::~SceneMain()
 	SAFE_DELETE(pBG);
 };
 
-void SceneMain::update()
+void SceneMain::Update()
 {	
 	if (pause()){
 		return;
@@ -67,23 +67,23 @@ void SceneMain::update()
 
 }
 
-void SceneMain::draw()
+void SceneMain::Draw()
 {
-	View::clear();
+	View::Clear();
 
-	pBG->draw();
+	pBG->Draw();
 
 
 #ifdef  DEBUG
 
-	drawString(SCREEN_WIDTH / 2, 100, "SCENE MAIN", 0xFFFFFFFF, STR_CENTER, 48, 48);
-	drawString(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 200, "Push [ENTER] to SCENE TITLE", 0xFFFFFFFF, STR_CENTER);
+	DrawString(SCREEN_WIDTH / 2, 100, "SCENE MAIN", 0xFFFFFFFF, STR_CENTER, 48, 48);
+	DrawString(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 200, "Push [ENTER] to SCENE TITLE", 0xFFFFFFFF, STR_CENTER);
 
 
 #endif //  DEBUG
 
 	if (step == STEP::INIT) {
-		drawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0x000000FF & (unsigned int)((20 - timer) / 20.0f * 255));
+		DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0x000000FF & (unsigned int)((20 - timer) / 20.0f * 255));
 	}
 
 }

@@ -2,9 +2,9 @@
 #define _RESOURCES_MANAGER_H_
 
 #include <d3d11.h>
-#include "WICTextureLoader.h"
-
+//
 //Namespace ResourcesManager
+//
 namespace RM {
 
 	#define FILE_NUM_MAX (64)
@@ -14,14 +14,14 @@ namespace RM {
 	template <typename D3D_TYPE>
 	struct D3D11_RESOURCES {
 		D3D_TYPE pData;
-		char* pFileName = NULL;
+		char pFileName[1024];
 		int fileRefNum = 0;
-		D3D11_RESOURCES() :pData(NULL), pFileName(NULL), fileRefNum(0) {};
-		void release() {
+		D3D11_RESOURCES() :pData(NULL), fileRefNum(0) {};
+		void Release() {
 			fileRefNum--;
 			if (fileRefNum <= 0) {
 				SAFE_RELEASE(pData);
-				pFileName = NULL;
+				ZeroMemory(pFileName, sizeof(pFileName));
 				fileRefNum = 0;
 			}
 		};
@@ -47,26 +47,38 @@ namespace RM {
 		static int s_psFileCounter;
 		static D3D11_RESOURCES<ID3D11PixelShader*> s_pixelShaderResources[FILE_NUM_MAX];
 
+		// ダミーテクスチャを作成する
+		static HRESULT	MakeDummyShaderResourceView(ID3D11Device *Device, ID3D11ShaderResourceView** shaderResourceView);
+
 	public:
 		// 画像データの管理
-		friend int loadShaderResourceView(ID3D11Device* pDevice, char* pFilename, ID3D11Resource** ppOutResource, ID3D11ShaderResourceView** ppOutSRV);
-		friend void releaseShaderResourceView(ID3D11ShaderResourceView* pInSRV);
+
+		////重複の作成を回避するため、作成と伴にファレンスを作成する
+		////pFileName が nullptr の場合ダミーテクスチャが作成される
+		friend int LoadShaderResourceView(ID3D11Device* pDevice, ID3D11ShaderResourceView** ppOutSRV, char* pFilename = nullptr, ID3D11Resource** ppOutResource = nullptr);
+
+		////リファレンスがすべてクリアしたらリソースを解放する
+		friend void ReleaseShaderResourceView(ID3D11ShaderResourceView* pInSRV);
 
 		// バーティクスシェーダーソースの管理
-		friend int loadVertexShader(ID3D11Device* pDevice, char* pFilename, D3D11_INPUT_ELEMENT_DESC* pInLayoutElements, int elementsNum, ID3D11VertexShader** ppOutVertexShader, ID3D11InputLayout** ppOutInputLayout);
 
-		friend void releaseVertexShader(ID3D11VertexShader* pInVertexShader, ID3D11InputLayout* pInInputLayout);
+		////重複の作成を回避するため、作成と伴にファレンスを作成する
+		friend int LoadVertexShader(ID3D11Device* pDevice, char* pFilename, D3D11_INPUT_ELEMENT_DESC* pInLayoutElements, int elementsNum, ID3D11VertexShader** ppOutVertexShader, ID3D11InputLayout** ppOutInputLayout);
+		
+		////リファレンスがすべてクリアしたらリソースを解放する
+		friend void ReleaseVertexShader(ID3D11VertexShader* pInVertexShader, ID3D11InputLayout* pInInputLayout);
 
 		// ピクセルシェーダーデータの管理
-		friend int loadPixelShader(ID3D11Device* pDevice, char* pFilename, ID3D11PixelShader** ppOut);
-		friend void releasePixelShader(ID3D11PixelShader* pIn);
+
+		////重複の作成を回避するため、作成と伴にファレンスを作成する
+		friend int LoadPixelShader(ID3D11Device* pDevice, char* pFilename, ID3D11PixelShader** ppOut);
+		
+		////リファレンスがすべてクリアしたらリソースを解放する
+		friend void ReleasePixelShader(ID3D11PixelShader* pIn);
 	};// class ResourcesManager
 	/*///////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 
-	HRESULT	MakeDummyShaderResourceView(ID3D11Device *Device, ID3D11ShaderResourceView** shaderResourceView);
-
 }//namespace RM
 
-//namespace RM = RM;
 
 #endif // !_RESOURCES_MANAGER_H_

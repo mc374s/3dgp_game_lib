@@ -10,7 +10,7 @@
 
 Numbers::Numbers(SPRITE_DATA* pFontData)
 {
-	clear();
+	Clear();
 	if (pFontData == nullptr)
 	{
 		sprData = e_sprNumbers;
@@ -49,7 +49,7 @@ Numbers::Numbers(const Numbers& inputObj)
 
 Numbers::~Numbers()
 {
-	clear();
+	Clear();
 }
 
 const Numbers& Numbers::operator=(const Numbers& right)
@@ -59,7 +59,7 @@ const Numbers& Numbers::operator=(const Numbers& right)
 }
 
 
-void Numbers::clear()
+void Numbers::Clear()
 {
 	//SAFE_DELETE(sprData);
 	pos = Vector3(0, 0, 0);
@@ -89,12 +89,12 @@ void Numbers::setValue(int value, Vector3 size)
 	//isVisible = true;
 }
 
-void Numbers::update()
+void Numbers::Update()
 {
 
 }
 
-void Numbers::draw()
+void Numbers::Draw()
 {
 	if (isVisible)
 	{
@@ -110,7 +110,7 @@ void Numbers::draw()
 			for (int i = digitNum; i >= 0; --i)
 			{
 				sprData.top = digit[i].val*sprData.height;
-				sprData.draw(pos.x + (digitNum - i)*digit[i].w*sprData.width, pos.y, transform2D);
+				sprData.Draw(pos.x + (digitNum - i)*digit[i].w*sprData.width, pos.y, transform2D);
 			}
 		}
 		if (!isVisibleAlways)

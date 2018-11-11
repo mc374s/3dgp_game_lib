@@ -1,9 +1,9 @@
 #ifndef _BLEND_H_
 #define _BLEND_H_
-#include "3dgp_system.h"
+
+#include <d3d11.h>
 
 #define BLEND_MODE_MAX (9)
-
 
 enum BLEND_MODE
 {
@@ -38,9 +38,9 @@ public:
 		BLENDOPALPHA,
 	};
 
-	static void initialize(ID3D11Device *pDevice);
+	static void Initialize(ID3D11Device *pDevice);
 	static void setMode(ID3D11DeviceContext* &pDeviceContext, int mode = BLEND_NONE);
-	static void release();
+	static void Release();
 };
 
 

@@ -23,9 +23,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="3dgp\3dgp_system.h">
-      <Filter>3dgp\Headers</Filter>
-    </ClInclude>
     <ClInclude Include="3dgp\blend.h">
       <Filter>3dgp\Headers</Filter>
     </ClInclude>
@@ -65,41 +62,41 @@
     <ClInclude Include="3dgp\template.h">
       <Filter>3dgp\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="game.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="numbers.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="obj2d.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="scene_main.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="scene_title.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="sound_data.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="sprite_data.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="3dgp\game_system.h">
       <Filter>3dgp</Filter>
     </ClInclude>
-    <ClInclude Include="mesh_data.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="obj3d.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="player.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="pch.h">
+    <ClInclude Include="3dgp\3dgp.h">
       <Filter>3dgp\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\game.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\mesh_data.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\numbers.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\obj2d.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\obj3d.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\player.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\scene_main.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\scene_title.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\sound_data.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\sprite_data.h">
+      <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -130,41 +127,38 @@
     <ClCompile Include="3dgp\sprite_string.cpp">
       <Filter>3dgp\Sources</Filter>
     </ClCompile>
-    <ClCompile Include="obj2d.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="scene_main.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="scene_title.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="sound_data.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="sprite_data.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
     <ClCompile Include="3dgp\game_system.cpp">
       <Filter>3dgp</Filter>
     </ClCompile>
     <ClCompile Include="3dgp\main.cpp">
       <Filter>3dgp</Filter>
     </ClCompile>
-    <ClCompile Include="numbers.cpp">
+    <ClCompile Include="Game\mesh_data.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="mesh_data.cpp">
+    <ClCompile Include="Game\numbers.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="obj3d.cpp">
+    <ClCompile Include="Game\obj2d.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="player.cpp">
+    <ClCompile Include="Game\obj3d.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="3dgp\pch.cpp">
-      <Filter>3dgp\Sources</Filter>
+    <ClCompile Include="Game\player.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\scene_main.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\scene_title.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\sound_data.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\sprite_data.cpp">
+      <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

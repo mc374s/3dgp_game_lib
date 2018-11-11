@@ -1,12 +1,6 @@
 ﻿#include "render_target.h"
 
-#include <iostream>
-//#define _CRT_SECURE_NO_WARNINGS
-
-using namespace RM;
-using namespace DirectX;
-
-bool RenderTarget::initialize(ID3D11Device* pDevice)
+bool RenderTarget::Initialize(ID3D11Device* pDevice)
 {
 	vertexCount = 4 /*sizeof(vertices) / sizeof(vertex)*/;
 
@@ -33,9 +27,9 @@ bool RenderTarget::initialize(ID3D11Device* pDevice)
 		{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 28,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "NORMAL",		0, DXGI_FORMAT_R32G32B32_FLOAT,		0, 36,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
-	loadVertexShader(pDevice, "Data/Shader/texture_on_3d_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &pVertexShader, &pInputLayout);
+	RM::LoadVertexShader(pDevice, "./Data/Shader/texture_on_3d_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &pVertexShader, &pInputLayout);
 
-	loadPixelShader(pDevice, "Data/Shader/texture_on_ps.cso", &pPixelShader);
+	RM::LoadPixelShader(pDevice, "./Data/Shader/texture_on_ps.cso", &pPixelShader);
 
 	// create rasterizer state
 	D3D11_RASTERIZER_DESC rasterizerDesc;
@@ -89,7 +83,7 @@ bool RenderTarget::initialize(ID3D11Device* pDevice)
 
 RenderTarget::RenderTarget(ID3D11Device* pDevice, int renderWidth, int renderHeight)
 {
-	initialize(pDevice);
+	Initialize(pDevice);
 	//loadShaderResourceView(pDevice, pFilename, &resource, &pShaderResourceView);
 
 	//// TEXTURE2D_DESC Initialize
@@ -175,13 +169,13 @@ RenderTarget::~RenderTarget()
 
 
 	SAFE_RELEASE(pShaderResourceView);
-	releasePixelShader(pPixelShader);
-	releaseVertexShader(pVertexShader, pInputLayout);
+	RM::ReleasePixelShader(pPixelShader);
+	RM::ReleaseVertexShader(pVertexShader, pInputLayout);
 
 
 }
 
-void RenderTarget::render(ID3D11DeviceContext* pDeviceContext)
+void RenderTarget::Render(ID3D11DeviceContext* pDeviceContext)
 {
 
 	UINT pStrides = sizeof(vertex);
@@ -206,7 +200,7 @@ void RenderTarget::render(ID3D11DeviceContext* pDeviceContext)
 	pDeviceContext->RSSetViewports(1, &e_mainCamera.viewPort);
 }
 
-void RenderTarget::render(ID3D11DeviceContext* pDeviceContext, vertex pCoordNDC[])
+void RenderTarget::Render(ID3D11DeviceContext* pDeviceContext, vertex pCoordNDC[])
 {
 
 	D3D11_MAPPED_SUBRESOURCE mappedSubRec;
@@ -219,11 +213,11 @@ void RenderTarget::render(ID3D11DeviceContext* pDeviceContext, vertex pCoordNDC[
 	memcpy(mappedSubRec.pData, pCoordNDC, sizeof(vertex)*vertexCount);
 	pDeviceContext->Unmap(pVertexBuffer, 0);
 
-	render(pDeviceContext);
+	Render(pDeviceContext);
 
 }
 
-void RenderTarget::render(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, float rotateAngle, UINTCOLOR blendColor, bool doReflection)
+void RenderTarget::Draw(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, float rotateAngle, UINTCOLOR blendColor, bool doReflection)
 {
 	if ((int)srcWidth == 0 || (int)srcHeight == 0)
 	{
@@ -261,9 +255,9 @@ void RenderTarget::render(ID3D11DeviceContext* pDeviceContext, float drawX, floa
 	float angleRadian = rotateAngle * 0.01745/*(M_PI / 180,0f)*/;
 	for (unsigned int i = 0; i < vertexCount; i++)
 	{
-		vertices[i].position = rotationZ(vertices[i].position, angleRadian, center);
-		vertices[i].position = toNDC(vertices[i].position);
-		vertices[i].texcoord = toNDC_UV(vertices[i].texcoord);
+		vertices[i].position = RotationZ(vertices[i].position, angleRadian, center);
+		vertices[i].position = ToNDC(vertices[i].position);
+		vertices[i].texcoord = ToNDC_UV(vertices[i].texcoord);
 		vertices[i].normal = { 0,0,-1 };
 		if (doReflection)
 		{
@@ -288,62 +282,36 @@ void RenderTarget::render(ID3D11DeviceContext* pDeviceContext, float drawX, floa
 		pDeviceContext->RSSetState(pRasterizerStateCullBack);
 	}
 
-	render(pDeviceContext, vertices);
+	Render(pDeviceContext, vertices);
 }
 
-void RenderTarget::setProjection(ID3D11DeviceContext *pDeviceContext, const XMFLOAT3 &position, const Transform& transform)
-{
-	static XMFLOAT3 positionNDC, rotationAxisNDC;
-	positionNDC = toNDC(transform.position);
-	rotationAxisNDC = toNDC(transform.rotationAxis);
-	static XMMATRIX S, R, T, W, V, P, WVP;
-	S = R = T = W = V = P = WVP = DirectX::XMMatrixIdentity();
-	//S = DirectX::XMMatrixScaling(transform.scaling.x, transform.scaling.y, transform.scaling.z);
-	////R = DirectX::XMMatrixRotationAxis(XMVectorSet(rotationAxisNDC.x, rotationAxisNDC.y, rotationAxisNDC.z, 0), transform.rotateAngle*0.01745329251);
-	//R = DirectX::XMMatrixRotationRollPitchYaw(transform.eulerAngle.y*0.01745, transform.eulerAngle.x*0.01745, transform.eulerAngle.z*0.01745);
-	//T = DirectX::XMMatrixTranslation(positionNDC.x, positionNDC.y, positionNDC.z);
-	//W = S*R*T;
-	//R = DirectX::XMMatrixRotationAxis(XMVectorSet(rotationAxisNDC.x, rotationAxisNDC.y, rotationAxisNDC.z, 0), transform2D3D->angle*0.01745329251);
-	R = DirectX::XMMatrixRotationAxis(XMVectorSet(0, 1, 0, 0), transform.eulerAngle.x*0.01745)
-		*DirectX::XMMatrixRotationAxis(XMVectorSet(1, 0, 0, 0), transform.eulerAngle.y*0.01745)
-		*DirectX::XMMatrixRotationAxis(XMVectorSet(0, 0, 1, 0), transform.eulerAngle.z*0.01745);
-	//R = DX::XMMatrixRotationRollPitchYaw(transform.eulerAngle.y*0.01745, transform.eulerAngle.x*0.01745, transform.eulerAngle.z*0.01745);
-	S = DirectX::XMMatrixScaling(transform.scaling.x, transform.scaling.y, transform.scaling.z);
-	T = DirectX::XMMatrixTranslation(positionNDC.x, positionNDC.y, positionNDC.z);
-	W = T*R*S;
-
-	//e_mainCamera.clear();
-	V = DirectX::XMMatrixLookAtLH(e_mainCamera.eyePosition, e_mainCamera.focusPosition, e_mainCamera.upDirection);
-	P = DirectX::XMMatrixPerspectiveFovLH(XM_PIDIV4, SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.01f, 100.0f);
-	WVP = W*V*P;
-	/*W = DX::XMMatrixTranspose(W);
-	V = DX::XMMatrixTranspose(V);
-	P = DX::XMMatrixTranspose(P);*/
-
-	PROJECTION_CBUFFER updateCbuffer;
-	updateCbuffer.world = W;
-	updateCbuffer.view = V;
-	updateCbuffer.projection = P;
-	updateCbuffer.worldViewProjection = WVP;
-	static XMVECTOR lightV;
-	lightV = (e_mainCamera.focusPosition - e_mainCamera.eyePosition);
-	updateCbuffer.lightDirection = XMFLOAT4(lightV.vector4_f32[0], lightV.vector4_f32[1], lightV.vector4_f32[2], 0.0f);
-	updateCbuffer.materialColor = XMFLOAT4(0.8, 0.8, 0, 1);
-
-	pDeviceContext->UpdateSubresource(pVSProjectionCBuffer, 0, NULL, &updateCbuffer, 0, 0);
-	pDeviceContext->VSSetConstantBuffers(0, 1, &pVSProjectionCBuffer);
-}
-
-void RenderTarget::render3D(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, float rotateAngle, UINTCOLOR blendColor, const Transform& transform, bool doReflection)
+void RenderTarget::Draw(ID3D11DeviceContext* pDeviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, float rotateAngle, UINTCOLOR blendColor, bool doReflection)
 {
 	// 
 	virtualWidth = srcWidth;
 	virtualHeight = srcHeight;
-	setProjection(pDeviceContext, XMFLOAT3(0, 0, 0), transform);
-	render(pDeviceContext, drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, rotateAngle, blendColor, doReflection);
+
+	static PROJECTION_CBUFFER updateCbuffer;
+	updateCbuffer.world = world;
+	updateCbuffer.view = view;
+	updateCbuffer.projection = projection;
+	updateCbuffer.worldViewProjection = world*view;
+	updateCbuffer.worldViewProjection *= projection;
+
+	/*static XMVECTOR lightV;
+	lightV = (e_mainCamera.focusPosition - e_mainCamera.eyePosition);
+	updateCbuffer.lightDirection = XMFLOAT4(lightV.vector4_f32[0], lightV.vector4_f32[1], lightV.vector4_f32[2], 0.0f);*/
+
+	updateCbuffer.lightDirection = { view._13, view._23, view._33, 1 };
+	updateCbuffer.materialColor = toNDColor(blendColor);
+
+	pDeviceContext->UpdateSubresource(pVSProjectionCBuffer, 0, NULL, &updateCbuffer, 0, 0);
+	pDeviceContext->VSSetConstantBuffers(0, 1, &pVSProjectionCBuffer);
+
+	Draw(pDeviceContext, drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, rotateAngle, blendColor, doReflection);
 }
 
-XMFLOAT3 RenderTarget::toNDC(float screenX, float screenY)
+XMFLOAT3 RenderTarget::ToNDC(float screenX, float screenY)
 {
 	float x, y;
 	x = 2.0f*screenX / SCREEN_WIDTH - 1.0f;
@@ -351,7 +319,7 @@ XMFLOAT3 RenderTarget::toNDC(float screenX, float screenY)
 	return XMFLOAT3(x, y, 0);
 }
 
-XMFLOAT3 RenderTarget::toNDC(XMFLOAT3 coord)
+XMFLOAT3 RenderTarget::ToNDC(XMFLOAT3 coord)
 {
 	float x, y, z;
 	// 2D without projection
@@ -366,7 +334,7 @@ XMFLOAT3 RenderTarget::toNDC(XMFLOAT3 coord)
 }
 
 // Screen coordinate to UV NDC coordinate
-XMFLOAT2 RenderTarget::toNDC_UV(XMFLOAT2 coord)
+XMFLOAT2 RenderTarget::ToNDC_UV(XMFLOAT2 coord)
 {
 	float x, y;
 	float imgWidth, imgHeight;
@@ -378,7 +346,7 @@ XMFLOAT2 RenderTarget::toNDC_UV(XMFLOAT2 coord)
 	return XMFLOAT2(x, y);
 }
 
-XMFLOAT3 RenderTarget::rotationZ(XMFLOAT3 coord, float rotateAngle, XMFLOAT3 centerCoord)
+XMFLOAT3 RenderTarget::RotationZ(XMFLOAT3 coord, float rotateAngle, XMFLOAT3 centerCoord)
 {
 	XMFLOAT3 P, Pr;
 	P.x = coord.x - centerCoord.x;

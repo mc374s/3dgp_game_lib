@@ -25,7 +25,7 @@
 
 void loadMeshesProgress(void(*callback)(),int *progress)
 {
-	pMeshManager->loadMeshes(e_sequencedFbxFiles, progress);
+	pMeshManager->LoadMeshes(e_sequencedFbxFiles, progress);
 	if (callback)
 	{
 		callback();
@@ -75,7 +75,7 @@ SceneTitle::~SceneTitle() {
 	SAFE_DELETE(pBG);
 }
 
-void SceneTitle::update()
+void SceneTitle::Update()
 {
 	switch (step) {
 	case STEP::INIT:
@@ -93,7 +93,7 @@ void SceneTitle::update()
 			break;
 		}
 
-		pPlayerManager->update();
+		pPlayerManager->Update();
 
 		break;
 	default:
@@ -102,30 +102,30 @@ void SceneTitle::update()
 
 }
 
-void SceneTitle::draw()
+void SceneTitle::Draw()
 {
-	View::clear();
+	View::Clear();
 
-	pBG->draw();
-
-	e_fbxItemFloor.draw();
+	pBG->Draw();
+	// -210F
+	e_fbxItemFloor.Draw();
 	//e_fbxItemBox.draw();
 	
 	//static OBJ3D temp = g_player;
 
-
-	pPlayerManager->draw();
+	// -60F
+	pPlayerManager->Draw();
 
 
 
 #ifdef  DEBUG
 
-	drawString(SCREEN_WIDTH / 2, 100, "SCENE TITLE", 0xFFFFFFFF, STR_CENTER, 48, 48);
-	drawString(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 200, "Push [ENTER] to next scene", 0xFFFFFFFF, STR_CENTER);
+	DrawString(SCREEN_WIDTH / 2, 100, "SCENE TITLE", 0xFFFFFFFF, STR_CENTER, 48, 48);
+	DrawString(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 200, "Push [ENTER] to next scene", 0xFFFFFFFF, STR_CENTER);
 
 	char buf[256];
 	sprintf_s(buf, "Loading Progress: %d %%", progress);
-	drawString(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 100, buf, 0xFF0000FF, STR_CENTER);
+	DrawString(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 100, buf, 0xFF0000FF, STR_CENTER);
 
 #endif //  DEBUG
 

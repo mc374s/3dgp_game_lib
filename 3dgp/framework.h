@@ -1,7 +1,7 @@
 ﻿#ifndef _FRAMEWORK_H_
 #define _FRAMEWORK_H_
 
-#include "3dgp_system.h"
+#include "3dgp.h"
 #include "blend.h"
 
 #include "sprite.h"
@@ -41,7 +41,7 @@ public:
 	bool isFullScreen;
 
 public:
-	HWND hwnd = NULL;
+	HWND outputWindow = NULL;
 	/*static CONST LONG SCREEN_WIDTH = SCREEN_WIDTH;
 	static CONST LONG SCREEN_HEIGHT = SCREEN_HEIGHT;*/
 
@@ -51,8 +51,6 @@ public:
 
 	static ID3D11Device*			s_pDevice;
 	static ID3D11DeviceContext*		s_pDeviceContext;
-
-	ID3D11Debug* pD3dDebug;
 
 
 	static ID3D11RenderTargetView*	s_pRenderTargetView;
@@ -84,25 +82,25 @@ public:
 	framework(HWND _hwnd) /*: hwnd(hwnd)*/
 	{
 		//MessageBox(0, L"Constructor called", L"framework", MB_OK);
-		if (!initialize(_hwnd)) {
-			MessageBox(0, L"run: Iniialize FAILED", 0, 0);
+		if (!Initialize(_hwnd)) {
+			MessageBox(0, L"Run: Iniialize FAILED", 0, 0);
 			return;
 		}
 	}
 	~framework()
 	{
-		release();
+		Release();
 	}
-	int run();
+	int Run();
 
 	LRESULT CALLBACK handle_message(HWND _hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
 private:
 
-	bool initialize(HWND _hwnd);
-	void update(float elapsed_time = .0f/*Elapsed seconds from last frame*/);
-	void render(float elapsed_time = .0f/*Elapsed seconds from last frame*/);
-	void release();
+	bool Initialize(HWND _hwnd);
+	void Update(float elapsed_time = .0f/*Elapsed seconds from last frame*/);
+	void Render(float elapsed_time = .0f/*Elapsed seconds from last frame*/);
+	void Release();
 
 private:
 	high_resolution_timer timer;

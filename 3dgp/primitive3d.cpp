@@ -1,9 +1,5 @@
 #include "primitive3d.h"
 
-#include "resources_manager.h"
-
-using namespace RM;
-
 Primitive3D::Primitive3D(ID3D11Device *pDevice)
 {
 	// Define the input layout
@@ -14,9 +10,9 @@ Primitive3D::Primitive3D(ID3D11Device *pDevice)
 		{ "NORMAL",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 28,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
-	loadVertexShader(pDevice, "Data/Shader/texture_off_3d_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &pVertexShader, &pInputLayout);
+	RM::LoadVertexShader(pDevice, "./Data/Shader/texture_off_3d_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &pVertexShader, &pInputLayout);
 
-	loadPixelShader(pDevice, "Data/Shader/texture_off_ps.cso", &pPixelShader);
+	RM::LoadPixelShader(pDevice, "./Data/Shader/texture_off_ps.cso", &pPixelShader);
 
 	// create rasterizer state
 	D3D11_RASTERIZER_DESC rasterizerDesc;
@@ -71,7 +67,7 @@ Primitive3D::Primitive3D(ID3D11Device *pDevice)
 
 }
 
-void Primitive3D::initialize(ID3D11Device *pDevice, const int &type, const int &_latitudeNum, const int &_longitudeNum)
+void Primitive3D::Initialize(ID3D11Device *pDevice, const int &type, const int &_latitudeNum, const int &_longitudeNum)
 {
 	if (type == GEOMETRY_CUBE)
 	{
@@ -132,7 +128,7 @@ void Primitive3D::initialize(ID3D11Device *pDevice, const int &type, const int &
 			20,21,22,
 			21,23,22
 		};
-		createBuffers(pDevice, vertices, indices);
+		CreateBuffers(pDevice, vertices, indices);
 	}
 
 	if (type == GEOMETRY_CYLINDER)
@@ -237,7 +233,7 @@ void Primitive3D::initialize(ID3D11Device *pDevice, const int &type, const int &
 			vertexCount++;
 		}
 
-		createBuffers(pDevice, vertices, vertexCount, indices, indexCount);
+		CreateBuffers(pDevice, vertices, vertexCount, indices, indexCount);
 		
 		delete vertices;
 		delete indices;
@@ -248,7 +244,7 @@ void Primitive3D::initialize(ID3D11Device *pDevice, const int &type, const int &
 
 
 
-void Primitive3D::createBuffers(ID3D11Device *pDevice, vertex3D *pVertices, int _vertexNum, WORD *pIndices, int _indexNum)
+void Primitive3D::CreateBuffers(ID3D11Device *pDevice, vertex3D *pVertices, int _vertexNum, WORD *pIndices, int _indexNum)
 {
 
 	vertexNum = _vertexNum;
@@ -309,7 +305,7 @@ void Primitive3D::createBuffers(ID3D11Device *pDevice, vertex3D *pVertices, int 
 	}
 }
 
-void Primitive3D::render(ID3D11DeviceContext *pDeviceContext, bool doFill)
+void Primitive3D::Render(ID3D11DeviceContext *pDeviceContext, bool doFill)
 {
 	if (doFill)
 	{
@@ -333,119 +329,25 @@ void Primitive3D::render(ID3D11DeviceContext *pDeviceContext, bool doFill)
 	pDeviceContext->DrawIndexed(indexNum, 0, 0);
 }
 
-void Primitive3D::setProjection(ID3D11DeviceContext *pDeviceContext, const XMFLOAT3 &position, const XMFLOAT4 &materialColor, const Transform& transform)
+
+void Primitive3D::Draw(ID3D11DeviceContext *pDeviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, const UINTCOLOR &blendColor)
 {
-	static XMFLOAT3 positionNDC, rotationAxisNDC;
-	positionNDC = toNDC(transform.position);
-	rotationAxisNDC = toNDC(transform.rotationAxis);
-	static XMMATRIX S, R, T, W, V, P, WVP;
-	S = R = T = W = V = P = WVP = DirectX::XMMatrixIdentity();
-	//R = DirectX::XMMatrixRotationAxis(XMVectorSet(rotationAxisNDC.x, rotationAxisNDC.y, rotationAxisNDC.z, 0), transform2D3D->angle*0.01745329251);
-	R = DirectX::XMMatrixRotationRollPitchYaw(transform.eulerAngle.y*0.01745, transform.eulerAngle.x*0.01745, transform.eulerAngle.z*0.01745);
-	//DirectX::XMQuaternionRotationAxis();
-	//DirectX::XMMatrixRotationQuaternion();
-	S = DirectX::XMMatrixScaling(transform.scaling.x, transform.scaling.y, transform.scaling.z);
-	T = DirectX::XMMatrixTranslation(positionNDC.x, positionNDC.y, positionNDC.z);
-	W = S*R*T;
-	
-	V = DirectX::XMMatrixLookAtLH(e_mainCamera.eyePosition, e_mainCamera.focusPosition, e_mainCamera.upDirection);
-	P = DirectX::XMMatrixPerspectiveFovLH(XM_PIDIV4, SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.01f, 100.0f);
-	/*W = DirectX::XMMatrixTranspose(W);
-	V = DirectX::XMMatrixTranspose(V);
-	P = DirectX::XMMatrixTranspose(P);*/
-	WVP = W*V*P;
 
-	//D3D11_MAPPED_SUBRESOURCE mappedSubRec;
-	//hr = _DeviceContext->Map(pConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD/*D3D11_MAP_WRITE_NO_OVERWRITE*/, 0, &mappedSubRec);
-	//if (FAILED(hr))
-	//{
-	//	MessageBox(0, L"Update pConstantBuffer failed", L"primitive3D::render()", 0);
-	//	return;
-	//}
-
-	PROJECTION_CBUFFER updateCbuffer;
-	updateCbuffer.world = W;
-	updateCbuffer.view = V;
-	updateCbuffer.projection = P;
-	updateCbuffer.worldViewProjection = WVP; 
-	static XMVECTOR lightDirection = { 0.0f,0.0f,1.0f,0.0f };
-	lightDirection = e_mainCamera.focusPosition - e_mainCamera.eyePosition;
-	updateCbuffer.lightDirection = XMFLOAT4(lightDirection.vector4_f32);
-	updateCbuffer.materialColor = materialColor;
+	static PROJECTION_CBUFFER updateCbuffer;
+	updateCbuffer.world = world;
+	updateCbuffer.view = view;
+	updateCbuffer.projection = projection;
+	updateCbuffer.worldViewProjection = world*view;
+	updateCbuffer.worldViewProjection *= projection;
+	updateCbuffer.lightDirection = { view._13, view._23, view._33, 1 };
+	updateCbuffer.materialColor = toNDColor(blendColor);
 
 	pDeviceContext->UpdateSubresource(pConstantBuffer, 0, NULL, &updateCbuffer, 0, 0);
 	pDeviceContext->VSSetConstantBuffers(0, 1, &pConstantBuffer);
-	//_DeviceContext->Unmap(pConstantBuffer, 0); 
+
+	Render(pDeviceContext, true);
 }
 
-void Primitive3D::drawCube(ID3D11DeviceContext *pDeviceContext, const XMFLOAT3 &position, const XMFLOAT3 &size, const UINTCOLOR &blendColor, const Transform& transform)
-{
-	//return;
-	float x = position.x, y = position.y, z = position.z;
-	float w = size.x, h = size.y, d = size.z;
-	float wHalf = w / 2.0f, hHalf = h / 2.0f, dHalf = d / 2.0f;
-	XMFLOAT4 ndColor = toNDColor(blendColor);
-	vertex3D vertices[] =
-	{
-		//UP
-		{ XMFLOAT3(x - wHalf, y + hHalf, z + dHalf), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-		{ XMFLOAT3(x + wHalf, y + hHalf, z + dHalf), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-		{ XMFLOAT3(x - wHalf, y + hHalf, z - dHalf), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-		{ XMFLOAT3(x + wHalf, y + hHalf, z - dHalf), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-		//UNDER
-		{ XMFLOAT3(x - wHalf, y - hHalf, z - dHalf), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f) },
-		{ XMFLOAT3(x + wHalf, y - hHalf, z - dHalf), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f) },
-		{ XMFLOAT3(x - wHalf, y - hHalf, z + dHalf), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f) },
-		{ XMFLOAT3(x + wHalf, y - hHalf, z + dHalf), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f) },
-		//LEFT
-		{ XMFLOAT3(x - wHalf, y + hHalf, z + dHalf), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f) },
-		{ XMFLOAT3(x - wHalf, y + hHalf, z - dHalf), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f) },
-		{ XMFLOAT3(x - wHalf, y - hHalf, z + dHalf), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f) },
-		{ XMFLOAT3(x - wHalf, y - hHalf, z - dHalf), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f) },
-		//RIGHT
-		{ XMFLOAT3(x + wHalf, y + hHalf, z - dHalf), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
-		{ XMFLOAT3(x + wHalf, y + hHalf, z + dHalf), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
-		{ XMFLOAT3(x + wHalf, y - hHalf, z - dHalf), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
-		{ XMFLOAT3(x + wHalf, y - hHalf, z + dHalf), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
-		//FRONT
-		{ XMFLOAT3(x - wHalf, y + hHalf, z - dHalf), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f) },
-		{ XMFLOAT3(x + wHalf, y + hHalf, z - dHalf), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f) },
-		{ XMFLOAT3(x - wHalf, y - hHalf, z - dHalf), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f) },
-		{ XMFLOAT3(x + wHalf, y - hHalf, z - dHalf), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f) },
-		//BACK
-		{ XMFLOAT3(x + wHalf, y + hHalf, z + dHalf), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
-		{ XMFLOAT3(x - wHalf, y + hHalf, z + dHalf), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
-		{ XMFLOAT3(x + wHalf, y - hHalf, z + dHalf), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
-		{ XMFLOAT3(x - wHalf, y - hHalf, z + dHalf), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
-	};
-
-	UINT vertexCount = ARRAYSIZE(vertices);
-	/*for (int i = 0; i < vertexCount; i++)
-	{
-		vertices[i].position = toNDC(vertices[i].position);
-	}*/
-	pDeviceContext->UpdateSubresource(pVertexBuffer, 0, NULL, vertices, 0, 0);
-
-	setProjection(pDeviceContext, position, ndColor, transform);
-	render(pDeviceContext, true);
-}
-
-void Primitive3D::drawCylinder(ID3D11DeviceContext *pDeviceContext, const XMFLOAT3 &position, const XMFLOAT3 &size,const Transform& transform)
-{
-
-	setProjection(pDeviceContext, position, XMFLOAT4(0.5, 0.5, 0.4, 1.0f), transform);
-	render(pDeviceContext, true);
-	
-}
-
-XMFLOAT3 Primitive3D::toNDC(const XMFLOAT3 &inputCoord)
-{
-	float x, y, z;
-	x = inputCoord.x / (float)SCREEN_WIDTH;
-	y = inputCoord.y / (float)SCREEN_WIDTH;
-	z = inputCoord.z / (float)SCREEN_WIDTH;
-	return XMFLOAT3(x, y, z);
-}
 
 Primitive3D::~Primitive3D()
 {
@@ -461,8 +363,8 @@ Primitive3D::~Primitive3D()
 	SAFE_DELETE(pVertices);
 	SAFE_DELETE(pIndices);
 
-	releasePixelShader(pPixelShader);
-	releaseVertexShader(pVertexShader, pInputLayout);
+	RM::ReleasePixelShader(pPixelShader);
+	RM::ReleaseVertexShader(pVertexShader, pInputLayout);
 }
 
 

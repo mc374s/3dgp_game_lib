@@ -1,12 +1,20 @@
-﻿#include "skinned_mesh.h"
+﻿//#include "resources_manager.h"
+//
+//#define _XM_NO_INTRINSICS_
+//#include <DirectXMath.h>
+//using namespace DirectX;
+
+#include "skinned_mesh.h"
+
+//#include <crtdbg.h>
+#include <functional>
+
+#pragma comment(lib,"libfbxsdk-md")
 #include <fbxsdk.h>
 using namespace fbxsdk;
 
 
-#include <functional>
-#include "resources_manager.h"
-
-void fetchBoneInfluences(const FbxMesh *pFbxMesh, std::vector<SkinnedMesh::BoneInfluencesPerContralPoint> &influences)
+void FetchBoneInfluences(const FbxMesh *pFbxMesh, std::vector<SkinnedMesh::BoneInfluencesPerContralPoint> &influences)
 {
 	const int controlPointsNum = pFbxMesh->GetControlPointsCount();
 	influences.resize(controlPointsNum);
@@ -36,7 +44,7 @@ void fetchBoneInfluences(const FbxMesh *pFbxMesh, std::vector<SkinnedMesh::BoneI
 
 }
 
-void fetchBoneMatrices(FbxMesh* pFbxMesh, std::vector<SkinnedMesh::Bone> &skeletal, FbxTime time)
+void FetchBoneMatrices(FbxMesh* pFbxMesh, std::vector<SkinnedMesh::Bone> &skeletal, FbxTime time)
 {
 	const int deformersNum = pFbxMesh->GetDeformerCount(FbxDeformer::eSkin);
 	for (int deformerIndex = 0; deformerIndex < deformersNum; ++deformerIndex) {
@@ -78,7 +86,7 @@ void fetchBoneMatrices(FbxMesh* pFbxMesh, std::vector<SkinnedMesh::Bone> &skelet
 	}
 }
 
-void fetchAnimations(FbxMesh *pFbxMesh, SkinnedMesh::SkeletalAnimation &skeletalAnimation, u_int samplingRate = 0)
+void FetchAnimations(FbxMesh *pFbxMesh, SkinnedMesh::SkeletalAnimation &skeletalAnimation, u_int samplingRate = 0)
 {
 	// Get the list of all the animation stack
 	FbxArray<FbxString*> pAnimationStackNamesArray;
@@ -93,7 +101,7 @@ void fetchAnimations(FbxMesh *pFbxMesh, SkinnedMesh::SkeletalAnimation &skeletal
 		FbxTime frameTime;
 		frameTime.SetTime(0, 0, 0, 1, 0, timeMode);
 
-		samplingRate = samplingRate > 0 ? samplingRate : frameTime.GetFrameRate(timeMode);
+		samplingRate = samplingRate > 0 ? samplingRate : (u_int)frameTime.GetFrameRate(timeMode);
 		float samplingTime = 1.0f / samplingRate;
 		skeletalAnimation.samplingTime = samplingTime;
 		skeletalAnimation.animationTick = 0;
@@ -111,7 +119,7 @@ void fetchAnimations(FbxMesh *pFbxMesh, SkinnedMesh::SkeletalAnimation &skeletal
 		samplingStep = static_cast<FbxLongLong>(samplingStep.Get()*samplingTime);
 		for (FbxTime currentTime = startTime; currentTime < endTime; currentTime += samplingStep) {
 			SkinnedMesh::Skeletal skeletal;
-			fetchBoneMatrices(pFbxMesh, skeletal, currentTime);
+			FetchBoneMatrices(pFbxMesh, skeletal, currentTime);
 			skeletalAnimation.push_back(skeletal);
 		}
 	}
@@ -121,9 +129,9 @@ void fetchAnimations(FbxMesh *pFbxMesh, SkinnedMesh::SkeletalAnimation &skeletal
 
 }
 
-SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const bool exchangeYandZ)
+SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const bool exchangeAxisYwithAxisZ)
 {
-	if (!exchangeYandZ){
+	if (!exchangeAxisYwithAxisZ){
 		coordinateConversion = XMMatrixIdentity();
 	}
 
@@ -139,14 +147,14 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const 
 	// Initialize the importer
 	bool isImportSuccessed = false;
 	isImportSuccessed = pFbxImporter->Initialize(pFbxFileName, -1, pFbxManager->GetIOSettings());
-	_ASSERT_EXPR_A(isImportSuccessed, pFbxImporter->GetStatus().GetErrorString());
+	_ASSERT_EXPR(isImportSuccessed, pFbxImporter->GetStatus().GetErrorString());
 
 	// Create a new scene, so it can be populated by the imported file
 	FbxScene* scene = FbxScene::Create(pFbxManager, "");
 
 	// Import the contents of the file into the scene
 	isImportSuccessed = pFbxImporter->Import(scene);
-	_ASSERT_EXPR_A(isImportSuccessed, pFbxImporter->GetStatus().GetErrorString());
+	_ASSERT_EXPR(isImportSuccessed, pFbxImporter->GetStatus().GetErrorString());
 
 	// Convert mesh, NURBS and patch into triangle mesh
 	FbxGeometryConverter geometryConverter(pFbxManager);
@@ -187,13 +195,14 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const 
 	//FbxMesh *pFbxMesh = fetchedMeshes.at(0)->GetMesh();		// Currently only one mesh
 	//FbxMesh *pFbxMesh = nullptr;
 	meshesList.resize(fetchedMeshes.size());
+
 	for (size_t i = 0, max = fetchedMeshes.size(); i < max; i++) {
 		FbxMesh *pFbxMesh = fetchedMeshes.at(i)->GetMesh();
 
 
 		// Fetch Bone Influences
 		std::vector<BoneInfluencesPerContralPoint> boneInfluences;
-		fetchBoneInfluences(pFbxMesh, boneInfluences);
+		FetchBoneInfluences(pFbxMesh, boneInfluences);
 
 		Mesh &mesh = meshesList.at(i);
 		// Fetch mesh data
@@ -214,7 +223,7 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const 
 		//fetchBoneMatrices(pFbxMesh, mesh.skeletal, frameTime * 20); // pose at frame 20 for testing
 
 		// Fetch Animations
-		fetchAnimations(pFbxMesh, mesh.skeletalAnimation);
+		FetchAnimations(pFbxMesh, mesh.skeletalAnimation);
 
 		// Fetch global transform matrix
 		FbxAMatrix globalTransform = pFbxMesh->GetNode()->EvaluateGlobalTransform(0);
@@ -230,16 +239,17 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const 
 		}
 		else {
 			Subset dummyData;
-			RM::MakeDummyShaderResourceView(pDevice, &dummyData.diffuse.pShaderResourceView);
+			RM::LoadShaderResourceView(pDevice, &dummyData.diffuse.pShaderResourceView, nullptr, nullptr);
 			mesh.subsetsList.push_back(dummyData);
 		}
+
 		for (int materialsIndex = 0; materialsIndex < materialsNum; materialsIndex++) {
 			Subset &subset = mesh.subsetsList.at(materialsIndex);
 
 			const FbxSurfaceMaterial *pSurfaceMaterial = pFbxMesh->GetNode()->GetMaterial(materialsIndex);
-
 			const FbxProperty property = pSurfaceMaterial->FindProperty(FbxSurfaceMaterial::sDiffuse);
 			const FbxProperty factor = pSurfaceMaterial->FindProperty(FbxSurfaceMaterial::sDisplacementFactor);
+			
 			if (property.IsValid() && factor.IsValid()) {
 				FbxDouble3 color = property.Get<FbxDouble3>();
 				double f = factor.Get<FbxDouble>();
@@ -267,45 +277,17 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const 
 						memcpy(pUVFilePath, pFileFolderPath, meshFileFloderPathLength);
 						pUVFilePath[meshFileFloderPathLength] = '\0';
 						strcat_s(pUVFilePath, uvFilePathLength, pUVFileName);
-						ID3D11Resource* pResource = NULL;
-
-						RM::loadShaderResourceView(pDevice, pUVFilePath, &pResource, &subset.diffuse.pShaderResourceView);
-						SAFE_RELEASE(pResource);
+						
+						//ID3D11Resource *temp;
+						RM::LoadShaderResourceView(pDevice, &subset.diffuse.pShaderResourceView, pUVFilePath, nullptr);
+						//SAFE_RELEASE(temp);
+						
 						SAFE_DELETE(pUVFilePath);
-
-						// SAMPLER_DESC Initialize
-						D3D11_SAMPLER_DESC samplerDesc;
-						ZeroMemory(&samplerDesc, sizeof(samplerDesc));
-						//samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-						//samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-						//samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
-						//samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
-						//samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
-						samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
-						samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-						samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-						samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-						samplerDesc.MipLODBias = 0.0f;
-						samplerDesc.MaxAnisotropy = 16;
-						samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-						/*samplerDesc.BorderColor[0] = 1.0f;
-						samplerDesc.BorderColor[1] = 1.0f;
-						samplerDesc.BorderColor[2] = 1.0f;
-						samplerDesc.BorderColor[3] = 1.0f;*/
-						samplerDesc.MinLOD = 0;
-						samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-
-						hr = pDevice->CreateSamplerState(&samplerDesc, &pSamplerState);
-						if (FAILED(hr))
-						{
-							MessageBox(0, L"skinned_mesh: Create SamplerState failed", 0, 0);
-							exit(-1);
-						}
-
+						
 					}
 				}
 				else {
-					RM::MakeDummyShaderResourceView(pDevice, &subset.diffuse.pShaderResourceView);
+					RM::LoadShaderResourceView(pDevice, &subset.diffuse.pShaderResourceView, nullptr, nullptr);
 				}
 
 			}
@@ -388,10 +370,10 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const 
 		vertex3D *vertices = new vertex3D[vertexCount];
 		WORD *indices = new WORD[indexCount];
 
-		for (int i = 0; i < vertexCount; i++)
+		for (u_int i = 0; i < vertexCount; ++i)
 		{
 			vertices[i] = verticesList[i];
-			//vertices[i].position = toNDC(vertices[i].position);
+			//vertices[i].position = ToNDC(vertices[i].position);
 			//vertices[i].color = diffuse.color;
 		}
 		for (int i = 0; i < indexCount; i++)
@@ -399,16 +381,33 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const 
 			indices[i] = indicesList[i];
 		}
 
-		createBuffers(pDevice, &mesh.vertexBuffer, &mesh.indexBuffer, vertices, vertexCount, indices, indexCount);
+		CreateBuffers(pDevice, &mesh.vertexBuffer, &mesh.indexBuffer, vertices, vertexCount, indices, indexCount);
 		delete vertices;
 		delete indices;
 	}
-
 
 	SAFE_DELETE(pFileFolderPath);
 	pFbxManager->Destroy();
 
 	// Initailize DirectX3D COM objects
+
+	// Create constant buffer
+	D3D11_BUFFER_DESC bufferDesc;
+	ZeroMemory(&bufferDesc, sizeof(bufferDesc));
+	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	bufferDesc.ByteWidth = sizeof(VS_CBUFFER_PROJECTION);
+	bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	//bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+	
+	VS_CBUFFER_PROJECTION VSConstantData;
+	//ZeroMemory(&VSConstantData, sizeof(VS_CBUFFER_PROJECTION));
+
+
+	hr = pDevice->CreateBuffer(&bufferDesc, NULL, &pConstantBuffer);
+	if (FAILED(hr)) {
+		MessageBox(0, L"Create pConstantBuffer failed", L"SkinnedMesh::CreateBuffers()", 0);
+		exit(-1);
+	}
 
 	// Define the input layout
 	D3D11_INPUT_ELEMENT_DESC layoutDesc[] =
@@ -421,15 +420,44 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const 
 		{ "BONES",		0, DXGI_FORMAT_R32G32B32A32_SINT,		0, 68,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		//{ "BONES",		0, DXGI_FORMAT_R32G32B32A32_SINT,		0, D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
-	RM::loadVertexShader(pDevice, "Data/Shader/texture_on_3d_bone_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &pVertexShader, &pInputLayout);
+	RM::LoadVertexShader(pDevice, "./Data/Shader/texture_on_3d_bone_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &pVertexShader, &pInputLayout);
 
-	RM::loadPixelShader(pDevice, "Data/Shader/texture_on_ps.cso", &pPixelShader);
+	RM::LoadPixelShader(pDevice, "./Data/Shader/texture_on_ps.cso", &pPixelShader);
+
+	// SAMPLER_DESC Initialize
+	D3D11_SAMPLER_DESC samplerDesc;
+	ZeroMemory(&samplerDesc, sizeof(samplerDesc));
+	//samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	//samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+	//samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+	//samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+	//samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.MipLODBias = 0.0f;
+	samplerDesc.MaxAnisotropy = 16;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	/*samplerDesc.BorderColor[0] = 1.0f;
+	samplerDesc.BorderColor[1] = 1.0f;
+	samplerDesc.BorderColor[2] = 1.0f;
+	samplerDesc.BorderColor[3] = 1.0f;*/
+	samplerDesc.MinLOD = 0;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+	hr = pDevice->CreateSamplerState(&samplerDesc, &pSamplerState);
+	if (FAILED(hr))
+	{
+		MessageBox(0, L"skinned_mesh: Create SamplerState failed", 0, 0);
+		exit(-1);
+	}
 
 	// Create rasterizer state
 	D3D11_RASTERIZER_DESC rasterizerDesc;
 	ZeroMemory(&rasterizerDesc, sizeof(rasterizerDesc));
 	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
-	if (exchangeYandZ){
+	if (exchangeAxisYwithAxisZ){
 		rasterizerDesc.CullMode = /*D3D11_CULL_BACK*//*D3D11_CULL_NONE*/D3D11_CULL_FRONT;
 	}
 	else {
@@ -457,7 +485,7 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const 
 	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
 }
 
-void SkinnedMesh::createBuffers(ID3D11Device *pDevice, ID3D11Buffer** ppVertexBuffer, ID3D11Buffer** ppIndexBuffer, vertex3D *pVertices, int vertexNum, WORD *pIndices, int indexNum)
+void SkinnedMesh::CreateBuffers(ID3D11Device *pDevice, ID3D11Buffer** ppVertexBuffer, ID3D11Buffer** ppIndexBuffer, vertex3D *pVertices, int vertexNum, WORD *pIndices, int indexNum)
 {
 	//pVertices = new vertex3D[_vertexNum];
 	//memcpy(pVertices, _vertices, sizeof(vertex3D)*_vertexNum);
@@ -477,7 +505,7 @@ void SkinnedMesh::createBuffers(ID3D11Device *pDevice, ID3D11Buffer** ppVertexBu
 
 	if (FAILED(hr))
 	{
-		MessageBox(0, L"Create pVertexBuffer failed", L"SkinnedMesh::createBuffers()", 0);
+		MessageBox(0, L"Create pVertexBuffer failed", L"SkinnedMesh::CreateBuffers()", 0);
 		exit(-1);
 	}
 	
@@ -494,34 +522,18 @@ void SkinnedMesh::createBuffers(ID3D11Device *pDevice, ID3D11Buffer** ppVertexBu
 	subResourceData.pSysMem = pIndices;
 	hr = pDevice->CreateBuffer(&bufferDesc, &subResourceData, ppIndexBuffer);
 	if (FAILED(hr)) {
-		MessageBox(0, L"Create pIndexBuffer failed", L"SkinnedMesh::createBuffers()", 0);
+		MessageBox(0, L"Create pIndexBuffer failed", L"SkinnedMesh::CreateBuffers()", 0);
 		exit(-1);
 	}
-
-	// Create constant buffer
-	VS_CBUFFER_PROJECTION VSConstantData;
-	//ZeroMemory(&VSConstantData, sizeof(VS_CBUFFER_PROJECTION));
-
-	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	bufferDesc.ByteWidth = sizeof(VS_CBUFFER_PROJECTION);
-	bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	//bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-
-	hr = pDevice->CreateBuffer(&bufferDesc, NULL, &pConstantBuffer);
-	if (FAILED(hr)) {
-		MessageBox(0, L"Create pConstantBuffer failed", L"SkinnedMesh::createBuffers()", 0);
-		exit(-1);
-	}
-	
 }
 
-void SkinnedMesh::render(ID3D11DeviceContext *pDeviceContext, bool doFill, const Mesh &mesh)
+void SkinnedMesh::Render(ID3D11DeviceContext *pDeviceContext, bool isWireframe, const Mesh &mesh)
 {
-	if (doFill) {
-		pDeviceContext->RSSetState(pFillRasterizerState);
+	if (isWireframe) {
+		pDeviceContext->RSSetState(pWireRasterizerState);
 	}
 	else {
-		pDeviceContext->RSSetState(pWireRasterizerState);
+		pDeviceContext->RSSetState(pFillRasterizerState);
 	}
 
 	UINT pStrides = sizeof(vertex3D);
@@ -544,87 +556,54 @@ void SkinnedMesh::render(ID3D11DeviceContext *pDeviceContext, bool doFill, const
 	}
 }
 
-void SkinnedMesh::setProjection(ID3D11DeviceContext *pDeviceContext, const Transform &preSetTransform, const Transform& transform, const XMMATRIX& globalTransform, SkeletalAnimation& skeletalAnimation, const int& animationFrame, float elapsedTime)
+void SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, bool isWireframe, const int& animationFrame, float elapsedTime)
 {
-	static XMFLOAT3 position, rotationAxis;
-	//position = toNDC(transform.position + preSetTransform.position);
-	rotationAxis = toNDC(transform.rotationAxis);
-	position = transform.position + preSetTransform.position;
-	//rotationAxis = 
-	static XMMATRIX S, R, T, W, V, P, WVP;
-	S = R = T = W = V = P = WVP = DirectX::XMMatrixIdentity();
-	S = DirectX::XMMatrixScaling(transform.scaling.x*preSetTransform.scaling.x, transform.scaling.y*preSetTransform.scaling.y, transform.scaling.z*preSetTransform.scaling.z);
-	//R = DirectX::XMMatrixRotationAxis(XMVectorSet(rotationAxis.x, rotationAxis.y, rotationAxis.z, 0), transform2D3D->angle*0.01745329251);
-	R =	DirectX::XMMatrixRotationX((transform.eulerAngle.x + preSetTransform.eulerAngle.x)*0.01745)
-		*DirectX::XMMatrixRotationY((transform.eulerAngle.y + preSetTransform.eulerAngle.y)*0.01745)
-		*DirectX::XMMatrixRotationZ((transform.eulerAngle.z + preSetTransform.eulerAngle.z)*0.01745);
-	//R = DirectX::XMMatrixRotationRollPitchYaw((transform.eulerAngle.y)*0.01745, transform.eulerAngle.x*0.01745, transform.eulerAngle.z*0.01745);
-	T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
-	W = S*R*T;
-	
-	V = DirectX::XMMatrixLookAtLH(e_mainCamera.eyePosition, e_mainCamera.focusPosition, e_mainCamera.upDirection);
-	P = DirectX::XMMatrixPerspectiveFovLH(XM_PIDIV4, SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.01f, 100.0f);
-	/*W = DirectX::XMMatrixTranspose(W);
-	V = DirectX::XMMatrixTranspose(V);
-	P = DirectX::XMMatrixTranspose(P);*/
-	WVP = W*V*P;
 
-	//D3D11_MAPPED_SUBRESOURCE mappedSubRec;
-	//hr = _DeviceContext->Map(pConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD/*D3D11_MAP_WRITE_NO_OVERWRITE*/, 0, &mappedSubRec);
-	//if (FAILED(hr))
-	//{
-	//	MessageBox(0, L"Update pConstantBuffer failed", L"SkinnedMesh::render()", 0);
-	//	return;
-	//}
+	XMMATRIX worldViewProjection(world);
+	worldViewProjection *= view;
+	worldViewProjection *= projection;
 
 	static VS_CBUFFER_PROJECTION updateCbuffer;
-	updateCbuffer.world = globalTransform*coordinateConversion*W;
-	updateCbuffer.view = V;
-	updateCbuffer.projection = P;
-	updateCbuffer.worldViewProjection = globalTransform*coordinateConversion*WVP;
-	static XMVECTOR lightDirection = { 0.0f,0.0f,1.0f,0.0f };
-	lightDirection = e_mainCamera.focusPosition - e_mainCamera.eyePosition;
-	updateCbuffer.lightDirection = XMFLOAT4(lightDirection.vector4_f32);
+	updateCbuffer.view = view;
+	updateCbuffer.projection = projection;
+	//static XMVECTOR lightDirection = { 0.0f,0.0f,1.0f,0.0f };
+	//lightDirection = e_mainCamera.focusPosition - e_mainCamera.eyePosition;
+	updateCbuffer.lightDirection = { view._13, view._23, view._33, 1 };
 	updateCbuffer.materialColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
-	//Play Fbx Animation
-	if (skeletalAnimation.size() > 0) {
-		if (animationFrame == 0)
-		{
-			frame = skeletalAnimation.animationTick / skeletalAnimation.samplingTime;
-		}
-		else
-		{
-			frame = animationFrame;
-		}
-		
-		if (frame > skeletalAnimation.size() - 1) {
-			frame = 0;
-			skeletalAnimation.animationTick = 0;
-		}
-		Skeletal skeletal = skeletalAnimation.at(frame);
-		size_t bonesNum = skeletal.size();
-		_ASSERT_EXPR(bonesNum < MAX_BONES, L"The bonesNum exceeds MAX_BONES!");
-		for (size_t i = 0; i < bonesNum; i++) {
-			updateCbuffer.boneTransforms[i] = skeletal[i].transform;
-		}
-		skeletalAnimation.animationTick += elapsedTime;
-	}
-
-	pDeviceContext->UpdateSubresource(pConstantBuffer, 0, NULL, &updateCbuffer, 0, 0);
-
-	//_DeviceContext->Unmap(pConstantBuffer, 0);
-}
-
-
-void SkinnedMesh::drawMesh(ID3D11DeviceContext *pDeviceContext, const Transform& preSetTransform, const Transform& transform, const int& animationFrame, float elapsedTime)
-{
+	// Play Fbx Animation	
 	for (Mesh &mesh : meshesList)
 	{
-		setProjection(pDeviceContext, preSetTransform, transform, mesh.globalTransform, mesh.skeletalAnimation, animationFrame, elapsedTime);
-		render(pDeviceContext, true, mesh);
+		if (mesh.skeletalAnimation.size() > 0) {
+			if (animationFrame == 0)
+			{
+				frame = mesh.skeletalAnimation.animationTick / mesh.skeletalAnimation.samplingTime;
+			}
+			else
+			{
+				frame = animationFrame;
+			}
+
+			if (frame > mesh.skeletalAnimation.size() - 1) {
+				frame = 0;
+				mesh.skeletalAnimation.animationTick = 0;
+			}
+			Skeletal skeletal = mesh.skeletalAnimation.at(frame);
+			size_t bonesNum = skeletal.size();
+			_ASSERT_EXPR(bonesNum < MAX_BONES, L"The bonesNum exceeds MAX_BONES!");
+			for (size_t i = 0; i < bonesNum; i++) {
+				updateCbuffer.boneTransforms[i] = skeletal[i].transform;
+			}
+			mesh.skeletalAnimation.animationTick += elapsedTime;
+		}
+
+		updateCbuffer.world = mesh.globalTransform*coordinateConversion*world;
+		updateCbuffer.worldViewProjection = mesh.globalTransform*coordinateConversion*worldViewProjection;
+		pDeviceContext->UpdateSubresource(pConstantBuffer, 0, NULL, &updateCbuffer, 0, 0);
+		Render(pDeviceContext, isWireframe, mesh);
 	}
 }
+
 
 SkinnedMesh::~SkinnedMesh()
 {
@@ -633,7 +612,7 @@ SkinnedMesh::~SkinnedMesh()
 		SAFE_RELEASE(mesh.vertexBuffer);
 		SAFE_RELEASE(mesh.indexBuffer);
 		for (Subset &subset : mesh.subsetsList) {
-			SAFE_RELEASE(subset.diffuse.pShaderResourceView);
+			RM::ReleaseShaderResourceView(subset.diffuse.pShaderResourceView);
 		}
 	}
 
@@ -644,23 +623,9 @@ SkinnedMesh::~SkinnedMesh()
 
 	SAFE_RELEASE(pDepthStencilState);
 
-	RM::releasePixelShader(pPixelShader);
-	RM::releaseVertexShader(pVertexShader, pInputLayout);
+	RM::ReleasePixelShader(pPixelShader);
+	RM::ReleaseVertexShader(pVertexShader, pInputLayout);
 
 	SAFE_RELEASE(pSamplerState);
 
-}
-
-XMFLOAT3 SkinnedMesh::toNDC(XMFLOAT3 input)
-{
-	float x, y, z;
-	// 2D without projection
-	/*x = 2.0f*_coord.x / SCREEN_WIDTH - 1.0f;
-	y = 1.0f - 2.0f*_coord.y / SCREEN_WIDTH;*/
-
-	// 2D with projection
-	x = input.x / (float)SCREEN_WIDTH;
-	y = input.y / (float)SCREEN_WIDTH;
-	z = input.z / (float)SCREEN_WIDTH;
-	return XMFLOAT3(x, y, z);
 }

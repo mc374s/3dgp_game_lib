@@ -1,4 +1,6 @@
 #include "resources_manager.h"
+
+#include "WICTextureLoader.h"
 #include <cstdio>
 
 using namespace RM;
@@ -8,16 +10,20 @@ using namespace RM;
 int ResourcesManager::s_imgFileCounter = 0;
 D3D11_RESOURCES<ID3D11ShaderResourceView*> ResourcesManager::s_SRVResources[FILE_NUM_MAX];
 
-int RM::loadShaderResourceView(ID3D11Device* pDevice, char* pFilename, ID3D11Resource** ppOutResource, ID3D11ShaderResourceView** ppOutSRV) {
+int RM::LoadShaderResourceView(ID3D11Device* pDevice, ID3D11ShaderResourceView** ppOutSRV, char* pFileName, ID3D11Resource** ppOutResource) {
 	int fileNO = 0;
 
-	// すでに存在しているリソース
+	// すでに存在しているリソースがあれば、レファレンス作成。無ければ新規作成
 	for (fileNO = 0; fileNO < ResourcesManager::s_imgFileCounter; fileNO++)
 	{
-		if (ResourcesManager::s_SRVResources[fileNO].pFileName == pFilename)
+		// pFileName == nullptrのときにダミーSRVを参照
+		if ((pFileName && strcmp(ResourcesManager::s_SRVResources[fileNO].pFileName, pFileName) == 0)
+			|| (!pFileName && strcmp(ResourcesManager::s_SRVResources[fileNO].pFileName, "NULL") == 0))
 		{
-			//　リソースを _resource に返す
-			ResourcesManager::s_SRVResources[fileNO].pData->GetResource(ppOutResource);
+			//　リソースを ppOutResource に返す
+			if (ppOutResource) {
+				ResourcesManager::s_SRVResources[fileNO].pData->GetResource(ppOutResource);
+			}
 			ResourcesManager::s_SRVResources[fileNO].fileRefNum++;
 			break;
 		}
@@ -26,20 +32,34 @@ int RM::loadShaderResourceView(ID3D11Device* pDevice, char* pFilename, ID3D11Res
 	//　新規リソース
 	if (fileNO == ResourcesManager::s_imgFileCounter)
 	{
-		const size_t cSize = strlen(pFilename) + 1;
-		wchar_t *wcFileName = new wchar_t[cSize];
-		size_t temp;
-		mbstowcs_s(&temp, wcFileName, cSize, pFilename, cSize);
-		HRESULT hr = DirectX::CreateWICTextureFromFile(pDevice, wcFileName, ppOutResource, &ResourcesManager::s_SRVResources[fileNO].pData);
-		delete[] wcFileName;
-		if (FAILED(hr))
+		HRESULT hr;
+		// pFileName が nullptr の場合はダミーSRVを作成
+		if (pFileName)
 		{
-			MessageBox(0, L"CreateWICTextureFromFile Filed!", L"MyResourceManager::loadResource()", MB_OK);
-			return -1;
+			const size_t cSize = strlen(pFileName) + 1;
+			wchar_t *wcFileName = new wchar_t[cSize];
+			mbstowcs_s(nullptr, wcFileName, cSize, pFileName, cSize);
+			hr = DirectX::CreateWICTextureFromFile(pDevice, wcFileName, ppOutResource, &ResourcesManager::s_SRVResources[fileNO].pData);
+			delete[] wcFileName;
+			if (FAILED(hr))
+			{
+				MessageBox(0, L"CreateWICTextureFromFile Filed!", L"MyResourceManager::loadResource()", MB_OK);
+				return -1;
+			}
+			strcpy_s(ResourcesManager::s_SRVResources[fileNO].pFileName, pFileName);
 		}
-		ResourcesManager::s_SRVResources[fileNO].pFileName = pFilename;
-		ResourcesManager::s_SRVResources[fileNO].fileRefNum++;
+		else
+		{
+			hr = ResourcesManager::MakeDummyShaderResourceView(pDevice, &ResourcesManager::s_SRVResources[fileNO].pData);
+			if (FAILED(hr))
+			{
+				MessageBox(0, L"MakeDummyShaderResourceView Filed!", L"MyResourceManager::loadResource()", MB_OK);
+				return -1;
+			}
+			strcpy_s(ResourcesManager::s_SRVResources[fileNO].pFileName, "NULL");
+		}
 
+		ResourcesManager::s_SRVResources[fileNO].fileRefNum++;
 		ResourcesManager::s_imgFileCounter++;
 
 	}
@@ -49,15 +69,15 @@ int RM::loadShaderResourceView(ID3D11Device* pDevice, char* pFilename, ID3D11Res
 	//　リソースの番号を返す
 	return fileNO;
 }
-// リソースを解放
-void RM::releaseShaderResourceView(ID3D11ShaderResourceView* pInSRV) {
+
+void RM::ReleaseShaderResourceView(ID3D11ShaderResourceView* pInSRV) {
 	if (pInSRV)
 	{
 		for (int i = 0; i < ResourcesManager::s_imgFileCounter; i++)
 		{
 			if (ResourcesManager::s_SRVResources[i].pData == pInSRV)
 			{
-				ResourcesManager::s_SRVResources[i].release();
+				ResourcesManager::s_SRVResources[i].Release();
 				break;
 			}
 		}
@@ -70,22 +90,22 @@ int ResourcesManager::s_vsFileCounter = 0;
 D3D11_RESOURCES<ID3D11VertexShader*> ResourcesManager::s_vertexShaderResources[FILE_NUM_MAX];
 ID3D11InputLayout* ResourcesManager::s_inputLayoutResources[FILE_NUM_MAX];
 
-int RM::loadVertexShader(ID3D11Device* pDevice, char* pFilename, D3D11_INPUT_ELEMENT_DESC* pInLayoutDesc, int elementsNum, ID3D11VertexShader** ppOutVertexShader, ID3D11InputLayout** ppOutInputLayout)
+int RM::LoadVertexShader(ID3D11Device* pDevice, char* pFilename, D3D11_INPUT_ELEMENT_DESC* pInLayoutDesc, int elementsNum, ID3D11VertexShader** ppOutVertexShader, ID3D11InputLayout** ppOutInputLayout)
 {
-	int fileNo = 0;
+	int fileNO = 0;
 
 	// すでに存在しているリソース
-	for (fileNo = 0; fileNo < ResourcesManager::s_vsFileCounter; fileNo++)
+	for (fileNO = 0; fileNO < ResourcesManager::s_vsFileCounter; fileNO++)
 	{
-		if (ResourcesManager::s_vertexShaderResources[fileNo].pFileName == pFilename)
+		if (strcmp(ResourcesManager::s_vertexShaderResources[fileNO].pFileName, pFilename) == 0)
 		{
-			ResourcesManager::s_vertexShaderResources[fileNo].fileRefNum++;
+			ResourcesManager::s_vertexShaderResources[fileNO].fileRefNum++;
 			break;
 		}
 	}
 
 	//　新規リソース
-	if (fileNo == ResourcesManager::s_vsFileCounter)
+	if (fileNO == ResourcesManager::s_vsFileCounter)
 	{
 		unsigned char *cso_data = NULL;
 		UINT cso_sz;
@@ -101,44 +121,45 @@ int RM::loadVertexShader(ID3D11Device* pDevice, char* pFilename, D3D11_INPUT_ELE
 		fread(cso_data, cso_sz, 1, fp);
 		fclose(fp);
 		// Create the vertex shader
-		HRESULT hr = pDevice->CreateVertexShader(cso_data, cso_sz, NULL, &ResourcesManager::s_vertexShaderResources[fileNo].pData);
+		HRESULT hr = pDevice->CreateVertexShader(cso_data, cso_sz, NULL, &ResourcesManager::s_vertexShaderResources[fileNO].pData);
 		if (FAILED(hr))
 		{
-			MessageBox(0, L"CreateVertexShader failed", L"ResourceManager::loadVertexShader()", MB_OK);
+			MessageBox(0, L"CreateVertexShader failed", L"ResourceManager::LoadVertexShader()", MB_OK);
 			return -1;
 		}
 
 		// Create the input layout
-		hr = pDevice->CreateInputLayout(pInLayoutDesc, elementsNum, cso_data, cso_sz, &ResourcesManager::s_inputLayoutResources[fileNo]);
+		hr = pDevice->CreateInputLayout(pInLayoutDesc, elementsNum, cso_data, cso_sz, &ResourcesManager::s_inputLayoutResources[fileNO]);
 		if (FAILED(hr))
 		{
-			MessageBox(0, L"CreateInputLayout failed", L"ResourceManager::loadVertexShader()", MB_OK);
+			MessageBox(0, L"CreateInputLayout failed", L"ResourceManager::LoadVertexShader()", MB_OK);
 			return -1;
 		}
 		delete[] cso_data;
 
-		ResourcesManager::s_vertexShaderResources[fileNo].pFileName = pFilename;
-		ResourcesManager::s_vertexShaderResources[fileNo].fileRefNum++;
+		//ResourcesManager::s_vertexShaderResources[fileNO].pFileName = pFileName;
+		strcpy_s(ResourcesManager::s_vertexShaderResources[fileNO].pFileName, pFilename);
+		ResourcesManager::s_vertexShaderResources[fileNO].fileRefNum++;
 		ResourcesManager::s_vsFileCounter++;
 	}
 
 	// VertexShaderとInputLayoutの出力
-	*ppOutVertexShader = ResourcesManager::s_vertexShaderResources[fileNo].pData;
-	*ppOutInputLayout = ResourcesManager::s_inputLayoutResources[fileNo];
+	*ppOutVertexShader = ResourcesManager::s_vertexShaderResources[fileNO].pData;
+	*ppOutInputLayout = ResourcesManager::s_inputLayoutResources[fileNO];
 
 	//　リソースの番号を返す
-	return fileNo;
+	return fileNO;
 };
 
 
-void RM::releaseVertexShader(ID3D11VertexShader* pInVertexShader, ID3D11InputLayout* pInInputLayout) {
+void RM::ReleaseVertexShader(ID3D11VertexShader* pInVertexShader, ID3D11InputLayout* pInInputLayout) {
 	if (pInVertexShader)
 	{
 		for (int i = 0; i < ResourcesManager::s_vsFileCounter; i++)
 		{
 			if (ResourcesManager::s_vertexShaderResources[i].pData == pInVertexShader)
 			{
-				ResourcesManager::s_vertexShaderResources[i].release();
+				ResourcesManager::s_vertexShaderResources[i].Release();
 				if (ResourcesManager::s_vertexShaderResources[i].fileRefNum <= 0)
 				{
 					SAFE_RELEASE(ResourcesManager::s_inputLayoutResources[i]);
@@ -154,22 +175,22 @@ void RM::releaseVertexShader(ID3D11VertexShader* pInVertexShader, ID3D11InputLay
 int ResourcesManager::s_psFileCounter = 0;
 D3D11_RESOURCES<ID3D11PixelShader*> ResourcesManager::s_pixelShaderResources[FILE_NUM_MAX];
 
-int RM::loadPixelShader(ID3D11Device* pDevice, char* pFilename, ID3D11PixelShader** ppOut)
+int RM::LoadPixelShader(ID3D11Device* pDevice, char* pFilename, ID3D11PixelShader** ppOut)
 {
-	int fileNo = 0;
+	int fileNO = 0;
 
 	// すでに存在しているリソース
-	for (fileNo = 0; fileNo < ResourcesManager::s_psFileCounter; fileNo++)
+	for (fileNO = 0; fileNO < ResourcesManager::s_psFileCounter; fileNO++)
 	{
-		if (ResourcesManager::s_pixelShaderResources[fileNo].pFileName == pFilename)
+		if (strcmp(ResourcesManager::s_pixelShaderResources[fileNO].pFileName, pFilename) == 0)
 		{
-			ResourcesManager::s_pixelShaderResources[fileNo].fileRefNum++;
+			ResourcesManager::s_pixelShaderResources[fileNO].fileRefNum++;
 			break;
 		}
 	}
 
 	//　新規リソース
-	if (fileNo == ResourcesManager::s_psFileCounter)
+	if (fileNO == ResourcesManager::s_psFileCounter)
 	{
 		unsigned char *cso_data = NULL;
 		UINT cso_sz;
@@ -185,7 +206,7 @@ int RM::loadPixelShader(ID3D11Device* pDevice, char* pFilename, ID3D11PixelShade
 		fread(cso_data, cso_sz, 1, fp);
 		fclose(fp);
 		// Create the pixel shader
-		HRESULT hr = pDevice->CreatePixelShader(cso_data, cso_sz, NULL, &ResourcesManager::s_pixelShaderResources[fileNo].pData);
+		HRESULT hr = pDevice->CreatePixelShader(cso_data, cso_sz, NULL, &ResourcesManager::s_pixelShaderResources[fileNO].pData);
 		if (FAILED(hr))
 		{
 			MessageBox(0, L"sprite: CreatePixelShader failed", 0, 0);
@@ -194,32 +215,33 @@ int RM::loadPixelShader(ID3D11Device* pDevice, char* pFilename, ID3D11PixelShade
 		delete[] cso_data;
 
 		// リソースカウンタアップ
-		ResourcesManager::s_pixelShaderResources[fileNo].pFileName = pFilename;
-		ResourcesManager::s_pixelShaderResources[fileNo].fileRefNum++;
+		strcpy_s(ResourcesManager::s_pixelShaderResources[fileNO].pFileName, pFilename);
+		//ResourcesManager::s_pixelShaderResources[fileNO].pFileName = pFileName;
+		ResourcesManager::s_pixelShaderResources[fileNO].fileRefNum++;
 		ResourcesManager::s_psFileCounter++;
 	}
 	// PixelShader Data出力
-	*ppOut = ResourcesManager::s_pixelShaderResources[fileNo].pData;
+	*ppOut = ResourcesManager::s_pixelShaderResources[fileNO].pData;
 	//　リソースの番号を返す
-	return fileNo;
+	return fileNO;
 
 }
 
-void RM::releasePixelShader(ID3D11PixelShader* pIn) {
+void RM::ReleasePixelShader(ID3D11PixelShader* pIn) {
 	if (pIn)
 	{
 		for (int i = 0; i < ResourcesManager::s_psFileCounter; i++)
 		{
 			if (ResourcesManager::s_pixelShaderResources[i].pData == pIn)
 			{
-				ResourcesManager::s_pixelShaderResources[i].release();
+				ResourcesManager::s_pixelShaderResources[i].Release();
 				break;
 			}
 		}
 	}
 }
 
-HRESULT	RM::MakeDummyShaderResourceView(ID3D11Device *Device, ID3D11ShaderResourceView** shaderResourceView)
+HRESULT	ResourcesManager::MakeDummyShaderResourceView(ID3D11Device *Device, ID3D11ShaderResourceView** shaderResourceView)
 {
 	HRESULT hr = S_OK;
 

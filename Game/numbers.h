@@ -42,10 +42,10 @@ public:
 
 	void setValue(int value, Vector3 size = Vector3(1.0f, 1.0f, 0.0f));
 
-	virtual void clear();
-	virtual void update();
+	virtual void Clear();
+	virtual void Update();
 
-	virtual void draw();
+	virtual void Draw();
 
 };
 
