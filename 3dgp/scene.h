@@ -28,10 +28,10 @@ public:
 	virtual void Update() {};
 	virtual void Draw() {};
 
-	virtual void changeScene(Scene* pNextScene) {
-		pNextScene->pNextScene = nullptr;
-		pNextScene->init();
-		pNextScene = pNextScene;
+	virtual void changeScene(Scene* pTargetScene) {
+		pTargetScene->pNextScene = nullptr;
+		pTargetScene->init();
+		pNextScene = pTargetScene;
 	};
 };
 

@@ -37,7 +37,7 @@ public:
 	LARGE_INTEGER timeEnd;
 	LARGE_INTEGER timeFreq;
 
-	void setFPSLimitation(int limation = 20);
+	void setFPSLimitation(int limitation = FPS);
 	bool isFullScreen;
 
 public:

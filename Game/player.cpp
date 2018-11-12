@@ -46,7 +46,7 @@ void Player::Update()
 		}
 		break;
 	}
-
+	
 	if (speed.x > speedMax.x)
 	{
 		speed.x = speedMax.x;
@@ -107,11 +107,34 @@ void Player::Update()
 		speed.y = 0;
 	}
 
+	static float cameraY = 2, cameraZ = -9;
+	if (KEY_BOARD.I)
+	{
+		cameraY += 0.01;
+	}
+	if (KEY_BOARD.K)
+	{
+		cameraY -= 0.01;
+	}
+	if (KEY_BOARD.O)
+	{
+		cameraZ += 0.01;
+	}
+	if (KEY_BOARD.U)
+	{
+		cameraZ -= 0.01;
+	}
 	
-	e_mainCamera.upDirection = { 0,1,0, 0 };
-	e_mainCamera.eyePosition = { transform.position.x, transform.position.y + 0.5f,transform.position.z - 3.0f,0 };
+	e_mainCamera.eyePosition = { transform.position.x, transform.position.y + cameraY,transform.position.z + cameraZ,0 };
 	e_mainCamera.focusPosition = { transform.position.x, transform.position.y + 0.5f, transform.position.z,0 };
 
+	Vector3 forword = XMVectorSubtract(e_mainCamera.focusPosition, e_mainCamera.eyePosition);
+	forword.Normalize();
+	float angle = forword.Dot(Vector3(0, 1, 0));
+	e_mainCamera.upDirection = Vector3(0, 1, 0) - forword*angle;
+
+	e_mainCamera.upDirection = XMVector3Normalize(e_mainCamera.upDirection);
+	
 	//e_mainCamera.toNDC();
 }
 

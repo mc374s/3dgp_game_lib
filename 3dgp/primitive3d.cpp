@@ -1,3 +1,7 @@
+#include "resources_manager.h"
+#include <DirectXMath.h>
+using namespace DirectX;
+
 #include "primitive3d.h"
 
 Primitive3D::Primitive3D(ID3D11Device *pDevice)
@@ -244,11 +248,16 @@ void Primitive3D::Initialize(ID3D11Device *pDevice, const int &type, const int &
 
 
 
-void Primitive3D::CreateBuffers(ID3D11Device *pDevice, vertex3D *pVertices, int _vertexNum, WORD *pIndices, int _indexNum)
+void Primitive3D::CreateBuffers(ID3D11Device *pDevice, vertex3D *_pVertices, int _vertexNum, WORD *_pIndices, int _indexNum)
 {
 
 	vertexNum = _vertexNum;
 	indexNum = _indexNum;
+	pVertices = new vertex3D[_vertexNum];
+	pIndices = new WORD[_indexNum];
+	memcpy(pVertices, _pVertices, sizeof(vertex3D)*_vertexNum);
+	memcpy(pIndices, _pVertices, sizeof(WORD)*_indexNum);
+	
 
 	//pVertices = new vertex3D[_vertexNum];
 	//memcpy(pVertices, _vertices, sizeof(vertex3D)*_vertexNum);
@@ -330,7 +339,7 @@ void Primitive3D::Render(ID3D11DeviceContext *pDeviceContext, bool doFill)
 }
 
 
-void Primitive3D::Draw(ID3D11DeviceContext *pDeviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, const UINTCOLOR &blendColor)
+void Primitive3D::Draw(ID3D11DeviceContext *pDeviceContext, XMMATRIX world, XMMATRIX view, XMMATRIX projection, FXMVECTOR blendColor)
 {
 
 	static PROJECTION_CBUFFER updateCbuffer;
@@ -339,8 +348,9 @@ void Primitive3D::Draw(ID3D11DeviceContext *pDeviceContext, const XMMATRIX& worl
 	updateCbuffer.projection = projection;
 	updateCbuffer.worldViewProjection = world*view;
 	updateCbuffer.worldViewProjection *= projection;
-	updateCbuffer.lightDirection = { view._13, view._23, view._33, 1 };
-	updateCbuffer.materialColor = toNDColor(blendColor);
+	
+	updateCbuffer.lightDirection = { XMVectorGetZ(view.r[0]), XMVectorGetZ(view.r[1]), XMVectorGetZ(view.r[2]), 1 };
+	XMStoreFloat4(&updateCbuffer.materialColor, blendColor);
 
 	pDeviceContext->UpdateSubresource(pConstantBuffer, 0, NULL, &updateCbuffer, 0, 0);
 	pDeviceContext->VSSetConstantBuffers(0, 1, &pConstantBuffer);

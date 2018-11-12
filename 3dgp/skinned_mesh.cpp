@@ -556,7 +556,7 @@ void SkinnedMesh::Render(ID3D11DeviceContext *pDeviceContext, bool isWireframe, 
 	}
 }
 
-void SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, bool isWireframe, const int& animationFrame, float elapsedTime)
+void SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, XMMATRIX world, XMMATRIX view, XMMATRIX projection, bool isWireframe, const int& animationFrame, float elapsedTime)
 {
 
 	XMMATRIX worldViewProjection(world);
@@ -568,7 +568,7 @@ void SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, const XMMATRIX& worl
 	updateCbuffer.projection = projection;
 	//static XMVECTOR lightDirection = { 0.0f,0.0f,1.0f,0.0f };
 	//lightDirection = e_mainCamera.focusPosition - e_mainCamera.eyePosition;
-	updateCbuffer.lightDirection = { view._13, view._23, view._33, 1 };
+	updateCbuffer.lightDirection = { view._13, view._23, view._33, 0 }/*XMFLOAT4(lightDirection.vector4_f32)*/;
 	updateCbuffer.materialColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	// Play Fbx Animation	

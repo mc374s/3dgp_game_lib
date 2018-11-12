@@ -1,8 +1,6 @@
 #ifndef _SPRITE_H_
 #define _SPRITE_H_
 
-#include "3dgp.h"
-
 enum SCALE_MODE
 {
 	LEFTTOP,
@@ -70,12 +68,11 @@ public:
 	~Sprite();
 
 
-	void Render(ID3D11DeviceContext* pDeviceContext);
 	void Render(ID3D11DeviceContext* pDeviceContext, vertex pCoordNDC[]);
-	void Render(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float rotateAngle = 0.0, UINTCOLOR blendColor = 0xFFFFFFFF);
-	void Render(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, UINTCOLOR blendColor = 0xFFFFFFFF, float rotateAngle = .0f, bool doCenterRotation = true, float rotatePosX = .0f, float rotatePosY = .0f, bool doReflection = false, int scaleMode = LEFTTOP);
+	void Render(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float rotateAngle = 0.0, FXMVECTOR blendColor = g_XMOne);
+	void Render(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, FXMVECTOR blendColor = g_XMOne, float rotateAngle = .0f, bool doCenterRotation = true, float rotatePosX = .0f, float rotatePosY = .0f, bool doReflection = false, int scaleMode = LEFTTOP);
 
-	void Render3D(ID3D11DeviceContext* pDeviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, UINTCOLOR blendColor = 0xFFFFFFFF, float rotateAngle = .0f, bool doCenterRotation = true, float rotatePosX = .0f, float rotatePosY = .0f, bool doReflection = false, int scaleMode = LEFTTOP);
+	void Render3D(ID3D11DeviceContext* pDeviceContext, XMMATRIX world, XMMATRIX view, XMMATRIX projection, float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, FXMVECTOR blendColor = g_XMOne, float rotateAngle = .0f, bool doCenterRotation = true, float rotatePosX = .0f, float rotatePosY = .0f, bool doReflection = false, int scaleMode = LEFTTOP);
 
 
 };

@@ -4,10 +4,8 @@
 
 #include "Scene.h"
 
-#include "PrimitiveBatch.h"
 
-
-CameraData e_mainCamera;
+Camera e_mainCamera;
 std::unique_ptr<DirectX::Keyboard> e_pKeyboard = std::make_unique<Keyboard>();
 DirectX::Keyboard::State KEY_BOARD = Keyboard::State();
 DirectX::Keyboard::KeyboardStateTracker KEY_TRACKER = DirectX::Keyboard::KeyboardStateTracker();
@@ -183,9 +181,16 @@ bool framework::Initialize(HWND _hwnd)
 	return true;
 }
 
-void framework::setFPSLimitation(int limation)
+void framework::setFPSLimitation(int limitation)
 {
-	minFrameTime = 1.0 / (double)limation;
+	if (limitation <= 0)
+	{
+		minFrameTime = 0;
+	}
+	else
+	{
+		minFrameTime = 1.0 / (double)limitation;
+	}
 }
 
 int framework::Run()
@@ -272,7 +277,7 @@ int framework::Run()
 			}
 			if (KEY_BOARD.LeftShift)
 			{
-				setFPSLimitation(2000);
+				setFPSLimitation(0);
 			}
 		}
 
@@ -333,6 +338,7 @@ LRESULT CALLBACK framework::handle_message(HWND _hwnd, UINT msg, WPARAM wparam, 
 		e_pGamePad->Resume();
 		break;
 	case WM_SIZE:
+		// Window resizing has already disabled, so WM_SIZE can be realized as FullScreen
 		isFullScreen = !isFullScreen;
 		break;
 	default:
@@ -383,7 +389,7 @@ void framework::Update(float elapsed_time/*Elapsed seconds from last frame*/)
 	static float aXY = -XM_PIDIV2, aZY = XM_1DIVPI;
 	static float d = XM_PI;
 	static bool isCharactorSurroundCameraOn = false;
-	static CameraData oldCamera;
+	static Camera oldCamera;
 	if (KEY_TRACKER.pressed.D1)
 	{
 		isCharactorSurroundCameraOn = !isCharactorSurroundCameraOn;
@@ -420,7 +426,7 @@ void framework::Update(float elapsed_time/*Elapsed seconds from last frame*/)
 			d -= 0.05f;
 		}
 		e_mainCamera.upDirection = { sinf(aZY)*sinf(aXY), cosf(aZY), sinf(aZY)*cosf(aXY), 0 };
-		e_mainCamera.eyePosition = { -fabs(d)*cosf(aZY)*sinf(aXY), fabs(d)*sinf(aZY)/* + 310 / (float)SCREEN_WIDTH*/, -fabs(d)*cosf(aZY)*cosf(aXY),0 };
+		e_mainCamera.eyePosition = XMVectorSet(-fabs(d)*cosf(aZY)*sinf(aXY), fabs(d)*sinf(aZY)/* + 310 / (float)SCREEN_WIDTH*/, -fabs(d)*cosf(aZY)*cosf(aXY), 0) + oldCamera.eyePosition;
 	}
 
 }
@@ -468,8 +474,13 @@ void framework::Render(float elapsed_time/*Elapsed seconds from last frame*/)
 	// -5F
 	char buf[256];
 	sprintf_s(buf, "mainCamera: \nPosX: %f \nPosY: %f \nPosZ: %lf \nDistance: %f \n",
-		e_mainCamera.eyePosition.vector4_f32[0], e_mainCamera.eyePosition.vector4_f32[1], e_mainCamera.eyePosition.vector4_f32[2],
-		XMVector3Length(e_mainCamera.eyePosition - e_mainCamera.focusPosition).vector4_f32[0]);
+		e_mainCamera.eyePosition.m128_f32[0], e_mainCamera.eyePosition.m128_f32[1], e_mainCamera.eyePosition.m128_f32[2],
+		XMVector3Length(XMVectorSubtract(e_mainCamera.eyePosition, e_mainCamera.focusPosition)).m128_f32[0]);
+
+	if (!XMVerifyCPUSupport())
+	{
+		exit(-5);
+	}
 	MyBlending::setMode(s_pDeviceContext, BLEND_ALPHA);
 	SpriteString::DrawString(s_pDeviceContext, 0, 0, buf);
 

@@ -151,7 +151,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="3dgp\3dgp.h" />
+    <ClInclude Include="3dgp\3dgp_math.h" />
     <ClInclude Include="3dgp\blend.h" />
+    <ClInclude Include="3dgp\camera.h" />
     <ClInclude Include="3dgp\framework.h" />
     <ClInclude Include="3dgp\game_system.h" />
     <ClInclude Include="3dgp\high_resolution_timer.h" />

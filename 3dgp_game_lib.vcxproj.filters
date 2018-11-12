@@ -98,6 +98,12 @@
     <ClInclude Include="Game\sprite_data.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="3dgp\camera.h">
+      <Filter>3dgp\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\3dgp_math.h">
+      <Filter>3dgp\Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="3dgp\blend.cpp">

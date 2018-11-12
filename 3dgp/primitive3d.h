@@ -1,8 +1,6 @@
 #ifndef _PRIMITIVE3D_H_
 #define _PRIMITIVE3D_H_
 
-#include "3dgp.h"
-
 enum GEOMETRY_TYPE
 {
 	GEOMETRY_CUBE,
@@ -44,8 +42,7 @@ private:
 	ID3D11RasterizerState*		pFillRasterizerState;
 	ID3D11DepthStencilState*	pDepthStencilState;
 	
-	vertex3D *pVertices;
-	WORD *pIndices;
+	WORD* pIndices;
 	UINT indexNum;
 	UINT vertexNum;
 	UINT latitudeNum;
@@ -60,12 +57,16 @@ private:
 	void Render(ID3D11DeviceContext *pDeviceContext, bool doFill);
 
 public:
+
+
+	vertex3D *pVertices;
+
 	Primitive3D(ID3D11Device *pDevice);
 	virtual ~Primitive3D();
 
 	virtual void Initialize(ID3D11Device *pDevice, const int &type = GEOMETRY_CUBE, const int &latitudeNum = 2, const int &longitudeNum = 6);
 
-	void Draw(ID3D11DeviceContext *pDeviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, const UINTCOLOR &blendColor = 0xFFFFFFFF);
+	void Draw(ID3D11DeviceContext *pDeviceContext, XMMATRIX world, XMMATRIX view, XMMATRIX projection, FXMVECTOR blendColor = g_XMOne);
 };
 
 

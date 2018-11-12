@@ -285,7 +285,7 @@ void RenderTarget::Draw(ID3D11DeviceContext* pDeviceContext, float drawX, float 
 	Render(pDeviceContext, vertices);
 }
 
-void RenderTarget::Draw(ID3D11DeviceContext* pDeviceContext, const XMMATRIX& world, const XMMATRIX& view, const XMMATRIX& projection, float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, float rotateAngle, UINTCOLOR blendColor, bool doReflection)
+void RenderTarget::Draw(ID3D11DeviceContext* pDeviceContext, XMMATRIX world, XMMATRIX view, XMMATRIX projection, float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, float rotateAngle, UINTCOLOR blendColor, bool doReflection)
 {
 	// 
 	virtualWidth = srcWidth;
