@@ -9,31 +9,15 @@
 #include <memory>
 #include <d3d11.h>
 #include <tchar.h>
-#include <assert.h>
+//#include <assert.h>
 #include <tchar.h>
-#include <ctime>
 #include <cstdlib>
-#include <vector>
-
-
-#include <DirectXMath.h>
-
-#include "Keyboard.h"
-#include "GamePad.h"
-
-using namespace DirectX;
-
 
 #define SCREEN_WIDTH (1280)
 #define SCREEN_HEIGHT (720)
 
-#include "high_resolution_timer.h"
-
-#include "resources_manager.h"
-
-#include "camera.h"
-
-extern Camera e_mainCamera;
+#include "Keyboard.h"
+#include "GamePad.h"
 
 extern std::unique_ptr<DirectX::Keyboard> e_pKeyboard;
 extern DirectX::Keyboard::State KEY_BOARD;

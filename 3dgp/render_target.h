@@ -1,7 +1,9 @@
 ﻿#ifndef _RENDER_TARGET_H_
 #define _RENDER_TARGET_H_
 
-#include "3dgp.h"
+#include <d3d11.h>
+#include <DirectXMath.h>
+using namespace DirectX;
 
 class RenderTarget
 {
@@ -50,24 +52,20 @@ private:
 	int virtualWidth = 1280;
 	int virtualHeight = 720;
 
-
-	XMFLOAT3 ToNDC(float screenX, float screenY);
-	XMFLOAT3 ToNDC(XMFLOAT3 coord);
-	XMFLOAT2 ToNDC_UV(XMFLOAT2 coord);
 	XMFLOAT3 RotationZ(XMFLOAT3 coord, float angle, XMFLOAT3 center);
 
 	bool Initialize(ID3D11Device* pDevice);
-	void Render(ID3D11DeviceContext* pDeviceContext);
-	void Render(ID3D11DeviceContext* pDeviceContext, vertex pCoordNDC[]);
+	void Draw(ID3D11DeviceContext* pDeviceContext);
+	void Draw(ID3D11DeviceContext* pDeviceContext, vertex pCoordNDC[]);
 
 public:
 
 	RenderTarget(ID3D11Device* pDevice, int renderWidth = 512, int renderHeight = 512);
 	~RenderTarget();
 
-	void Draw(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, float rotateAngle = .0f, UINTCOLOR blendColor = 0xFFFFFFFF, bool doReflection = false);
+	void Draw(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, float rotateAngle = .0f, FXMVECTOR blendColor = g_XMOne, bool doReflection = false);
 
-	void Draw(ID3D11DeviceContext* pDeviceContext, XMMATRIX world, XMMATRIX view, XMMATRIX projection, float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, float rotateAngle = .0f, UINTCOLOR blendColor = 0xFFFFFFFF, bool doReflection = false);
+	void XM_CALLCONV Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, float rotateAngle = .0f, FXMVECTOR blendColor = g_XMOne, bool doReflection = false);
 };
 
 

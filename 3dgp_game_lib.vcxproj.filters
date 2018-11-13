@@ -166,6 +166,9 @@
     <ClCompile Include="Game\sprite_data.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="3dgp\camera.cpp">
+      <Filter>3dgp\Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="3dgp\texture_off.hlsli">

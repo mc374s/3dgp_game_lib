@@ -1,11 +1,17 @@
-﻿#include "framework.h"
-#include "sprite_string.h"
-#include "mf_audio.h"
+﻿#include "resources_manager.h"
 
+#include "high_resolution_timer.h"
+
+#include "blend.h"
+#include "camera.h"
+#include "sprite_string.h"
+#include "primitive3d.h"
+#include "mf_audio.h"
 #include "Scene.h"
 
+#include "framework.h"
+#include <ctime>
 
-Camera e_mainCamera;
 std::unique_ptr<DirectX::Keyboard> e_pKeyboard = std::make_unique<Keyboard>();
 DirectX::Keyboard::State KEY_BOARD = Keyboard::State();
 DirectX::Keyboard::KeyboardStateTracker KEY_TRACKER = DirectX::Keyboard::KeyboardStateTracker();
@@ -168,6 +174,9 @@ bool framework::Initialize(HWND _hwnd)
 	UINT m4xMsaaQuality;
 	s_pDevice->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM/*DXGI_FORMAT_R32G32B32A32_FLOAT*//*DXGI_FORMAT_R8G8B8A8_UNORM*/, 4, &m4xMsaaQuality);
 
+	timer = new HighResolutionTimer();
+
+
 	// Initialzie the blending
 	MyBlending::Initialize(s_pDevice);
 
@@ -258,14 +267,14 @@ int framework::Run()
 			PAD_TRACKER.Update(GAME_PAD);
 
 			//preTime = timeGetTime();
-			timer.tick();
+			timer->tick();
 
 
 			MFAudioCheckLoops();
 			if (isFocused)
 			{
-				Update(timer.time_interval());
-				Render(timer.time_interval());
+				Update(timer->time_interval());
+				Draw(timer->time_interval());
 			}
 
 			calculate_frame_stats();
@@ -322,12 +331,12 @@ LRESULT CALLBACK framework::handle_message(HWND _hwnd, UINT msg, WPARAM wparam, 
 		break;
 	case WM_ENTERSIZEMOVE:
 		// WM_EXITSIZEMOVE is sent when the user grabs the resize bars.
-		timer.stop();
+		timer->stop();
 		break;
 	case WM_EXITSIZEMOVE:
 		// WM_EXITSIZEMOVE is sent when the user releases the resize bars.
 		// Here we reset everything based on the new window dimensions.
-		timer.start();
+		timer->start();
 		break;
 	case WM_KILLFOCUS:
 		isFocused = false;
@@ -358,7 +367,7 @@ void framework::calculate_frame_stats()
 	frames++;
 
 	// Compute averages over one second period.
-	if ((timer.time_stamp() - time_tlapsed) >= 1.0f)
+	if ((timer->time_stamp() - time_tlapsed) >= 1.0f)
 	{
 		float fps = static_cast<float>(frames); // fps = frameCnt / 1
 		float mspf = 1000.0f / fps;
@@ -398,11 +407,11 @@ void framework::Update(float elapsed_time/*Elapsed seconds from last frame*/)
 			aXY = -XM_PIDIV2;
 			aZY = XM_1DIVPI;
 			d = XM_PI;
-			e_mainCamera = oldCamera;
+			Camera::mainCamera = oldCamera;
 		}
 		else
 		{
-			oldCamera = e_mainCamera;
+			oldCamera = Camera::mainCamera;
 		}
 	}
 	if (isCharactorSurroundCameraOn)
@@ -425,15 +434,15 @@ void framework::Update(float elapsed_time/*Elapsed seconds from last frame*/)
 		if (KEY_BOARD.U) {
 			d -= 0.05f;
 		}
-		e_mainCamera.upDirection = { sinf(aZY)*sinf(aXY), cosf(aZY), sinf(aZY)*cosf(aXY), 0 };
-		e_mainCamera.eyePosition = XMVectorSet(-fabs(d)*cosf(aZY)*sinf(aXY), fabs(d)*sinf(aZY)/* + 310 / (float)SCREEN_WIDTH*/, -fabs(d)*cosf(aZY)*cosf(aXY), 0) + oldCamera.eyePosition;
+		Camera::mainCamera.upDirection = { sinf(aZY)*sinf(aXY), cosf(aZY), sinf(aZY)*cosf(aXY), 0 };
+		Camera::mainCamera.eyePosition = XMVectorSet(-fabs(d)*cosf(aZY)*sinf(aXY), fabs(d)*sinf(aZY)/* + 310 / (float)SCREEN_WIDTH*/, -fabs(d)*cosf(aZY)*cosf(aXY), 0) + oldCamera.eyePosition;
 	}
 
 }
 
-void framework::Render(float elapsed_time/*Elapsed seconds from last frame*/)
+void framework::Draw(float elapsed_time/*Elapsed seconds from last frame*/)
 {
-	//e_mainCamera.focusPosition = { focusPos.x,focusPos.y,focusPos.z,0 };
+	//Camera::mainCamera.focusPosition = { focusPos.x,focusPos.y,focusPos.z,0 };
 
 	// Change the blending mode 
 	if (GetAsyncKeyState(VK_SPACE) < 0)
@@ -445,9 +454,9 @@ void framework::Render(float elapsed_time/*Elapsed seconds from last frame*/)
 
 	s_pDeviceContext->OMSetRenderTargets(1, &s_pRenderTargetView, s_pDepthStencilView);
 
-	e_mainCamera.viewPort.Width = SCREEN_WIDTH;
-	e_mainCamera.viewPort.Height = SCREEN_HEIGHT;
-	s_pDeviceContext->RSSetViewports(1, &e_mainCamera.viewPort);
+	Camera::mainCamera.viewPort.Width = SCREEN_WIDTH;
+	Camera::mainCamera.viewPort.Height = SCREEN_HEIGHT;
+	s_pDeviceContext->RSSetViewports(1, &Camera::mainCamera.viewPort);
 
 	// Just clear the backbuffer
 	//float ClearColor[4] = { 0.0f / 255.0f, 111.0f / 255.0f, 129.0f / 255.0f, 1.0f }; //red,green,blue,alpha
@@ -474,8 +483,8 @@ void framework::Render(float elapsed_time/*Elapsed seconds from last frame*/)
 	// -5F
 	char buf[256];
 	sprintf_s(buf, "mainCamera: \nPosX: %f \nPosY: %f \nPosZ: %lf \nDistance: %f \n",
-		e_mainCamera.eyePosition.m128_f32[0], e_mainCamera.eyePosition.m128_f32[1], e_mainCamera.eyePosition.m128_f32[2],
-		XMVector3Length(XMVectorSubtract(e_mainCamera.eyePosition, e_mainCamera.focusPosition)).m128_f32[0]);
+		Camera::mainCamera.eyePosition.m128_f32[0], Camera::mainCamera.eyePosition.m128_f32[1], Camera::mainCamera.eyePosition.m128_f32[2],
+		XMVector3Length(XMVectorSubtract(Camera::mainCamera.eyePosition, Camera::mainCamera.focusPosition)).m128_f32[0]);
 
 	if (!XMVerifyCPUSupport())
 	{
@@ -525,6 +534,7 @@ void framework::Release()
 	SAFE_RELEASE(pDepthStencilResource);
 	SAFE_RELEASE(pDepthStencilState);
 	
+	delete timer;
 
 	MyBlending::Release();
 

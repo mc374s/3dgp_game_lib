@@ -2,6 +2,7 @@
 #include "player.h"
 
 #include "mesh_data.h"
+#include "../3dgp/camera.h"
 
 Player::Player()
 {
@@ -125,17 +126,17 @@ void Player::Update()
 		cameraZ -= 0.01;
 	}
 	
-	e_mainCamera.eyePosition = { transform.position.x, transform.position.y + cameraY,transform.position.z + cameraZ,0 };
-	e_mainCamera.focusPosition = { transform.position.x, transform.position.y + 0.5f, transform.position.z,0 };
+	Camera::mainCamera.eyePosition = { transform.position.x, transform.position.y + cameraY,transform.position.z + cameraZ,0 };
+	Camera::mainCamera.focusPosition = { transform.position.x, transform.position.y + 0.5f, transform.position.z,0 };
 
-	Vector3 forword = XMVectorSubtract(e_mainCamera.focusPosition, e_mainCamera.eyePosition);
+	Vector3 forword = XMVectorSubtract(Camera::mainCamera.focusPosition, Camera::mainCamera.eyePosition);
 	forword.Normalize();
 	float angle = forword.Dot(Vector3(0, 1, 0));
-	e_mainCamera.upDirection = Vector3(0, 1, 0) - forword*angle;
+	Camera::mainCamera.upDirection = Vector3(0, 1, 0) - forword*angle;
 
-	e_mainCamera.upDirection = XMVector3Normalize(e_mainCamera.upDirection);
+	Camera::mainCamera.upDirection = XMVector3Normalize(Camera::mainCamera.upDirection);
 	
-	//e_mainCamera.toNDC();
+	//Camera::mainCamera.toNDC();
 }
 
 void Player::Draw()

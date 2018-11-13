@@ -1,8 +1,4 @@
-﻿//#include "resources_manager.h"
-//
-//#define _XM_NO_INTRINSICS_
-//#include <DirectXMath.h>
-//using namespace DirectX;
+﻿#include "resources_manager.h"
 
 #include "skinned_mesh.h"
 
@@ -77,11 +73,18 @@ void FetchBoneMatrices(FbxMesh* pFbxMesh, std::vector<SkinnedMesh::Bone> &skelet
 			FbxAMatrix transform = referenceGlobalCurrentPosition.Inverse() * clusterGlobalCurrentPosition * clusterGlobalInitPosition.Inverse()*referenceGlobalInitPosition;
 
 			// Convert FbxAMatrix(transform) to XMFLOAT4X4(bone.transform)
-			for (int row = 0, column = 0; row < 4; ++row) {
+			bone.transform = XMMatrixSet(
+				transform.mData[0][0], transform.mData[0][1], transform.mData[0][2], transform.mData[0][3],
+				transform.mData[1][0], transform.mData[1][1], transform.mData[1][2], transform.mData[1][3],
+				transform.mData[2][0], transform.mData[2][1], transform.mData[2][2], transform.mData[2][3],
+				transform.mData[3][0], transform.mData[3][1], transform.mData[3][2], transform.mData[3][3]
+			);
+				
+			/*for (int row = 0, column = 0; row < 4; ++row) {
 				for (column = 0; column < 4; ++column) {
 					bone.transform(row, column) = static_cast<float>(transform[row][column]);
 				}
-			}
+			}*/
 		}
 	}
 }
@@ -227,11 +230,17 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const 
 
 		// Fetch global transform matrix
 		FbxAMatrix globalTransform = pFbxMesh->GetNode()->EvaluateGlobalTransform(0);
-		for (int row = 0, column = 0; row < 4; ++row) {
+		mesh.globalTransform = XMMatrixSet(
+			globalTransform.mData[0][0], globalTransform.mData[0][1], globalTransform.mData[0][2], globalTransform.mData[0][3],
+			globalTransform.mData[1][0], globalTransform.mData[1][1], globalTransform.mData[1][2], globalTransform.mData[1][3],
+			globalTransform.mData[2][0], globalTransform.mData[2][1], globalTransform.mData[2][2], globalTransform.mData[2][3],
+			globalTransform.mData[3][0], globalTransform.mData[3][1], globalTransform.mData[3][2], globalTransform.mData[3][3]
+		);
+		/*for (int row = 0, column = 0; row < 4; ++row) {
 			for (column = 0; column < 4; ++column) {
 				mesh.globalTransform(row, column) = static_cast<float>(globalTransform[row][column]);
 			}
-		}
+		}*/
 		// Fetch material properties
 		const int materialsNum = pFbxMesh->GetNode()->GetMaterialCount();
 		if (materialsNum > 0) {
@@ -527,7 +536,7 @@ void SkinnedMesh::CreateBuffers(ID3D11Device *pDevice, ID3D11Buffer** ppVertexBu
 	}
 }
 
-void SkinnedMesh::Render(ID3D11DeviceContext *pDeviceContext, bool isWireframe, const Mesh &mesh)
+void SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, bool isWireframe, const Mesh &mesh)
 {
 	if (isWireframe) {
 		pDeviceContext->RSSetState(pWireRasterizerState);
@@ -556,7 +565,7 @@ void SkinnedMesh::Render(ID3D11DeviceContext *pDeviceContext, bool isWireframe, 
 	}
 }
 
-void SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, XMMATRIX world, XMMATRIX view, XMMATRIX projection, bool isWireframe, const int& animationFrame, float elapsedTime)
+void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, bool isWireframe, const int& animationFrame, float elapsedTime)
 {
 
 	XMMATRIX worldViewProjection(world);
@@ -567,8 +576,8 @@ void SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, XMMATRIX world, XMMA
 	updateCbuffer.view = view;
 	updateCbuffer.projection = projection;
 	//static XMVECTOR lightDirection = { 0.0f,0.0f,1.0f,0.0f };
-	//lightDirection = e_mainCamera.focusPosition - e_mainCamera.eyePosition;
-	updateCbuffer.lightDirection = { view._13, view._23, view._33, 0 }/*XMFLOAT4(lightDirection.vector4_f32)*/;
+	//lightDirection = Camera::mainCamera.focusPosition - Camera::mainCamera.eyePosition;
+	updateCbuffer.lightDirection = { XMVectorGetZ(view.r[0]), XMVectorGetZ(view.r[1]), XMVectorGetZ(view.r[2]), 1 };
 	updateCbuffer.materialColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	// Play Fbx Animation	
@@ -600,7 +609,7 @@ void SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, XMMATRIX world, XMMA
 		updateCbuffer.world = mesh.globalTransform*coordinateConversion*world;
 		updateCbuffer.worldViewProjection = mesh.globalTransform*coordinateConversion*worldViewProjection;
 		pDeviceContext->UpdateSubresource(pConstantBuffer, 0, NULL, &updateCbuffer, 0, 0);
-		Render(pDeviceContext, isWireframe, mesh);
+		Draw(pDeviceContext, isWireframe, mesh);
 	}
 }
 

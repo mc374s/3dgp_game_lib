@@ -1,12 +1,14 @@
 ﻿#ifndef _GAME_SYSTEM_H_
 #define _GAME_SYSTEM_H_
 
-
 #include <cmath>
 #include "resources_manager.h"
 #include "sprite_string.h"
+#include "camera.h"
 #include "SimpleMath.h"
 using namespace DirectX::SimpleMath;
+
+#include "3dgp_math.h"
 
 //*****************************************************************************************************************************
 //

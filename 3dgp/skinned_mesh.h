@@ -1,10 +1,14 @@
 ﻿#ifndef _SKINEED_MESH_H_
 #define _SKINNED_MESH_H_
 
+#include <d3d11.h>
+#include <DirectXMath.h>
+using namespace DirectX;
+
+#include <vector>
+
 #define MAX_BONE_INFLUENCES (4)
 #define MAX_BONES (32)
-
-#include "3dgp.h"
 
 class SkinnedMesh
 {
@@ -109,13 +113,13 @@ public:
 	//
 	//Set Shaders and States
 	//
-	void Render(ID3D11DeviceContext *pDeviceContext, bool isWireframe, const Mesh &mesh);
+	void Draw(ID3D11DeviceContext *pDeviceContext, bool isWireframe, const Mesh &mesh);
 
 	//
 	//param(animationFrame) Set to 0 means always loop this fbx animation
 	//param(elapsedTime) How many ms this frame used
 	//
-	void Draw(ID3D11DeviceContext *pDeviceContext, XMMATRIX world, XMMATRIX view, XMMATRIX projection, bool isWireframe = false, const int& animationFrame = 0, float elapsedTime = 1 / 60.0f);
+	void XM_CALLCONV Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, bool isWireframe = false, const int& animationFrame = 0, float elapsedTime = 1 / 60.0f);
 };
 
 

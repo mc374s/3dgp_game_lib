@@ -3,16 +3,17 @@
 #include "framework.h"
 #include "blend.h"
 #include "sprite.h"
-
+#include "render_target.h"
 #include "skinned_mesh.h"
-
+#include "primitive3d.h"
 #include <fstream>
 
 
 void SPRITE_DATA::Draw(float x, float y,const Transform2D& transform2D) {
 	if (texNO >= 0 && texNO < TEX_MAX && pTextureManager->textureAt(texNO) && pTextureManager->textureAt(texNO)->img)
 	{
-		pTextureManager->textureAt(texNO)->img->Render(framework::s_pDeviceContext, x + ofsX, y + ofsY, transform2D.scaleX*width, transform2D.scaleY*height, left, top, width, height, transform2D.rgba, transform2D.angle, transform2D.centRotate, transform2D.centX, transform2D.centY, transform2D.reflectX, transform2D.scaleMode);
+		pTextureManager->textureAt(texNO)->img->Draw(framework::s_pDeviceContext, x + ofsX, y + ofsY, transform2D.scaleX*width, transform2D.scaleY*height, left, top, width, height,
+			XMConvertUIntToColor(transform2D.rgba), transform2D.angle, transform2D.centRotate, transform2D.centX, transform2D.centY, transform2D.reflectX, transform2D.scaleMode);
 	}
 }
 
@@ -27,10 +28,11 @@ void SPRITE_DATA::Draw(Vector3 &pos, const Transform2D& transform2D, const Trans
 			XMVECTOR rotate = XMQuaternionRotationRollPitchYaw(transform.eulerDegreeAngle.x, transform.eulerDegreeAngle.y, transform.eulerDegreeAngle.z);
 
 			world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), scale, g_XMZero, rotate, translate);
-			view = DirectX::XMMatrixLookAtLH(e_mainCamera.eyePosition, e_mainCamera.focusPosition, e_mainCamera.upDirection);
+			view = DirectX::XMMatrixLookAtLH(Camera::mainCamera.eyePosition, Camera::mainCamera.focusPosition, Camera::mainCamera.upDirection);
 			projection = DirectX::XMMatrixPerspectiveFovLH(XM_PIDIV4, SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.01f, 100.0f);
 
-			pTextureManager->textureAt(texNO)->img->Render3D(framework::s_pDeviceContext, world, view, projection, pos.x + ofsX, pos.y + ofsY, transform2D.scaleX*width, transform2D.scaleY*height, left, top, width, height, transform2D.rgba, transform2D.angle, transform2D.centRotate, transform2D.centX, transform2D.centY, transform2D.reflectX, transform2D.scaleMode);
+			pTextureManager->textureAt(texNO)->img->Draw(framework::s_pDeviceContext, world, view, projection, pos.x + ofsX, pos.y + ofsY, transform2D.scaleX*width, transform2D.scaleY*height, left, top, width, height,
+				XMConvertUIntToColor(transform2D.rgba), transform2D.angle, transform2D.centRotate, transform2D.centX, transform2D.centY, transform2D.reflectX, transform2D.scaleMode);
 		}
 		else
 		{
@@ -124,14 +126,14 @@ int  BasicInput()
 
 void DrawString(int x, int y, char *buf, UINTCOLOR color, int format, int sizeX, int sizeY, float angle)
 {
-	SpriteString::DrawString(framework::s_pDeviceContext, x, y, buf, color, format, sizeX, sizeY, angle);
+	SpriteString::DrawString(framework::s_pDeviceContext, x, y, buf, XMConvertUIntToColor(color), format, sizeX, sizeY, angle);
 }
 
 void DrawRectangle(int x, int y, int w, int h, float angle, UINTCOLOR color)
 {
 	static Sprite rect(framework::s_pDevice);
 	//MyBlending::setMode(framework::pDeviceContext, BLEND_REPLACE);
-	rect.Render(framework::s_pDeviceContext, x, y, w, h, angle, color);
+	rect.Draw(framework::s_pDeviceContext, x, y, w, h, angle, XMConvertUIntToColor(color));
 	//MyBlending::setMode(framework::pDeviceContext, BLEND_ALPHA);
 }
 
@@ -173,10 +175,10 @@ void View::Set(float drawX, float drawY, float drawWidth, float drawHeight, floa
 	XMVECTOR rotate = XMQuaternionRotationRollPitchYaw(transform.eulerDegreeAngle.x, transform.eulerDegreeAngle.y, transform.eulerDegreeAngle.z);
 
 	world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), scale, g_XMZero, rotate, translate);
-	view = DirectX::XMMatrixLookAtLH(e_mainCamera.eyePosition, e_mainCamera.focusPosition, e_mainCamera.upDirection);
+	view = DirectX::XMMatrixLookAtLH(Camera::mainCamera.eyePosition, Camera::mainCamera.focusPosition, Camera::mainCamera.upDirection);
 	projection = DirectX::XMMatrixPerspectiveFovLH(XM_PIDIV4, SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.01f, 100.0f);
 
-	pRenderTarget->Draw(framework::s_pDeviceContext, world, view, projection, drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, rotateAngle, blendColor, doReflection);
+	pRenderTarget->Draw(framework::s_pDeviceContext, world, view, projection, drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, rotateAngle, XMConvertUIntToColor(blendColor), doReflection);
 }
 
 void View::Set()
@@ -188,20 +190,19 @@ void View::Set()
 	XMVECTOR rotate = XMQuaternionRotationRollPitchYaw(transform.eulerDegreeAngle.x, transform.eulerDegreeAngle.y, transform.eulerDegreeAngle.z);
 
 	world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), scale, g_XMZero, rotate, translate);
-	view = DirectX::XMMatrixLookAtLH(e_mainCamera.eyePosition, e_mainCamera.focusPosition, e_mainCamera.upDirection);
+	view = DirectX::XMMatrixLookAtLH(Camera::mainCamera.eyePosition, Camera::mainCamera.focusPosition, Camera::mainCamera.upDirection);
 	projection = DirectX::XMMatrixPerspectiveFovLH(XM_PIDIV4, SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.01f, 100.0f);
 
-	pRenderTarget->Draw(framework::s_pDeviceContext, world, view, projection, drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, rotateAngle, blendColor, doReflection);
+	pRenderTarget->Draw(framework::s_pDeviceContext, world, view, projection, drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, rotateAngle, XMConvertUIntToColor(blendColor), doReflection);
 }
 
 void View::Clear()
 {
 	framework::s_pDeviceContext->OMSetRenderTargets(1, &framework::s_pRenderTargetView, framework::s_pDepthStencilView);
 
-	e_mainCamera.viewPort.Width = SCREEN_WIDTH;
-	e_mainCamera.viewPort.Height = SCREEN_HEIGHT;
-	framework::s_pDeviceContext->RSSetViewports(1, &e_mainCamera.viewPort);
-	setRenderTargetWH(SCREEN_WIDTH, SCREEN_HEIGHT);
+	Camera::mainCamera.viewPort.Width = SCREEN_WIDTH;
+	Camera::mainCamera.viewPort.Height = SCREEN_HEIGHT;
+	framework::s_pDeviceContext->RSSetViewports(1, &Camera::mainCamera.viewPort);
 }
 
 ///////////////////////////////////////////////////////////
@@ -247,7 +248,7 @@ void MeshData::Draw(const Transform &transform, const int& frame)
 		XMVECTOR rotate = XMQuaternionRotationRollPitchYaw(rotateAdd.x, rotateAdd.y, rotateAdd.z);
 
 		world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), scale, g_XMZero, rotate, translate);
-		view = DirectX::XMMatrixLookAtLH(e_mainCamera.eyePosition, e_mainCamera.focusPosition, e_mainCamera.upDirection);
+		view = DirectX::XMMatrixLookAtLH(Camera::mainCamera.eyePosition, Camera::mainCamera.focusPosition, Camera::mainCamera.upDirection);
 		projection = DirectX::XMMatrixPerspectiveFovLH(XM_PIDIV4, SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.01f, 100.0f);
 
 		pMeshManager->meshAt(fileNO)->data->Draw(framework::s_pDeviceContext, world, view, projection, false, frame);

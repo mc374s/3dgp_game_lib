@@ -1,6 +1,10 @@
 #ifndef _PRIMITIVE3D_H_
 #define _PRIMITIVE3D_H_
 
+#include <d3d11.h>
+#include <DirectXMath.h>
+using namespace DirectX;
+
 enum GEOMETRY_TYPE
 {
 	GEOMETRY_CUBE,
@@ -27,7 +31,6 @@ private:
 		XMFLOAT4 materialColor;			//材質色
 		XMFLOAT4 lightDirection;		//ライト進行行列
 	};
-
 private:
 
 	HRESULT hr;
@@ -54,7 +57,7 @@ private:
 	};
 	void CreateBuffers(ID3D11Device *pDevice, vertex3D *pVertices, int vertexNum, WORD *pIndices, int indexNum);
 
-	void Render(ID3D11DeviceContext *pDeviceContext, bool doFill);
+	void Draw(ID3D11DeviceContext *pDeviceContext, bool doFill);
 
 public:
 
@@ -66,7 +69,7 @@ public:
 
 	virtual void Initialize(ID3D11Device *pDevice, const int &type = GEOMETRY_CUBE, const int &latitudeNum = 2, const int &longitudeNum = 6);
 
-	void Draw(ID3D11DeviceContext *pDeviceContext, XMMATRIX world, XMMATRIX view, XMMATRIX projection, FXMVECTOR blendColor = g_XMOne);
+	void XM_CALLCONV Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, FXMVECTOR blendColor = g_XMOne);
 };
 
 

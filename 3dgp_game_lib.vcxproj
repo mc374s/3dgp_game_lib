@@ -180,6 +180,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="3dgp\blend.cpp" />
+    <ClCompile Include="3dgp\camera.cpp" />
     <ClCompile Include="3dgp\framework.cpp" />
     <ClCompile Include="3dgp\game_system.cpp" />
     <ClCompile Include="3dgp\main.cpp" />

@@ -1,6 +1,10 @@
 #ifndef _SPRITE_H_
 #define _SPRITE_H_
 
+#include <d3d11.h>
+#include <DirectXMath.h>
+using namespace DirectX;
+
 enum SCALE_MODE
 {
 	LEFTTOP,
@@ -58,7 +62,6 @@ private:
 
 	bool Initialize(ID3D11Device* pDevice);
 
-	XMFLOAT2 ToNDC_UV(XMFLOAT2 coord);
 	XMFLOAT3 RotationZ(XMFLOAT3 coord, float angle, XMFLOAT3 center);
 
 public:
@@ -68,11 +71,11 @@ public:
 	~Sprite();
 
 
-	void Render(ID3D11DeviceContext* pDeviceContext, vertex pCoordNDC[]);
-	void Render(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float rotateAngle = 0.0, FXMVECTOR blendColor = g_XMOne);
-	void Render(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, FXMVECTOR blendColor = g_XMOne, float rotateAngle = .0f, bool doCenterRotation = true, float rotatePosX = .0f, float rotatePosY = .0f, bool doReflection = false, int scaleMode = LEFTTOP);
+	void Draw(ID3D11DeviceContext* pDeviceContext, vertex pCoordNDC[]);
+	void Draw(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float rotateAngle = 0.0, FXMVECTOR blendColor = g_XMOne);
+	void Draw(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, FXMVECTOR blendColor = g_XMOne, float rotateAngle = .0f, bool doCenterRotation = true, float rotatePosX = .0f, float rotatePosY = .0f, bool doReflection = false, int scaleMode = LEFTTOP);
 
-	void Render3D(ID3D11DeviceContext* pDeviceContext, XMMATRIX world, XMMATRIX view, XMMATRIX projection, float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, FXMVECTOR blendColor = g_XMOne, float rotateAngle = .0f, bool doCenterRotation = true, float rotatePosX = .0f, float rotatePosY = .0f, bool doReflection = false, int scaleMode = LEFTTOP);
+	void XM_CALLCONV Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, FXMVECTOR blendColor = g_XMOne, float rotateAngle = .0f, bool doCenterRotation = true, float rotatePosX = .0f, float rotatePosY = .0f, bool doReflection = false, int scaleMode = LEFTTOP);
 
 
 };

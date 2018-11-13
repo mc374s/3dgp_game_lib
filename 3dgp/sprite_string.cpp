@@ -16,7 +16,7 @@ Sprite* SpriteString::Initialize(ID3D11Device* pDevice, char *pFilename)
 	return SpriteString::s_pSprString;
 }
 
-void SpriteString::DrawString(ID3D11DeviceContext* pDeviceConetxt, int drawX, int drawY, char* pIn, UINTCOLOR blendColor, int format, int sizeX, int sizeY, float rotateAngle, Sprite *pSprStringFont)
+void SpriteString::DrawString(ID3D11DeviceContext* pDeviceConetxt, int drawX, int drawY, char* pIn, FXMVECTOR blendColor, int format, int sizeX, int sizeY, float rotateAngle, Sprite *pSprStringFont)
 {
 	int adjustX = 0, marginX = -sizeX*0.4;
 	if (format == STR_CENTER && pIn)
@@ -40,7 +40,7 @@ void SpriteString::DrawString(ID3D11DeviceContext* pDeviceConetxt, int drawX, in
 				j = -1;
 				continue;
 			}
-			pSprStringFont->Render(pDeviceConetxt, drawX + j * (sizeX + marginX) + adjustX, drawY, sizeX, sizeY, (pIn[i] - (pIn[i] >> 0x4 << 0x4)) << 0x5, pIn[i] >> 0x4 << 0x5, 32.0f, 32.0f, blendColor, rotateAngle);
+			pSprStringFont->Draw(pDeviceConetxt, drawX + j * (sizeX + marginX) + adjustX, drawY, sizeX, sizeY, (pIn[i] - (pIn[i] >> 0x4 << 0x4)) << 0x5, pIn[i] >> 0x4 << 0x5, 32.0f, 32.0f, blendColor, rotateAngle);
 		}
 	}
 	else if (pIn)
@@ -54,7 +54,7 @@ void SpriteString::DrawString(ID3D11DeviceContext* pDeviceConetxt, int drawX, in
 				j = -1;
 				continue;
 			}
-			SpriteString::s_pSprString->Render(pDeviceConetxt, drawX + j * (sizeX + marginX) + adjustX, drawY, sizeX, sizeY, (pIn[i] - (pIn[i] >> 0x4 << 0x4)) << 0x5, pIn[i] >> 0x4 << 0x5, 32.0f, 32.0f, blendColor, rotateAngle);
+			SpriteString::s_pSprString->Draw(pDeviceConetxt, drawX + j * (sizeX + marginX) + adjustX, drawY, sizeX, sizeY, (pIn[i] - (pIn[i] >> 0x4 << 0x4)) << 0x5, pIn[i] >> 0x4 << 0x5, 32.0f, 32.0f, blendColor, rotateAngle);
 		}
 	}
 }

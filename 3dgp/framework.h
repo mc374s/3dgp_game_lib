@@ -2,20 +2,17 @@
 #define _FRAMEWORK_H_
 
 #include "3dgp.h"
-#include "blend.h"
 
-#include "sprite.h"
-
-#include "primitive3d.h"
-#include <ctime>
-
-#include "render_target.h"
 
 #pragma comment(lib, "winmm")
 
 #define FPS (60)
 
+class HighResolutionTimer;
+
 class Scene;
+class Primitive3D;
+
 
 class framework
 {
@@ -99,11 +96,11 @@ private:
 
 	bool Initialize(HWND _hwnd);
 	void Update(float elapsed_time = .0f/*Elapsed seconds from last frame*/);
-	void Render(float elapsed_time = .0f/*Elapsed seconds from last frame*/);
+	void Draw(float elapsed_time = .0f/*Elapsed seconds from last frame*/);
 	void Release();
 
 private:
-	high_resolution_timer timer;
+	HighResolutionTimer* timer;
 	void calculate_frame_stats();
 };
 

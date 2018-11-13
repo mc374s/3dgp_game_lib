@@ -1,7 +1,4 @@
 #include "resources_manager.h"
-#include <DirectXMath.h>
-using namespace DirectX;
-
 #include "primitive3d.h"
 
 Primitive3D::Primitive3D(ID3D11Device *pDevice)
@@ -58,7 +55,6 @@ Primitive3D::Primitive3D(ID3D11Device *pDevice)
 	//depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
 	//depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 	//depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-	
 
 	hr = pDevice->CreateDepthStencilState(&depthStencilDesc, &pDepthStencilState);
 	if (FAILED(hr))
@@ -314,7 +310,7 @@ void Primitive3D::CreateBuffers(ID3D11Device *pDevice, vertex3D *_pVertices, int
 	}
 }
 
-void Primitive3D::Render(ID3D11DeviceContext *pDeviceContext, bool doFill)
+void Primitive3D::Draw(ID3D11DeviceContext *pDeviceContext, bool doFill)
 {
 	if (doFill)
 	{
@@ -339,7 +335,7 @@ void Primitive3D::Render(ID3D11DeviceContext *pDeviceContext, bool doFill)
 }
 
 
-void Primitive3D::Draw(ID3D11DeviceContext *pDeviceContext, XMMATRIX world, XMMATRIX view, XMMATRIX projection, FXMVECTOR blendColor)
+void XM_CALLCONV Primitive3D::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, FXMVECTOR blendColor)
 {
 
 	static PROJECTION_CBUFFER updateCbuffer;
@@ -355,7 +351,7 @@ void Primitive3D::Draw(ID3D11DeviceContext *pDeviceContext, XMMATRIX world, XMMA
 	pDeviceContext->UpdateSubresource(pConstantBuffer, 0, NULL, &updateCbuffer, 0, 0);
 	pDeviceContext->VSSetConstantBuffers(0, 1, &pConstantBuffer);
 
-	Render(pDeviceContext, true);
+	Draw(pDeviceContext, true);
 }
 
 

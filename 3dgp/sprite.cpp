@@ -1,8 +1,4 @@
 ﻿#include "resources_manager.h"
-
-#include <DirectXMath.h>
-using namespace DirectX;
-
 #include "sprite.h"
 
 bool Sprite::Initialize(ID3D11Device* pDevice)
@@ -192,14 +188,14 @@ Sprite::~Sprite()
 	RM::ReleaseShaderResourceView(pShaderResourceView);
 }
 
-void Sprite::Render(ID3D11DeviceContext* pDeviceContext, vertex pCoordNDC[])
+void Sprite::Draw(ID3D11DeviceContext* pDeviceContext, vertex pCoordNDC[])
 {
 
 	D3D11_MAPPED_SUBRESOURCE mappedSubRec;
 	hr = pDeviceContext->Map(pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD/*D3D11_MAP_WRITE_NO_OVERWRITE*/, 0, &mappedSubRec);
 	if (FAILED(hr))
 	{
-		MessageBox(0, L"sprite: Render Map failed", 0, 0);
+		MessageBox(0, L"sprite: Draw Map failed", 0, 0);
 		return;
 	}
 	memcpy(mappedSubRec.pData, pCoordNDC, sizeof(vertex)*vertexCount);
@@ -221,7 +217,7 @@ void Sprite::Render(ID3D11DeviceContext* pDeviceContext, vertex pCoordNDC[])
 
 }
 
-void Sprite::Render(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float rotateAngle, FXMVECTOR blendColor)
+void Sprite::Draw(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float rotateAngle, FXMVECTOR blendColor)
 {
 	XMFLOAT4 vertexColor;
 	XMStoreFloat4(&vertexColor, blendColor);
@@ -236,7 +232,8 @@ void Sprite::Render(ID3D11DeviceContext* pDeviceContext, float drawX, float draw
 	float angleRadian = rotateAngle * 0.01745/*(M_PI / 180,0f)*/;
 
 	static D3D11_VIEWPORT viewPort;
-	pDeviceContext->RSGetViewports(nullptr, &viewPort);
+	static UINT viewPortNum = 1;
+	pDeviceContext->RSGetViewports(&viewPortNum, &viewPort);
 
 	for (int i = 0; i < vertexCount; i++)
 	{
@@ -245,10 +242,10 @@ void Sprite::Render(ID3D11DeviceContext* pDeviceContext, float drawX, float draw
 		vertices[i].position.y = 1.0f - 2.0f*vertices[i].position.y / viewPort.Height;
 	}
 
-	Render(pDeviceContext, vertices);
+	Draw(pDeviceContext, vertices);
 }
 
-void Sprite::Render(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, FXMVECTOR blendColor, float rotateAngle, bool doCenterRotation, float rotatePosX, float rotatePosY, bool doReflection, int scaleMode)
+void Sprite::Draw(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, FXMVECTOR blendColor, float rotateAngle, bool doCenterRotation, float rotatePosX, float rotatePosY, bool doReflection, int scaleMode)
 {
 	if ((int)srcWidth == 0 || (int)srcHeight == 0)
 	{
@@ -295,24 +292,12 @@ void Sprite::Render(ID3D11DeviceContext* pDeviceContext, float drawX, float draw
 
 	// Caculate 2D texture coordinate and update vertics buffer
 	XMFLOAT4 colorNDC;
-	colorNDC = toNDColor(blendColor);
+	XMStoreFloat4(&colorNDC, blendColor);
 	vertex vertices[] = {
-		{
-			XMFLOAT3(drawX, drawY, 0),								XMFLOAT4(colorNDC.x, colorNDC.y, colorNDC.z, colorNDC.w),
-			XMFLOAT2(srcX, srcY)
-		},
-		{
-			XMFLOAT3(drawX + drawWidth, drawY, 0),				XMFLOAT4(colorNDC.x, colorNDC.y, colorNDC.z, colorNDC.w),
-			XMFLOAT2(srcX + srcWidth, srcY)
-		},
-		{
-			XMFLOAT3(drawX, drawY + drawHeight, 0),				XMFLOAT4(colorNDC.x, colorNDC.y, colorNDC.z, colorNDC.w),
-			XMFLOAT2(srcX , srcY + srcHeight)
-		},
-		{
-			XMFLOAT3(drawX + drawWidth, drawY + drawHeight, 0),	XMFLOAT4(colorNDC.x, colorNDC.y, colorNDC.z, colorNDC.w),
-			XMFLOAT2(srcX + srcWidth, srcY + srcHeight)
-		},
+		{ XMFLOAT3(drawX, drawY, 0),							colorNDC,	XMFLOAT2(srcX, srcY) },
+		{ XMFLOAT3(drawX + drawWidth, drawY, 0),				colorNDC,	XMFLOAT2(srcX + srcWidth, srcY) },
+		{ XMFLOAT3(drawX, drawY + drawHeight, 0),				colorNDC,	XMFLOAT2(srcX , srcY + srcHeight) },
+		{ XMFLOAT3(drawX + drawWidth, drawY + drawHeight, 0),	colorNDC,	XMFLOAT2(srcX + srcWidth, srcY + srcHeight) },
 	};
 	if (doReflection)
 	{
@@ -329,11 +314,11 @@ void Sprite::Render(ID3D11DeviceContext* pDeviceContext, float drawX, float draw
 	center.x = doCenterRotation ? (drawX + drawWidth / 2) : rotatePosX;
 	center.y = doCenterRotation ? (drawY + drawHeight / 2) : rotatePosY;
 	center.z = 0;
-	// Rotation And Change to NDC coordinate
-	float angleRadian = rotateAngle * 0.01745/*(M_PI / 180,0f)*/;
 
+	float angleRadian = rotateAngle * 0.01745/*(M_PI / 180,0f)*/;
 	static D3D11_VIEWPORT viewPort;
-	pDeviceContext->RSGetViewports(nullptr, &viewPort);
+	static UINT viewPortNum = 1;
+	pDeviceContext->RSGetViewports(&viewPortNum, &viewPort);
 
 	// Rotation and Change screen coordinates to NDC
 	for (int i = 0; i < vertexCount; i++)
@@ -353,11 +338,11 @@ void Sprite::Render(ID3D11DeviceContext* pDeviceContext, float drawX, float draw
 	pDeviceContext->PSSetShaderResources(0, 1, &pShaderResourceView);
 	pDeviceContext->PSSetSamplers(0, 1, &pSamplerState);
 
-	Render(pDeviceContext, vertices);
+	Draw(pDeviceContext, vertices);
 }
 
 
-void Sprite::Render3D(ID3D11DeviceContext* pDeviceContext, XMMATRIX world, XMMATRIX view, XMMATRIX projection, float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, FXMVECTOR blendColor, float rotateAngle, bool doCenterRotation, float rotatePosX, float rotatePosY, bool doReflection, int scaleMode)
+void XM_CALLCONV Sprite::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, FXMVECTOR blendColor, float rotateAngle, bool doCenterRotation, float rotatePosX, float rotatePosY, bool doReflection, int scaleMode)
 {
 	static PROJECTION_CBUFFER updateCbuffer;
 	updateCbuffer.world = world;
@@ -366,28 +351,15 @@ void Sprite::Render3D(ID3D11DeviceContext* pDeviceContext, XMMATRIX world, XMMAT
 	updateCbuffer.worldViewProjection = world*view*projection;
 	updateCbuffer.lightDirection = { XMVectorGetZ(view.r[0]), XMVectorGetZ(view.r[1]), XMVectorGetZ(view.r[2]), 1 };
 	XMStoreFloat4(&updateCbuffer.materialColor, blendColor);
-	//lightDirection = e_mainCamera.focusPosition - e_mainCamera.eyePosition;
+	//lightDirection = Camera::mainCamera.focusPosition - Camera::mainCamera.eyePosition;
 	updateCbuffer.materialColor = { 1,1,1,1 };
 
 	pDeviceContext->UpdateSubresource(pVSProjectionCBuffer, 0, NULL, &updateCbuffer, 0, 0);
 	pDeviceContext->VSSetConstantBuffers(0, 1, &pVSProjectionCBuffer);
 
-	Render(pDeviceContext, drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, blendColor, rotateAngle, doCenterRotation, rotatePosX, rotatePosY, doReflection, scaleMode);
+	Draw(pDeviceContext, drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, blendColor, rotateAngle, doCenterRotation, rotatePosX, rotatePosY, doReflection, scaleMode);
 }
 
-
-// Screen coordinate to UV NDC coordinate
-XMFLOAT2 Sprite::ToNDC_UV(XMFLOAT2 coord)
-{
-	float x, y;
-	float imgWidth, imgHeight;
-	imgWidth = renderTargetTextureDesc.Width;
-	imgHeight = renderTargetTextureDesc.Height;
-
-	x = coord.x / imgWidth;
-	y = coord.y / imgHeight;
-	return XMFLOAT2(x, y);
-}
 
 XMFLOAT3 Sprite::RotationZ(XMFLOAT3 coord, float rotateAngle, XMFLOAT3 centerCoord)
 {

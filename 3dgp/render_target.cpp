@@ -1,4 +1,7 @@
-﻿#include "render_target.h"
+﻿#include "resources_manager.h"
+
+#include "render_target.h"
+#include "camera.h"
 
 bool RenderTarget::Initialize(ID3D11Device* pDevice)
 {
@@ -175,7 +178,7 @@ RenderTarget::~RenderTarget()
 
 }
 
-void RenderTarget::Render(ID3D11DeviceContext* pDeviceContext)
+void RenderTarget::Draw(ID3D11DeviceContext* pDeviceContext)
 {
 
 	UINT pStrides = sizeof(vertex);
@@ -193,31 +196,29 @@ void RenderTarget::Render(ID3D11DeviceContext* pDeviceContext)
 	pDeviceContext->ClearRenderTargetView(pRenderTargetView, ClearColor);
 	pDeviceContext->OMSetRenderTargets(1, &pRenderTargetView, NULL);
 
-	setRenderTargetWH(virtualWidth, virtualHeight);
-
-	e_mainCamera.viewPort.Width = virtualWidth;
-	e_mainCamera.viewPort.Height = virtualHeight;
-	pDeviceContext->RSSetViewports(1, &e_mainCamera.viewPort);
+	Camera::mainCamera.viewPort.Width = virtualWidth;
+	Camera::mainCamera.viewPort.Height = virtualHeight;
+	pDeviceContext->RSSetViewports(1, &Camera::mainCamera.viewPort);
 }
 
-void RenderTarget::Render(ID3D11DeviceContext* pDeviceContext, vertex pCoordNDC[])
+void RenderTarget::Draw(ID3D11DeviceContext* pDeviceContext, vertex pCoordNDC[])
 {
 
 	D3D11_MAPPED_SUBRESOURCE mappedSubRec;
 	hr = pDeviceContext->Map(pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD/*D3D11_MAP_WRITE_NO_OVERWRITE*/, 0, &mappedSubRec);
 	if (FAILED(hr))
 	{
-		MessageBox(0, L"sprite: Render Map failed", 0, 0);
+		MessageBox(0, L"sprite: Draw Map failed", 0, 0);
 		return;
 	}
 	memcpy(mappedSubRec.pData, pCoordNDC, sizeof(vertex)*vertexCount);
 	pDeviceContext->Unmap(pVertexBuffer, 0);
 
-	Render(pDeviceContext);
+	Draw(pDeviceContext);
 
 }
 
-void RenderTarget::Draw(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, float rotateAngle, UINTCOLOR blendColor, bool doReflection)
+void RenderTarget::Draw(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, float rotateAngle, FXMVECTOR blendColor, bool doReflection)
 {
 	if ((int)srcWidth == 0 || (int)srcHeight == 0)
 	{
@@ -227,37 +228,32 @@ void RenderTarget::Draw(ID3D11DeviceContext* pDeviceContext, float drawX, float 
 
 	// Caculate 2D texture coordinate and update vertics buffer
 	XMFLOAT4 colorNDC;
-	colorNDC = toNDColor(blendColor);
+	XMStoreFloat4(&colorNDC, blendColor);
 	vertex vertices[] = {
-		{
-			XMFLOAT3(drawX, drawY, 0),								XMFLOAT4(colorNDC.x, colorNDC.y, colorNDC.z, colorNDC.w),
-			XMFLOAT2(srcX, srcY)
-		},
-		{
-			XMFLOAT3(drawX + drawWidth, drawY, 0),				XMFLOAT4(colorNDC.x, colorNDC.y, colorNDC.z, colorNDC.w),
-			XMFLOAT2(srcX + srcWidth, srcY)
-		},
-		{
-			XMFLOAT3(drawX, drawY + drawHeight, 0),				XMFLOAT4(colorNDC.x, colorNDC.y, colorNDC.z, colorNDC.w),
-			XMFLOAT2(srcX , srcY + srcHeight)
-		},
-		{
-			XMFLOAT3(drawX + drawWidth, drawY + drawHeight, 0),	XMFLOAT4(colorNDC.x, colorNDC.y, colorNDC.z, colorNDC.w),
-			XMFLOAT2(srcX + srcWidth, srcY + srcHeight)
-		},
+		{ XMFLOAT3(drawX, drawY, 0),							colorNDC,	XMFLOAT2(srcX, srcY)						},
+		{ XMFLOAT3(drawX + drawWidth, drawY, 0),				colorNDC,	XMFLOAT2(srcX + srcWidth, srcY)				},
+		{ XMFLOAT3(drawX, drawY + drawHeight, 0),				colorNDC,	XMFLOAT2(srcX , srcY + srcHeight)			},
+		{ XMFLOAT3(drawX + drawWidth, drawY + drawHeight, 0),	colorNDC,	XMFLOAT2(srcX + srcWidth, srcY + srcHeight)	},
 	};
 
 
 
 	XMFLOAT3 center(drawX + drawWidth / 2, drawY + drawHeight / 2, 0);
 
-	// Rotation And Change to NDC coordinate
 	float angleRadian = rotateAngle * 0.01745/*(M_PI / 180,0f)*/;
+	static D3D11_VIEWPORT viewPort;
+	static UINT viewPortNum = 1;
+	pDeviceContext->RSGetViewports(&viewPortNum, &viewPort);
+
+	// Rotation and Change screen coordinates to NDC
 	for (unsigned int i = 0; i < vertexCount; i++)
 	{
 		vertices[i].position = RotationZ(vertices[i].position, angleRadian, center);
-		vertices[i].position = ToNDC(vertices[i].position);
-		vertices[i].texcoord = ToNDC_UV(vertices[i].texcoord);
+		vertices[i].position.x /=  viewPort.Width;
+		vertices[i].position.y /= -viewPort.Width;
+		vertices[i].position.z /=  viewPort.Width;
+		vertices[i].texcoord.x = vertices[i].texcoord.x / renderTargetTextureDesc.Width;
+		vertices[i].texcoord.y = vertices[i].texcoord.y / renderTargetTextureDesc.Height;
 		vertices[i].normal = { 0,0,-1 };
 		if (doReflection)
 		{
@@ -282,10 +278,10 @@ void RenderTarget::Draw(ID3D11DeviceContext* pDeviceContext, float drawX, float 
 		pDeviceContext->RSSetState(pRasterizerStateCullBack);
 	}
 
-	Render(pDeviceContext, vertices);
+	Draw(pDeviceContext, vertices);
 }
 
-void RenderTarget::Draw(ID3D11DeviceContext* pDeviceContext, XMMATRIX world, XMMATRIX view, XMMATRIX projection, float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, float rotateAngle, UINTCOLOR blendColor, bool doReflection)
+void XM_CALLCONV RenderTarget::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, float rotateAngle, FXMVECTOR blendColor, bool doReflection)
 {
 	// 
 	virtualWidth = srcWidth;
@@ -299,11 +295,11 @@ void RenderTarget::Draw(ID3D11DeviceContext* pDeviceContext, XMMATRIX world, XMM
 	updateCbuffer.worldViewProjection *= projection;
 
 	/*static XMVECTOR lightV;
-	lightV = (e_mainCamera.focusPosition - e_mainCamera.eyePosition);
+	lightV = (Camera::mainCamera.focusPosition - Camera::mainCamera.eyePosition);
 	updateCbuffer.lightDirection = XMFLOAT4(lightV.vector4_f32[0], lightV.vector4_f32[1], lightV.vector4_f32[2], 0.0f);*/
 
-	updateCbuffer.lightDirection = { view._13, view._23, view._33, 1 };
-	updateCbuffer.materialColor = toNDColor(blendColor);
+	updateCbuffer.lightDirection = { XMVectorGetZ(view.r[0]), XMVectorGetZ(view.r[1]), XMVectorGetZ(view.r[2]), 1 };
+	XMStoreFloat4(&updateCbuffer.materialColor, blendColor);
 
 	pDeviceContext->UpdateSubresource(pVSProjectionCBuffer, 0, NULL, &updateCbuffer, 0, 0);
 	pDeviceContext->VSSetConstantBuffers(0, 1, &pVSProjectionCBuffer);
@@ -311,40 +307,6 @@ void RenderTarget::Draw(ID3D11DeviceContext* pDeviceContext, XMMATRIX world, XMM
 	Draw(pDeviceContext, drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, rotateAngle, blendColor, doReflection);
 }
 
-XMFLOAT3 RenderTarget::ToNDC(float screenX, float screenY)
-{
-	float x, y;
-	x = 2.0f*screenX / SCREEN_WIDTH - 1.0f;
-	y = 1.0f - 2.0f*screenY / SCREEN_HEIGHT;
-	return XMFLOAT3(x, y, 0);
-}
-
-XMFLOAT3 RenderTarget::ToNDC(XMFLOAT3 coord)
-{
-	float x, y, z;
-	// 2D without projection
-	/*x = 2.0f*_coord.x / SCREEN_WIDTH - 1.0f;
-	y = 1.0f - 2.0f*_coord.y / SCREEN_WIDTH;*/
-
-	// 2D with projection
-	x = coord.x / (float)SCREEN_WIDTH;
-	y = -coord.y / (float)SCREEN_WIDTH;
-	z = coord.z / (float)SCREEN_WIDTH;
-	return XMFLOAT3(x, y, z);
-}
-
-// Screen coordinate to UV NDC coordinate
-XMFLOAT2 RenderTarget::ToNDC_UV(XMFLOAT2 coord)
-{
-	float x, y;
-	float imgWidth, imgHeight;
-	imgWidth = renderTargetTextureDesc.Width;
-	imgHeight = renderTargetTextureDesc.Height;
-
-	x = coord.x / imgWidth;
-	y = coord.y / imgHeight;
-	return XMFLOAT2(x, y);
-}
 
 XMFLOAT3 RenderTarget::RotationZ(XMFLOAT3 coord, float rotateAngle, XMFLOAT3 centerCoord)
 {

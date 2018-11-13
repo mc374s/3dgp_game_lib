@@ -2,10 +2,10 @@
 
 #include <windows.h>
 
-class high_resolution_timer
+class HighResolutionTimer
 {
 public:
-	high_resolution_timer() : delttime(-1.0), paused_time(0), stopped(false)
+	HighResolutionTimer() : delttime(-1.0), paused_time(0), stopped(false)
 	{
 		LONGLONG counts_per_sec;
 		QueryPerformanceFrequency(reinterpret_cast<LARGE_INTEGER*>(&counts_per_sec));
