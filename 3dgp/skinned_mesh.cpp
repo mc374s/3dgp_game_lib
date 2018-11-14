@@ -567,7 +567,6 @@ void SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, bool isWireframe, co
 
 void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, bool isWireframe, const int& animationFrame, float elapsedTime)
 {
-
 	XMMATRIX worldViewProjection(world);
 	worldViewProjection *= view;
 	worldViewProjection *= projection;

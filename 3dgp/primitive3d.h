@@ -61,7 +61,6 @@ private:
 
 public:
 
-
 	vertex3D *pVertices;
 
 	Primitive3D(ID3D11Device *pDevice);

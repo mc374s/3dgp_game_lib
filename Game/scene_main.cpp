@@ -49,7 +49,7 @@ void SceneMain::Update()
 	case STEP::BEGIN:
 
 		gameMain();
-		if (KEY_TRACKER.pressed.Enter || PAD_TRACKER.start == PAD_TRACKER.PRESSED)
+		if (Input::KEY_TRACKER.pressed.Enter || Input::PAD_TRACKER.start == Input::PAD_TRACKER.PRESSED)
 		{
 			MFAudioStop(BGM_MAIN);
 			MFAudioPlay(SE_START);
@@ -91,7 +91,7 @@ void SceneMain::Draw()
 bool SceneMain::pause()
 {
 	static int pressTimer = 0;
-	if ((KEY_TRACKER.pressed.Space || PAD_TRACKER.menu == PAD_TRACKER.PRESSED)) {
+	if ((Input::KEY_TRACKER.pressed.Space || Input::PAD_TRACKER.menu == Input::PAD_TRACKER.PRESSED)) {
 		isPaused = true;
 	}
 
@@ -99,11 +99,11 @@ bool SceneMain::pause()
 	{
 		pressTimer++;
 
-		if ((KEY_TRACKER.released.C || PAD_TRACKER.x == PAD_TRACKER.RELEASED))
+		if ((Input::KEY_TRACKER.released.C || Input::PAD_TRACKER.x == Input::PAD_TRACKER.RELEASED))
 		{
 
 		}
-		if (pressTimer > 15 && (KEY_TRACKER.pressed.Space || PAD_TRACKER.start == PAD_TRACKER.PRESSED))
+		if (pressTimer > 15 && (Input::KEY_TRACKER.pressed.Space || Input::PAD_TRACKER.start == Input::PAD_TRACKER.PRESSED))
 		{
 			pressTimer = 0;
 			isPaused = false;

@@ -85,7 +85,7 @@ void SceneTitle::Update()
 		//break;
 
 	case STEP::BEGIN:
-		if (KEY_TRACKER.pressed.Enter || PAD_TRACKER.start == PAD_TRACKER.PRESSED)
+		if (Input::KEY_TRACKER.pressed.Enter || Input::PAD_TRACKER.start == Input::PAD_TRACKER.PRESSED)
 		{
 			MFAudioStop(BGM_TITLE);
 			MFAudioPlay(SE_START);

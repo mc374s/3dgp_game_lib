@@ -9,18 +9,11 @@
 #include "mf_audio.h"
 #include "Scene.h"
 
+#include "input.h"
+
 #include "framework.h"
 #include <ctime>
 
-std::unique_ptr<DirectX::Keyboard> e_pKeyboard = std::make_unique<Keyboard>();
-DirectX::Keyboard::State KEY_BOARD = Keyboard::State();
-DirectX::Keyboard::KeyboardStateTracker KEY_TRACKER = DirectX::Keyboard::KeyboardStateTracker();
-
-std::unique_ptr<DirectX::GamePad> e_pGamePad = std::make_unique<GamePad>();
-DirectX::GamePad::State GAME_PAD = GamePad::State();
-DirectX::GamePad::ButtonStateTracker PAD_TRACKER = DirectX::GamePad::ButtonStateTracker();
-
-bool e_isAnyKeyDown = false;
 
 Scene* framework::s_pScene = nullptr;
 
@@ -29,9 +22,6 @@ ID3D11DeviceContext*    framework::s_pDeviceContext = NULL;
 
 ID3D11RenderTargetView*	framework::s_pRenderTargetView = NULL;
 ID3D11DepthStencilView*	framework::s_pDepthStencilView = NULL;
-
-int e_renderTargetWidth = SCREEN_WIDTH;
-int e_renderTargetHeight = SCREEN_HEIGHT;
 
 //ID3D11RenderTargetView* framework::s_pRenderTargetView = NULL;
 
@@ -213,9 +203,9 @@ int framework::Run()
 	}*/
 	srand((unsigned int)time(NULL));
 
-	PAD_TRACKER.Reset();
+	Input::PAD_TRACKER.Reset();
 
-	KEY_TRACKER.Reset();
+	Input::KEY_TRACKER.Reset();
 
 	//DWORD preTime;
 
@@ -233,7 +223,7 @@ int framework::Run()
 	while (WM_QUIT != msg.message)
 	{
 		//QueryPerformanceFrequency(&timeFreq);
-		e_isAnyKeyDown = false;
+		Input::isAnyKeyDown = false;
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&msg);
@@ -260,11 +250,11 @@ int framework::Run()
 			//////////////////////////////////////////////////////////////////////
 
 
-			KEY_BOARD = e_pKeyboard->GetState();
-			KEY_TRACKER.Update(KEY_BOARD);
+			Input::KEY_BOARD = Input::pKeyboard->GetState();
+			Input::KEY_TRACKER.Update(Input::KEY_BOARD);
 
-			GAME_PAD = e_pGamePad->GetState(0);
-			PAD_TRACKER.Update(GAME_PAD);
+			Input::GAME_PAD = Input::pGamePad->GetState(0);
+			Input::PAD_TRACKER.Update(Input::GAME_PAD);
 
 			//preTime = timeGetTime();
 			timer->tick();
@@ -280,11 +270,11 @@ int framework::Run()
 			calculate_frame_stats();
 
 			minFrameTime = MIN_FRAME_TIME_DAFAULT;
-			if (KEY_BOARD.LeftControl)
+			if (Input::KEY_BOARD.LeftControl)
 			{
 				setFPSLimitation(5);
 			}
-			if (KEY_BOARD.LeftShift)
+			if (Input::KEY_BOARD.LeftShift)
 			{
 				setFPSLimitation(0);
 			}
@@ -311,7 +301,7 @@ LRESULT CALLBACK framework::handle_message(HWND _hwnd, UINT msg, WPARAM wparam, 
 	}
 	case WM_ACTIVATEAPP:
 		Keyboard::ProcessMessage(msg, wparam, lparam);
-		e_pGamePad->Resume();
+		Input::pGamePad->Resume();
 		break;
 	case WM_KEYDOWN:
 		if (wparam == VK_ESCAPE) {
@@ -321,10 +311,10 @@ LRESULT CALLBACK framework::handle_message(HWND _hwnd, UINT msg, WPARAM wparam, 
 	case WM_KEYUP:
 	case WM_SYSKEYUP:
 		Keyboard::ProcessMessage(msg, wparam, lparam);
-		e_isAnyKeyDown = true;
+		Input::isAnyKeyDown = true;
 		break;
 	case WM_DESTROY:
-		e_pGamePad->Suspend();
+		Input::pGamePad->Suspend();
 		PostQuitMessage(0);
 		break;
 	case WM_CREATE:
@@ -340,11 +330,11 @@ LRESULT CALLBACK framework::handle_message(HWND _hwnd, UINT msg, WPARAM wparam, 
 		break;
 	case WM_KILLFOCUS:
 		isFocused = false;
-		e_pGamePad->Suspend();
+		Input::pGamePad->Suspend();
 		break;
 	case WM_SETFOCUS:
 		isFocused = true;
-		e_pGamePad->Resume();
+		Input::pGamePad->Resume();
 		break;
 	case WM_SIZE:
 		// Window resizing has already disabled, so WM_SIZE can be realized as FullScreen
@@ -399,7 +389,7 @@ void framework::Update(float elapsed_time/*Elapsed seconds from last frame*/)
 	static float d = XM_PI;
 	static bool isCharactorSurroundCameraOn = false;
 	static Camera oldCamera;
-	if (KEY_TRACKER.pressed.D1)
+	if (Input::KEY_TRACKER.pressed.D1)
 	{
 		isCharactorSurroundCameraOn = !isCharactorSurroundCameraOn;
 		if (!isCharactorSurroundCameraOn)
@@ -416,22 +406,22 @@ void framework::Update(float elapsed_time/*Elapsed seconds from last frame*/)
 	}
 	if (isCharactorSurroundCameraOn)
 	{
-		if (KEY_BOARD.J) {
+		if (Input::KEY_BOARD.J) {
 			aXY -= 0.01f;
 		}
-		if (KEY_BOARD.L) {
+		if (Input::KEY_BOARD.L) {
 			aXY += 0.01f;
 		}
-		if (KEY_BOARD.I) {
+		if (Input::KEY_BOARD.I) {
 			aZY += 0.01f;
 		}
-		if (KEY_BOARD.K) {
+		if (Input::KEY_BOARD.K) {
 			aZY -= 0.01f;
 		}
-		if (KEY_BOARD.O) {
+		if (Input::KEY_BOARD.O) {
 			d += 0.05f;
 		}
-		if (KEY_BOARD.U) {
+		if (Input::KEY_BOARD.U) {
 			d -= 0.05f;
 		}
 		Camera::mainCamera.upDirection = { sinf(aZY)*sinf(aXY), cosf(aZY), sinf(aZY)*cosf(aXY), 0 };
@@ -483,20 +473,12 @@ void framework::Draw(float elapsed_time/*Elapsed seconds from last frame*/)
 	// -5F
 	char buf[256];
 	sprintf_s(buf, "mainCamera: \nPosX: %f \nPosY: %f \nPosZ: %lf \nDistance: %f \n",
-		Camera::mainCamera.eyePosition.m128_f32[0], Camera::mainCamera.eyePosition.m128_f32[1], Camera::mainCamera.eyePosition.m128_f32[2],
-		XMVector3Length(XMVectorSubtract(Camera::mainCamera.eyePosition, Camera::mainCamera.focusPosition)).m128_f32[0]);
+		XMVectorGetX(Camera::mainCamera.eyePosition), XMVectorGetY(Camera::mainCamera.eyePosition), XMVectorGetZ(Camera::mainCamera.eyePosition),
+		XMVectorGetX(XMVector3Length(XMVectorSubtract(Camera::mainCamera.eyePosition, Camera::mainCamera.focusPosition))));
 
-	if (!XMVerifyCPUSupport())
-	{
-		exit(-5);
-	}
+
 	MyBlending::setMode(s_pDeviceContext, BLEND_ALPHA);
 	SpriteString::DrawString(s_pDeviceContext, 0, 0, buf);
-
-	if (KEY_TRACKER.pressed.I)
-	{
-		isFullScreen = !isFullScreen;
-	}
 
 	if (isFullScreen) {
 		// 垂直同期ON
@@ -507,7 +489,7 @@ void framework::Draw(float elapsed_time/*Elapsed seconds from last frame*/)
 		pSwapChain->Present(0, 0);
 	}
 
-
+	
 	// For FullScreen Mode, Synchronize presentation for 1 vertical blanks
 	//pSwapChain->Present(1, 0);
 

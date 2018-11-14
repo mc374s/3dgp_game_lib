@@ -7,6 +7,7 @@
 #include "../Game/sprite_data.h"
 #include "../Game/scene_title.h"
 #include <thread>
+#include <tchar.h>
 
 LRESULT CALLBACK fnWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {

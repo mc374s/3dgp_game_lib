@@ -1,5 +1,5 @@
-﻿#include "resources_manager.h"
-#include "sprite.h"
+﻿#include "sprite.h"
+#include "resources_manager.h"
 
 bool Sprite::Initialize(ID3D11Device* pDevice)
 {
@@ -235,7 +235,7 @@ void Sprite::Draw(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY,
 	static UINT viewPortNum = 1;
 	pDeviceContext->RSGetViewports(&viewPortNum, &viewPort);
 
-	for (int i = 0; i < vertexCount; i++)
+	for (UINT i = 0; i < vertexCount; i++)
 	{
 		vertices[i].position = RotationZ(vertices[i].position, angleRadian, center);
 		vertices[i].position.x = 2.0f*vertices[i].position.x / viewPort.Width - 1.0f;
@@ -315,13 +315,13 @@ void Sprite::Draw(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY,
 	center.y = doCenterRotation ? (drawY + drawHeight / 2) : rotatePosY;
 	center.z = 0;
 
-	float angleRadian = rotateAngle * 0.01745/*(M_PI / 180,0f)*/;
+	float angleRadian = rotateAngle * 0.01745f/*(M_PI / 180,0f)*/;
 	static D3D11_VIEWPORT viewPort;
 	static UINT viewPortNum = 1;
 	pDeviceContext->RSGetViewports(&viewPortNum, &viewPort);
 
 	// Rotation and Change screen coordinates to NDC
-	for (int i = 0; i < vertexCount; i++)
+	for (UINT i = 0; i < vertexCount; i++)
 	{
 		vertices[i].position = RotationZ(vertices[i].position, angleRadian, center);
 

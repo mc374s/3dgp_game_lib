@@ -240,7 +240,7 @@ void RenderTarget::Draw(ID3D11DeviceContext* pDeviceContext, float drawX, float 
 
 	XMFLOAT3 center(drawX + drawWidth / 2, drawY + drawHeight / 2, 0);
 
-	float angleRadian = rotateAngle * 0.01745/*(M_PI / 180,0f)*/;
+	float angleRadian = rotateAngle * 0.01745f/*(M_PI / 180,0f)*/;
 	static D3D11_VIEWPORT viewPort;
 	static UINT viewPortNum = 1;
 	pDeviceContext->RSGetViewports(&viewPortNum, &viewPort);

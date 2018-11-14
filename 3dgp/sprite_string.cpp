@@ -1,5 +1,5 @@
-#include "sprite.h"
 #include "sprite_string.h"
+#include "sprite.h"
 
 Sprite* SpriteString::s_pSprString = nullptr;
 

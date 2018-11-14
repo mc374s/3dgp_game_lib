@@ -1,11 +1,11 @@
 ﻿#include "game_system.h"
 
-#include "framework.h"
 #include "blend.h"
 #include "sprite.h"
 #include "render_target.h"
 #include "skinned_mesh.h"
 #include "primitive3d.h"
+
 #include <fstream>
 
 
@@ -90,34 +90,34 @@ int  BasicInput()
 {
 	int command = 0x0;
 
-	if (KEY_BOARD.Up || GAME_PAD.IsLeftThumbStickUp()) {
+	if (Input::KEY_BOARD.Up || Input::GAME_PAD.IsLeftThumbStickUp()) {
 		command |= PAD_UP;
 	}
-	if (KEY_BOARD.Down || GAME_PAD.IsLeftThumbStickDown()) {
+	if (Input::KEY_BOARD.Down || Input::GAME_PAD.IsLeftThumbStickDown()) {
 		command |= PAD_DOWN;
 	}
-	if (KEY_BOARD.Left || GAME_PAD.IsLeftThumbStickLeft()){
+	if (Input::KEY_BOARD.Left || Input::GAME_PAD.IsLeftThumbStickLeft()){
 		command |= PAD_LEFT;
 	}
-	if (KEY_BOARD.Right || GAME_PAD.IsLeftThumbStickRight()){
+	if (Input::KEY_BOARD.Right || Input::GAME_PAD.IsLeftThumbStickRight()){
 		command |= PAD_RIGHT;
 	}
-	if (KEY_TRACKER.pressed.Enter || GAME_PAD.IsStartPressed()) {
+	if (Input::KEY_TRACKER.pressed.Enter || Input::GAME_PAD.IsStartPressed()) {
 		command |= PAD_START;
 	}
-	if (KEY_TRACKER.pressed.Escape || GAME_PAD.IsBackPressed()) {
+	if (Input::KEY_TRACKER.pressed.Escape || Input::GAME_PAD.IsBackPressed()) {
 		command |= PAD_BACK;
 	}
-	if (KEY_TRACKER.pressed.Z || GAME_PAD.IsAPressed()) {
+	if (Input::KEY_TRACKER.pressed.Z || Input::GAME_PAD.IsAPressed()) {
 		command |= PAD_TRG1;
 	}
-	if (KEY_TRACKER.pressed.X || GAME_PAD.IsBPressed()) {
+	if (Input::KEY_TRACKER.pressed.X || Input::GAME_PAD.IsBPressed()) {
 		command |= PAD_TRG2;
 	}
-	if (KEY_TRACKER.pressed.C || GAME_PAD.IsXPressed()) {
+	if (Input::KEY_TRACKER.pressed.C || Input::GAME_PAD.IsXPressed()) {
 		command |= PAD_TRG3;
 	}
-	if (KEY_TRACKER.pressed.V || GAME_PAD.IsYPressed()) {
+	if (Input::KEY_TRACKER.pressed.V || Input::GAME_PAD.IsYPressed()) {
 		command |= PAD_TRG4;
 	}
 

@@ -3,8 +3,11 @@
 
 #include <cmath>
 #include "resources_manager.h"
+#include "framework.h"
 #include "sprite_string.h"
 #include "camera.h"
+#include "input.h"
+
 #include "SimpleMath.h"
 using namespace DirectX::SimpleMath;
 

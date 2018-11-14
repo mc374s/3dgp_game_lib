@@ -157,6 +157,7 @@
     <ClInclude Include="3dgp\framework.h" />
     <ClInclude Include="3dgp\game_system.h" />
     <ClInclude Include="3dgp\high_resolution_timer.h" />
+    <ClInclude Include="3dgp\input.h" />
     <ClInclude Include="3dgp\mf_audio.h" />
     <ClInclude Include="3dgp\misc.h" />
     <ClInclude Include="3dgp\primitive3d.h" />
@@ -183,6 +184,7 @@
     <ClCompile Include="3dgp\camera.cpp" />
     <ClCompile Include="3dgp\framework.cpp" />
     <ClCompile Include="3dgp\game_system.cpp" />
+    <ClCompile Include="3dgp\input.cpp" />
     <ClCompile Include="3dgp\main.cpp" />
     <ClCompile Include="3dgp\mf_audio.cpp" />
     <ClCompile Include="3dgp\primitive3d.cpp" />

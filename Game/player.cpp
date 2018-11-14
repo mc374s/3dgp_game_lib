@@ -109,19 +109,19 @@ void Player::Update()
 	}
 
 	static float cameraY = 2, cameraZ = -9;
-	if (KEY_BOARD.I)
+	if (Input::KEY_BOARD.I)
 	{
 		cameraY += 0.01;
 	}
-	if (KEY_BOARD.K)
+	if (Input::KEY_BOARD.K)
 	{
 		cameraY -= 0.01;
 	}
-	if (KEY_BOARD.O)
+	if (Input::KEY_BOARD.O)
 	{
 		cameraZ += 0.01;
 	}
-	if (KEY_BOARD.U)
+	if (Input::KEY_BOARD.U)
 	{
 		cameraZ -= 0.01;
 	}

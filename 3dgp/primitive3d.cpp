@@ -156,7 +156,7 @@ void Primitive3D::Initialize(ID3D11Device *pDevice, const int &type, const int &
 		WORD indices[72];
 		ZeroMemory(indices, sizeof(indices));*/
 		int latitudeNumFour = latitudeNum * 4;
-		for (int i = 0; i < longitudeNum; i++)
+		for (UINT i = 0; i < longitudeNum; i++)
 		{
 			vertexCount = 0;
 			vertices[latitudeNumFour * i + vertexCount].position = XMFLOAT3(0.0f, hHalf, 0.0f);
@@ -176,7 +176,7 @@ void Primitive3D::Initialize(ID3D11Device *pDevice, const int &type, const int &
 			indices[indexCount] = latitudeNumFour * i + vertexCount;
 			indexCount++;
 			vertexCount++;
-			for (int j = 0; j < latitudeNum - 1; j++)
+			for (UINT j = 0; j < latitudeNum - 1; j++)
 			{
 				vertices[latitudeNumFour * i + vertexCount].position = XMFLOAT3(dHalf*cosf(i*angle)*scaleAdjust, hHalf, dHalf*sinf(i*angle)*scaleAdjust);
 				vertices[latitudeNumFour * i + vertexCount].normal = XMFLOAT3(cosf(i*angle + angleHalf), tan(angleY), sinf(i*angle + angleHalf));

@@ -1,10 +1,15 @@
 ﻿#ifndef _FRAMEWORK_H_
 #define _FRAMEWORK_H_
 
-#include "3dgp.h"
-
-
 #pragma comment(lib, "winmm")
+#pragma comment(lib, "d3d11")
+#pragma comment(lib, "dxgi")
+#pragma comment(lib, "DirectXTK")
+
+#include <d3d11.h>
+
+#define SCREEN_WIDTH (1280)
+#define SCREEN_HEIGHT (720)
 
 #define FPS (60)
 
