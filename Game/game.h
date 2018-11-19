@@ -6,6 +6,34 @@
 #include "../3dgp/template.h"
 #include "../3dgp/scene.h"
 
+
+#include "SimpleMath.h"
+using namespace DirectX::SimpleMath;
+
+
+
+struct Transform
+{
+	Vector3 position;
+	Vector3 scaling;
+	Vector3 rotationDegree;
+
+	Transform() :position(Vector3::Zero), scaling(Vector3::One), rotationDegree(Vector3::Zero) {};
+
+	void Clear() {
+		position = Vector3::Zero;
+		scaling = Vector3::One;
+		rotationDegree = Vector3::Zero;
+	};
+
+	static Transform& initialValue() {
+		static Transform initialValue;
+		return initialValue;
+	};
+};
+
+
+
 #define DEBUG
 
 #include <vector>

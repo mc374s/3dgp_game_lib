@@ -23,6 +23,7 @@ public:
 	bool isHitAble;
 
 	Transform transform;
+	Matrix world;
 
 
 public:

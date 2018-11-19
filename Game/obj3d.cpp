@@ -62,6 +62,7 @@ void OBJ3D::Clear()
 	step = 0;
 	frame = 0;
 	transform.Clear();
+	world = Matrix::Identity;
 
 	isInit = false;
 
@@ -80,7 +81,8 @@ void OBJ3D::Draw()
 {
 	if (meshData)
 	{
-		meshData->Draw(transform, frame);
+		meshData->Draw(transform.position, transform.scaling, transform.rotationDegree, frame);
+		world = meshData->world;
 	}
 
 }

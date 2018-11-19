@@ -98,7 +98,7 @@ class ObjManager : public Singleton<ObjManager>, public Manager
 private:
 
 public:
-	void init();
+	void Init();
 	void Update(int liveInPagination = 1);
 	void Draw(int liveInPagination = 1);
 

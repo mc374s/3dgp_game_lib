@@ -3,6 +3,7 @@
 
 #include "mesh_data.h"
 #include "../3dgp/camera.h"
+#include "../3dgp/directxtk.h"
 
 Player::Player()
 {
@@ -13,7 +14,7 @@ Player::~Player()
 {
 }
 
-void Player::init()
+void Player::Init()
 {
 	Clear();
 	speedAcc.x = P_WALK_SPEED;
@@ -30,11 +31,11 @@ void Player::Update()
 	{
 	case PAD_LEFT:
 		speed.x -= speedAcc.x;
-		transform.eulerDegreeAngle.y = 180;
+		transform.rotationDegree.y = 180;
 		break;
 	case PAD_RIGHT:
 		speed.x += speedAcc.x;
-		transform.eulerDegreeAngle.y = 0;
+		transform.rotationDegree.y = 0;
 		break;
 	default:
 		if (speed.x > 0) {
@@ -109,39 +110,55 @@ void Player::Update()
 	}
 
 	static float cameraY = 2, cameraZ = -9;
-	if (Input::KEY_BOARD.I)
+	if (Input::KEY.I)
 	{
 		cameraY += 0.01;
 	}
-	if (Input::KEY_BOARD.K)
+	if (Input::KEY.K)
 	{
 		cameraY -= 0.01;
 	}
-	if (Input::KEY_BOARD.O)
+	if (Input::KEY.O)
 	{
 		cameraZ += 0.01;
 	}
-	if (Input::KEY_BOARD.U)
+	if (Input::KEY.U)
 	{
 		cameraZ -= 0.01;
 	}
 	
-	Camera::mainCamera.eyePosition = { transform.position.x, transform.position.y + cameraY,transform.position.z + cameraZ,0 };
-	Camera::mainCamera.focusPosition = { transform.position.x, transform.position.y + 0.5f, transform.position.z,0 };
+	GLC::mainCamera.eyePosition = transform.position + Vector3(0, cameraY, cameraZ);
+	GLC::mainCamera.focusPosition = transform.position + Vector3(0, 0.5f, 0);
 
-	Vector3 forword = XMVectorSubtract(Camera::mainCamera.focusPosition, Camera::mainCamera.eyePosition);
+	Vector3 forword = DirectX::XMVectorSubtract(GLC::mainCamera.focusPosition, GLC::mainCamera.eyePosition);
 	forword.Normalize();
-	float angle = forword.Dot(Vector3(0, 1, 0));
-	Camera::mainCamera.upDirection = Vector3(0, 1, 0) - forword*angle;
-
-	Camera::mainCamera.upDirection = XMVector3Normalize(Camera::mainCamera.upDirection);
 	
-	//Camera::mainCamera.toNDC();
+	float angle = forword.Dot(Vector3(0, 1, 0));
+	GLC::mainCamera.upDirection = Vector3(0, 1, 0) - forword*angle;
+
+	GLC::mainCamera.upDirection = DirectX::XMVector3Normalize(GLC::mainCamera.upDirection);
+
+
+	
 }
 
 void Player::Draw()
 {
 	OBJ3D::Draw();
+
+	/*Vector3 positionAdd = meshData->preSetTransform.position + transform.position;
+	Vector3 rotateAdd = (transform.eulerDegreeAngle)*0.01745f;
+
+	XMVECTOR rotate = XMQuaternionRotationRollPitchYaw(rotateAdd.x, rotateAdd.y, rotateAdd.z);
+
+	static XMMATRIX world;
+	world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), g_XMOne, g_XMZero, rotate, XMLoadFloat3(&transform.position));*/
+
+	DXTK::DrawAABB(Framework::pDeviceContext, meshData->world, GLC::mainCamera.view, GLC::mainCamera.projection, Vector3(-0.5, 0, 0.5), Vector3(0.5, 2, -0.5), DirectX::Colors::Green);
+
+	DXTK::DrawSphere(Framework::pDeviceContext, meshData->world, GLC::mainCamera.view, GLC::mainCamera.projection, DirectX::g_XMZero, 0.5, DirectX::Colors::Red);
+
+
 #ifdef DEBUG
 	char buf[256];
 	sprintf_s(buf, "Player:\nPosX:%lf \nPosY:%lf \nPosZ:%lf \n",
@@ -161,16 +178,16 @@ PlayerManager::~PlayerManager()
 	SAFE_DELETE(pPlayer);
 }
 
-void PlayerManager::init()
+void PlayerManager::Init()
 {
 	if (!pPlayer)
 	{
 		pPlayer = new Player();
-		pPlayer->init();
+		pPlayer->Init();
 	}
 	else
 	{
-		pPlayer->init();
+		pPlayer->Init();
 	}
 }
 

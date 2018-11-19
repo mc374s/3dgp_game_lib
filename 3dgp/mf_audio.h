@@ -7,12 +7,14 @@
 #include <mfapi.h>
 #include <mfplay.h>
 
+namespace GLC{
+
 #define AUDIO_MAX_NUM (64)
 
-struct RESOURCE_DATA
+struct NUMBERED_FILE
 {
-	int					fileNO;			// âπê∫î‘çÜ
-	char*				fileName;		// ÉtÉ@ÉCÉãñº
+	int					fileNO;		
+	char*				fileName;	
 };
 
 class MFAudioManager
@@ -20,9 +22,9 @@ class MFAudioManager
 private:
 	static IMFPMediaPlayer* pMFPlayer[AUDIO_MAX_NUM];	// MediaFoundationPlayer
 	static bool doLoop[AUDIO_MAX_NUM];					// loop flag
-public:
 	MFAudioManager();
 	~MFAudioManager();
+public:
 
 	static bool isLoaded;
 
@@ -31,7 +33,8 @@ public:
 		return &instance;
 	};
 
-	void loadAudios(const RESOURCE_DATA pData[]);
+	void loadAudios(const NUMBERED_FILE pData[]);
+
 	friend void MFAudiosRelease();
 	friend void MFAudioCheckLoops();
 
@@ -44,8 +47,6 @@ public:
 
 };
 
-#define pMFAudioManager (MFAudioManager::getInstance())
-
-
+}
 
 #endif // !_MFAUDIO_H_

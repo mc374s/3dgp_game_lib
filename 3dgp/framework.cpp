@@ -10,22 +10,26 @@
 #include "Scene.h"
 
 #include "input.h"
+#include "directxtk.h"
 
 #include "framework.h"
 #include <ctime>
 
+using namespace GLC;
+using namespace DirectX;
 
-Scene* framework::s_pScene = nullptr;
 
-ID3D11Device*           framework::s_pDevice = NULL;
-ID3D11DeviceContext*    framework::s_pDeviceContext = NULL;
+Scene* Framework::pScene = nullptr;
 
-ID3D11RenderTargetView*	framework::s_pRenderTargetView = NULL;
-ID3D11DepthStencilView*	framework::s_pDepthStencilView = NULL;
+ID3D11Device*           Framework::pDevice = NULL;
+ID3D11DeviceContext*    Framework::pDeviceContext = NULL;
+
+ID3D11RenderTargetView*	Framework::pRenderTargetView = NULL;
+ID3D11DepthStencilView*	Framework::pDepthStencilView = NULL;
 
 //ID3D11RenderTargetView* framework::s_pRenderTargetView = NULL;
 
-bool framework::Initialize(HWND _hwnd)
+bool Framework::Initialize(HWND _hwnd)
 {
 	//MessageBox(0, L"Initializer called", L"framework", MB_OK);
 	outputWindow = _hwnd;
@@ -75,13 +79,13 @@ bool framework::Initialize(HWND _hwnd)
 	{
 		driverType = driverTypes[driverTypeIndex];
 		hr = D3D11CreateDeviceAndSwapChain(NULL, driverType, NULL, createDeviceFlags, featureLevels, numFeatureLevels,
-			D3D11_SDK_VERSION, &descSwapChain, &pSwapChain, &s_pDevice, &featureLevel, &s_pDeviceContext);
+			D3D11_SDK_VERSION, &descSwapChain, &pSwapChain, &pDevice, &featureLevel, &pDeviceContext);
 		if (SUCCEEDED(hr)) {
 			break;
 		}
 	}
 	if (FAILED(hr)) {
-		MessageBox(0, L"D3D11CreateDevice Failed.", L"framework", MB_OK);
+		MessageBox(0, L"D3D11CreateDevice Failed.", L"Framework", MB_OK);
 		exit(-1);
 	}
 	if (featureLevel != D3D_FEATURE_LEVEL_11_0) {
@@ -93,18 +97,18 @@ bool framework::Initialize(HWND _hwnd)
 	ID3D11Texture2D* pBackBuffer = NULL;
 	hr = pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
 	if (FAILED(hr)) {
-		MessageBox(0, L"GetBuffer Failed.", L"framework", MB_OK);
+		MessageBox(0, L"GetBuffer Failed.", L"Framework", MB_OK);
 		return false;
 	}
 
 	//D3D11_RENDER_TARGET_VIEW_DESC descRenderTargetView;
 
-	hr = s_pDevice->CreateRenderTargetView(pBackBuffer, NULL, &s_pRenderTargetView);
+	hr = pDevice->CreateRenderTargetView(pBackBuffer, NULL, &pRenderTargetView);
 	if (pBackBuffer) {
 		pBackBuffer->Release();
 	}
 	if (FAILED(hr)) {
-		MessageBox(0, L"CreateRenderTargetView Failed.", L"framework", MB_OK);
+		MessageBox(0, L"CreateRenderTargetView Failed.", L"Framework", MB_OK);
 		return false;
 	}
 
@@ -122,9 +126,9 @@ bool framework::Initialize(HWND _hwnd)
 	descDepthStencil.CPUAccessFlags = 0;
 	descDepthStencil.MiscFlags = 0;
 
-	hr = s_pDevice->CreateTexture2D(&descDepthStencil, NULL, &pDepthStencilResource);
+	hr = pDevice->CreateTexture2D(&descDepthStencil, NULL, &pDepthStencilResource);
 	if (FAILED(hr)) {
-		MessageBox(0, L"CreateTexture2D Failed.", L"framework", MB_OK);
+		MessageBox(0, L"CreateTexture2D Failed.", L"Framework", MB_OK);
 		exit(-1);
 	}
 
@@ -134,12 +138,12 @@ bool framework::Initialize(HWND _hwnd)
 	descDepthStencilView.Format = descDepthStencil.Format;
 	descDepthStencilView.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	descDepthStencilView.Texture2D.MipSlice = 0;
-	hr = s_pDevice->CreateDepthStencilView(pDepthStencilResource, &descDepthStencilView, &s_pDepthStencilView);
+	hr = pDevice->CreateDepthStencilView(pDepthStencilResource, &descDepthStencilView, &pDepthStencilView);
 	if (FAILED(hr)) {
-		MessageBox(0, L"CreateTexture2DResource Failed.", L"framework", MB_OK);
+		MessageBox(0, L"CreateTexture2DResource Failed.", L"Framework", MB_OK);
 		return false;
 	}
-	s_pDeviceContext->OMSetRenderTargets(1, &s_pRenderTargetView, s_pDepthStencilView);
+	pDeviceContext->OMSetRenderTargets(1, &pRenderTargetView, pDepthStencilView);
 
 	// create depth stencil state
 	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
@@ -148,7 +152,7 @@ bool framework::Initialize(HWND _hwnd)
 	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
 
-	hr = s_pDevice->CreateDepthStencilState(&depthStencilDesc, &pDepthStencilState);
+	hr = pDevice->CreateDepthStencilState(&depthStencilDesc, &pDepthStencilState);
 
 	// Setup the viewport
 	D3D11_VIEWPORT vp;
@@ -158,29 +162,30 @@ bool framework::Initialize(HWND _hwnd)
 	vp.MaxDepth = 1.0f;
 	vp.TopLeftX = 0;
 	vp.TopLeftY = 0;
-	s_pDeviceContext->RSSetViewports(1, &vp);
+	pDeviceContext->RSSetViewports(1, &vp);
 
 
 	UINT m4xMsaaQuality;
-	s_pDevice->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM/*DXGI_FORMAT_R32G32B32A32_FLOAT*//*DXGI_FORMAT_R8G8B8A8_UNORM*/, 4, &m4xMsaaQuality);
+	pDevice->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM/*DXGI_FORMAT_R32G32B32A32_FLOAT*//*DXGI_FORMAT_R8G8B8A8_UNORM*/, 4, &m4xMsaaQuality);
 
 	timer = new HighResolutionTimer();
 
 
 	// Initialzie the blending
-	MyBlending::Initialize(s_pDevice);
+	MyBlending::Initialize(pDevice);
 
-	pPrimitive3D[0] = new Primitive3D(s_pDevice);
-	pPrimitive3D[0]->Initialize(s_pDevice, GEOMETRY_CUBE);
-	pPrimitive3D[1] = new Primitive3D(s_pDevice);
-	pPrimitive3D[1]->Initialize(s_pDevice, GEOMETRY_CYLINDER, 2, 24);
+	pPrimitive3D[0] = new Primitive3D(pDevice);
+	pPrimitive3D[0]->Initialize(pDevice, GEOMETRY_CUBE);
+	pPrimitive3D[1] = new Primitive3D(pDevice);
+	pPrimitive3D[1]->Initialize(pDevice, GEOMETRY_CYLINDER, 2, 24);
 
-	SpriteString::Initialize(s_pDevice);
+	SpriteString::Initialize(pDevice);
+	DXTK::CreateDirectXTKObject(pDevice, pDeviceContext);
 
 	return true;
 }
 
-void framework::setFPSLimitation(int limitation)
+void Framework::setFPSLimitation(int limitation)
 {
 	if (limitation <= 0)
 	{
@@ -192,7 +197,7 @@ void framework::setFPSLimitation(int limitation)
 	}
 }
 
-int framework::Run()
+int Framework::Run()
 {
 	MSG msg = {};
 
@@ -214,7 +219,7 @@ int framework::Run()
 	DWORD sleepTime;
 	if (QueryPerformanceFrequency(&timeFreq) == false)
 	{
-		MessageBox(0, L"This Device is too old, QueryPerformanceFrequency failed", L"framework", MB_OK);
+		MessageBox(0, L"This Device is too old, QueryPerformanceFrequency failed", L"Framework", MB_OK);
 		exit(-1);
 	}
 	QueryPerformanceCounter(&timeStart);
@@ -250,11 +255,12 @@ int framework::Run()
 			//////////////////////////////////////////////////////////////////////
 
 
-			Input::KEY_BOARD = Input::pKeyboard->GetState();
-			Input::KEY_TRACKER.Update(Input::KEY_BOARD);
+			Input::KEY = Input::pKeyboard->GetState();
+			Input::KEY_TRACKER.Update(Input::KEY);
 
-			Input::GAME_PAD = Input::pGamePad->GetState(0);
-			Input::PAD_TRACKER.Update(Input::GAME_PAD);
+			Input::PAD = Input::pGamePad->GetState(0);
+			Input::PAD_TRACKER.Update(Input::PAD);
+			DirectX::BasicEffect;
 
 			//preTime = timeGetTime();
 			timer->tick();
@@ -270,11 +276,11 @@ int framework::Run()
 			calculate_frame_stats();
 
 			minFrameTime = MIN_FRAME_TIME_DAFAULT;
-			if (Input::KEY_BOARD.LeftControl)
+			if (Input::KEY.LeftControl)
 			{
 				setFPSLimitation(5);
 			}
-			if (Input::KEY_BOARD.LeftShift)
+			if (Input::KEY.LeftShift)
 			{
 				setFPSLimitation(0);
 			}
@@ -284,7 +290,7 @@ int framework::Run()
 	return static_cast<int>(msg.wParam);
 }
 
-LRESULT CALLBACK framework::handle_message(HWND _hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
+LRESULT CALLBACK Framework::handle_message(HWND _hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	//if (wparam == ABN_FULLSCREENAPP){
 	//	isFullScreen = !isFullScreen;
@@ -346,7 +352,7 @@ LRESULT CALLBACK framework::handle_message(HWND _hwnd, UINT msg, WPARAM wparam, 
 	return 0;
 }
 
-void framework::calculate_frame_stats()
+void Framework::calculate_frame_stats()
 {
 	// Code computes the average frames per second, and also the 
 	// average time it takes to render one frame.  These stats 
@@ -372,14 +378,14 @@ void framework::calculate_frame_stats()
 	}
 }
 
-void framework::Update(float elapsed_time/*Elapsed seconds from last frame*/)
+void Framework::Update(float elapsed_time/*Elapsed seconds from last frame*/)
 {
-	if (s_pScene)
+	if (pScene)
 	{
-		s_pScene->Update(/*elapsed_time*/);
-		if (s_pScene->pNextScene)
+		pScene->Update(/*elapsed_time*/);
+		if (pScene->pNextScene)
 		{
-			s_pScene = s_pScene->pNextScene;
+			pScene = pScene->pNextScene;
 			//s_pScene->update(/*elapsed_time*/);
 		}
 	}
@@ -397,40 +403,52 @@ void framework::Update(float elapsed_time/*Elapsed seconds from last frame*/)
 			aXY = -XM_PIDIV2;
 			aZY = XM_1DIVPI;
 			d = XM_PI;
-			Camera::mainCamera = oldCamera;
+			mainCamera = oldCamera;
 		}
 		else
 		{
-			oldCamera = Camera::mainCamera;
+			oldCamera = mainCamera;
+			d = XMVectorGetX(XMVector3Length(mainCamera.focusPosition - mainCamera.eyePosition));
 		}
 	}
 	if (isCharactorSurroundCameraOn)
 	{
-		if (Input::KEY_BOARD.J) {
+		if (Input::KEY.J) {
 			aXY -= 0.01f;
 		}
-		if (Input::KEY_BOARD.L) {
+		if (Input::KEY.L) {
 			aXY += 0.01f;
 		}
-		if (Input::KEY_BOARD.I) {
+		if (Input::KEY.I) {
 			aZY += 0.01f;
 		}
-		if (Input::KEY_BOARD.K) {
+		if (Input::KEY.K) {
 			aZY -= 0.01f;
 		}
-		if (Input::KEY_BOARD.O) {
+		if (Input::KEY.O) {
 			d += 0.05f;
 		}
-		if (Input::KEY_BOARD.U) {
+		if (Input::KEY.U) {
 			d -= 0.05f;
 		}
-		Camera::mainCamera.upDirection = { sinf(aZY)*sinf(aXY), cosf(aZY), sinf(aZY)*cosf(aXY), 0 };
-		Camera::mainCamera.eyePosition = XMVectorSet(-fabs(d)*cosf(aZY)*sinf(aXY), fabs(d)*sinf(aZY)/* + 310 / (float)SCREEN_WIDTH*/, -fabs(d)*cosf(aZY)*cosf(aXY), 0) + oldCamera.eyePosition;
+		//mainCamera.eyePosition = mainCamera.eyePosition*XMQuaternionRotationRollPitchYaw(aXY, aZY, 0);
+		mainCamera.eyePosition = XMVectorSet(-fabs(d)*cosf(aZY)*sinf(aXY), fabs(d)*sinf(aZY), -fabs(d)*cosf(aZY)*cosf(aXY), 0);
+
+
+		XMVECTOR forword = XMVectorSubtract(mainCamera.focusPosition, mainCamera.eyePosition);
+		forword = XMVector3Normalize(forword);
+		float angle = XMVectorGetX(XMVector3Dot(forword, { 0,1,0 }));
+		mainCamera.upDirection = XMLoadFloat3(&XMFLOAT3(0, 1, 0)) - forword*angle;
+
+		mainCamera.upDirection = XMVector3Normalize(mainCamera.upDirection);
+
+		//mainCamera.upDirection = { sinf(aZY)*sinf(aXY), cosf(aZY), sinf(aZY)*cosf(aXY), 0 };
+		
 	}
 
 }
 
-void framework::Draw(float elapsed_time/*Elapsed seconds from last frame*/)
+void Framework::Draw(float elapsed_time/*Elapsed seconds from last frame*/)
 {
 	//Camera::mainCamera.focusPosition = { focusPos.x,focusPos.y,focusPos.z,0 };
 
@@ -440,45 +458,56 @@ void framework::Draw(float elapsed_time/*Elapsed seconds from last frame*/)
 		blendMode++;
 		blendMode %= 9;
 	}
-	MyBlending::setMode(s_pDeviceContext, BLEND_ALPHA);
+	MyBlending::setMode(pDeviceContext, BLEND_ALPHA);
 
-	s_pDeviceContext->OMSetRenderTargets(1, &s_pRenderTargetView, s_pDepthStencilView);
+	pDeviceContext->OMSetRenderTargets(1, &pRenderTargetView, pDepthStencilView);
 
-	Camera::mainCamera.viewPort.Width = SCREEN_WIDTH;
-	Camera::mainCamera.viewPort.Height = SCREEN_HEIGHT;
-	s_pDeviceContext->RSSetViewports(1, &Camera::mainCamera.viewPort);
+	mainCamera.viewPort.Width = SCREEN_WIDTH;
+	mainCamera.viewPort.Height = SCREEN_HEIGHT;
+	mainCamera.Update();
+	pDeviceContext->RSSetViewports(1, &mainCamera.viewPort);
 
 	// Just clear the backbuffer
 	//float ClearColor[4] = { 0.0f / 255.0f, 111.0f / 255.0f, 129.0f / 255.0f, 1.0f }; //red,green,blue,alpha
 	float ClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f }; //red,green,blue,alpha
-	s_pDeviceContext->ClearRenderTargetView(s_pRenderTargetView, ClearColor);
-	s_pDeviceContext->ClearDepthStencilView(s_pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	pDeviceContext->ClearRenderTargetView(pRenderTargetView, ClearColor);
+	pDeviceContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-	s_pDeviceContext->OMSetDepthStencilState(pDepthStencilState, 1);
+	pDeviceContext->OMSetDepthStencilState(pDepthStencilState, 1);
 
-	MyBlending::setMode(s_pDeviceContext, BLEND_ALPHA);
-	if (s_pScene)
+	MyBlending::setMode(pDeviceContext, BLEND_ALPHA);
+
+
+	if (pScene)
 	{
-		s_pScene->Draw(/*elapsed_time*/);
+		pScene->Draw(/*elapsed_time*/);
 	}
 
-	MyBlending::setMode(s_pDeviceContext, BLEND_NONE);
+	MyBlending::setMode(pDeviceContext, BLEND_NONE);
 
-	
+	pDeviceContext->OMSetDepthStencilState(pDepthStencilState, 1);
+	const XMVECTORF32 xaxis = { 20.f, 0.f, 0.f };
+	const XMVECTORF32 yaxis = { 0.f, 0.f, 20.f };
+	DXTK::DrawGrid(pDeviceContext, XMMatrixIdentity(), mainCamera.view, mainCamera.projection, xaxis, yaxis, g_XMZero, 20, 20, Colors::Gray);
+
+	const XMVECTORF32 minPos = { -0.5f, 0.0f, 0.5f };
+	const XMVECTORF32 maxPos = { 0.5f, 1.64f, -0.5f };
+	//DXTK::DrawAABB(pDeviceContext, XMMatrixIdentity(), mainCamera.view, mainCamera.projection, minPos, maxPos, Colors::Green);
+
+
 	//pPrimitive3D[0]->Draw(s_pDeviceContext, XMMatrixIdentity(), XMFLOAT3(2.0f, 0.01f, 0.01f), 0xFF0000FF);
 	//pPrimitive3D[0]->Draw(s_pDeviceContext, XMMatrixIdentity(), XMFLOAT3(0.01f, 2.0f, 0.01f), 0x00FF00FF);
 	//spPrimitive3D[0]->Draw(s_pDeviceContext, XMMatrixIdentity(), XMFLOAT3(0.01f, 0.01f, 2.0f), 0x0000FFFF);
-	//pPrimitive3D[1]->drawCylinder(s_pDeviceContext, XMFLOAT3(-310, 0, 10 + 0), XMFLOAT3(620, 700, 20), &custom3DTemp);
 
 	// -5F
 	char buf[256];
 	sprintf_s(buf, "mainCamera: \nPosX: %f \nPosY: %f \nPosZ: %lf \nDistance: %f \n",
-		XMVectorGetX(Camera::mainCamera.eyePosition), XMVectorGetY(Camera::mainCamera.eyePosition), XMVectorGetZ(Camera::mainCamera.eyePosition),
-		XMVectorGetX(XMVector3Length(XMVectorSubtract(Camera::mainCamera.eyePosition, Camera::mainCamera.focusPosition))));
+		XMVectorGetX(mainCamera.eyePosition), XMVectorGetY(mainCamera.eyePosition), XMVectorGetZ(mainCamera.eyePosition),
+		XMVectorGetX(XMVector3Length(XMVectorSubtract(mainCamera.eyePosition, mainCamera.focusPosition))));
 
 
-	MyBlending::setMode(s_pDeviceContext, BLEND_ALPHA);
-	SpriteString::DrawString(s_pDeviceContext, 0, 0, buf);
+	MyBlending::setMode(pDeviceContext, BLEND_ALPHA);
+	SpriteString::DrawString(pDeviceContext, 0, 0, buf);
 
 	if (isFullScreen) {
 		// 垂直同期ON
@@ -497,22 +526,22 @@ void framework::Draw(float elapsed_time/*Elapsed seconds from last frame*/)
 	//pSwapChain->Present(0, 0);
 }
 
-void framework::Release()
+void Framework::Release()
 {
 	SAFE_RELEASE(pBlendState);
-	SAFE_RELEASE(s_pDepthStencilView);
-	SAFE_RELEASE(s_pRenderTargetView);
+	SAFE_RELEASE(pDepthStencilView);
+	SAFE_RELEASE(pRenderTargetView);
 	SAFE_RELEASE(pSwapChain);
 
-	if (s_pDeviceContext) {
-		s_pDeviceContext->ClearState();
+	if (pDeviceContext) {
+		pDeviceContext->ClearState();
 		//MessageBox(0, L"DeviceContext Cleared", L"framework", MB_OK);
-		s_pDeviceContext->Release();
+		pDeviceContext->Release();
 		//MessageBox(0, L"DeviceContext Released", L"framework", MB_OK);
 	}
 
 	
-	SAFE_RELEASE(s_pDevice);
+	SAFE_RELEASE(pDevice);
 	SAFE_RELEASE(pDepthStencilResource);
 	SAFE_RELEASE(pDepthStencilState);
 	
@@ -521,6 +550,7 @@ void framework::Release()
 	MyBlending::Release();
 
 	SpriteString::Release();
+	DXTK::CleanupDirectXTKObject();
 
 	for (auto &p : pPrimitive3D)
 	{

@@ -2,13 +2,12 @@
 #define _3DGP_MATH_
 
 #include <DirectXMath.h>
-using namespace DirectX;
 
 typedef unsigned int UINTCOLOR;
 
-inline FXMVECTOR XMConvertUIntToColor(UINTCOLOR inColor)
+inline DirectX::XMVECTOR XMConvertUIntToColor(UINTCOLOR inColor)
 {
-	XMFLOAT4 rgba;
+	DirectX::XMFLOAT4 rgba;
 	/*red		= (inColor >> 24 & 0xFF) / 255.0f;
 	green	= (inColor >> 16 & 0xFF) / 255.0f;
 	blue	= (inColor >> 8 & 0xFF) / 255.0f;
@@ -28,8 +27,16 @@ inline FXMVECTOR XMConvertUIntToColor(UINTCOLOR inColor)
 	rgba.z = (inColor & 0xFF00) / (float)0xFF00;
 	rgba.w = (inColor & 0xFF) / (float)0xFF;
 
-	return XMLoadFloat4(&rgba);
+	return DirectX::XMLoadFloat4(&rgba);
 }
+
+struct AABB 
+{
+	DirectX::XMFLOAT3 minPos;
+	DirectX::XMFLOAT3 maxPos;
+	AABB(DirectX::XMFLOAT3 minPos, DirectX::XMFLOAT3 manPos) :minPos(minPos), maxPos(maxPos) {};
+};
+
 
 
 #endif // !_3DGP_MATH_

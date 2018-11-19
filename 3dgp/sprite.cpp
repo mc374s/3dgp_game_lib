@@ -1,6 +1,8 @@
 ﻿#include "sprite.h"
 #include "resources_manager.h"
 
+using namespace DirectX;
+
 bool Sprite::Initialize(ID3D11Device* pDevice)
 {
 	vertexCount = 4 /*sizeof(vertices) / sizeof(vertex)*/;
@@ -217,7 +219,7 @@ void Sprite::Draw(ID3D11DeviceContext* pDeviceContext, vertex pCoordNDC[])
 
 }
 
-void Sprite::Draw(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float rotateAngle, FXMVECTOR blendColor)
+void XM_CALLCONV Sprite::Draw(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float rotateAngle, FXMVECTOR blendColor)
 {
 	XMFLOAT4 vertexColor;
 	XMStoreFloat4(&vertexColor, blendColor);
@@ -245,7 +247,7 @@ void Sprite::Draw(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY,
 	Draw(pDeviceContext, vertices);
 }
 
-void Sprite::Draw(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, FXMVECTOR blendColor, float rotateAngle, bool doCenterRotation, float rotatePosX, float rotatePosY, bool doReflection, int scaleMode)
+void XM_CALLCONV Sprite::Draw(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, FXMVECTOR blendColor, float rotateAngle, bool doCenterRotation, float rotatePosX, float rotatePosY, bool doReflection, int scaleMode)
 {
 	if ((int)srcWidth == 0 || (int)srcHeight == 0)
 	{
@@ -344,7 +346,7 @@ void Sprite::Draw(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY,
 
 void XM_CALLCONV Sprite::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, FXMVECTOR blendColor, float rotateAngle, bool doCenterRotation, float rotatePosX, float rotatePosY, bool doReflection, int scaleMode)
 {
-	static PROJECTION_CBUFFER updateCbuffer;
+	//static PROJECTION_CBUFFER updateCbuffer;
 	updateCbuffer.world = world;
 	updateCbuffer.view = view;
 	updateCbuffer.projection = projection;

@@ -1,5 +1,7 @@
 #include "mf_audio.h"
 
+using namespace GLC;
+
 IMFPMediaPlayer* MFAudioManager::pMFPlayer[AUDIO_MAX_NUM] = { nullptr };
 bool MFAudioManager::doLoop[AUDIO_MAX_NUM] = { false };
 bool MFAudioManager::isLoaded = false;
@@ -14,7 +16,7 @@ MFAudioManager::~MFAudioManager()
 	MFAudiosRelease();
 }
 
-void MFAudioManager::loadAudios(const RESOURCE_DATA _data[])
+void MFAudioManager::loadAudios(const NUMBERED_FILE _data[])
 {
 	if (!MFAudioManager::isLoaded)
 	{
@@ -30,7 +32,7 @@ void MFAudioManager::loadAudios(const RESOURCE_DATA _data[])
 	}
 }
 
-void MFAudiosRelease()
+void GLC::MFAudiosRelease()
 {
 	for (int i = 0; i < AUDIO_MAX_NUM; i++) {
 		if (MFAudioManager::pMFPlayer[i]) {
@@ -40,7 +42,7 @@ void MFAudiosRelease()
 	//ZeroMemory(data, sizeof(AUDIO_DATA)*AUDIO_MAX_NUM);
 }
 
-void MFAudioCheckLoops()
+void GLC::MFAudioCheckLoops()
 {
 	MFP_MEDIAPLAYER_STATE state = MFP_MEDIAPLAYER_STATE_EMPTY;
 	
@@ -54,7 +56,7 @@ void MFAudioCheckLoops()
 	}
 }
 
-void MFAudioLoad(const int _fileNO, const char* _fileName)
+void GLC::MFAudioLoad(const int _fileNO, const char* _fileName)
 {
 	const size_t cSize = strlen(_fileName) + 1;
 	wchar_t *wcFileName = new wchar_t[cSize];
@@ -70,7 +72,7 @@ void MFAudioLoad(const int _fileNO, const char* _fileName)
 	}
 }
 
-void MFAudioPlay(const int _fileNO, const bool _doLoop)
+void GLC::MFAudioPlay(const int _fileNO, const bool _doLoop)
 {
 	if (MFAudioManager::pMFPlayer[_fileNO]) {
 		MFAudioManager::pMFPlayer[_fileNO]->Stop();
@@ -79,14 +81,14 @@ void MFAudioPlay(const int _fileNO, const bool _doLoop)
 	}
 }
 
-void MFAudioContinue(const int _fileNO)
+void GLC::MFAudioContinue(const int _fileNO)
 {
 	if (MFAudioManager::pMFPlayer[_fileNO]) {
 		MFAudioManager::pMFPlayer[_fileNO]->Play();
 	}
 }
 
-void MFAudioStop(const int _fileNO)
+void GLC::MFAudioStop(const int _fileNO)
 {
 	if (MFAudioManager::pMFPlayer[_fileNO]) {
 		MFAudioManager::pMFPlayer[_fileNO]->Stop();
@@ -94,14 +96,14 @@ void MFAudioStop(const int _fileNO)
 	}
 }
 
-void MFAudioPause(const int _fileNO)
+void GLC::MFAudioPause(const int _fileNO)
 {
 	if (MFAudioManager::pMFPlayer[_fileNO]){
 		MFAudioManager::pMFPlayer[_fileNO]->Pause();
 	}
 }
 
-bool isMFAudioPlaying(const int _fileNO)
+bool GLC::isMFAudioPlaying(const int _fileNO)
 {
 	if (MFAudioManager::pMFPlayer[_fileNO]) {
 		MFP_MEDIAPLAYER_STATE state = MFP_MEDIAPLAYER_STATE_EMPTY;

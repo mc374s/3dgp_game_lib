@@ -1,5 +1,7 @@
-#include "resources_manager.h"
 #include "primitive3d.h"
+
+#include "resources_manager.h"
+using namespace DirectX;
 
 Primitive3D::Primitive3D(ID3D11Device *pDevice)
 {

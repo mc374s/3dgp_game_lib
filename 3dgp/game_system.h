@@ -8,10 +8,9 @@
 #include "camera.h"
 #include "input.h"
 
-#include "SimpleMath.h"
-using namespace DirectX::SimpleMath;
-
 #include "3dgp_math.h"
+
+#include <DirectXMath.h>
 
 //*****************************************************************************************************************************
 //
@@ -123,27 +122,6 @@ struct Transform2D
 	//static Transform2D initialValue;
 };
 
-
-struct Transform
-{
-	Vector3 position;
-	Vector3 scaling;
-	Vector3 eulerDegreeAngle;
-
-	Transform() :position(0, 0, 0), scaling(1, 1, 1), eulerDegreeAngle(0, 0, 0) {};
-
-	void Clear() {
-		position = Vector3::Zero;
-		scaling = Vector3::One;
-		eulerDegreeAngle = Vector3::Zero;
-	};
-
-	static Transform& initialValue() {
-		static Transform initialValue;
-		return initialValue;
-	};
-};
-
 struct SPRITE_DATA
 {
 	int		texNO = 0;
@@ -161,7 +139,8 @@ struct SPRITE_DATA
 		ofsY(ofsY),
 		frameNum(frameNum)
 	{};
-	void Draw(Vector3 &pos, const Transform2D& transform2d = Transform2D::initialValue(), const Transform& transform=Transform::initialValue());
+	void XM_CALLCONV Draw(DirectX::FXMVECTOR pos, const Transform2D& transform2d = Transform2D::initialValue(),
+		DirectX::FXMVECTOR postiotion3D = DirectX::g_XMZero, DirectX::FXMVECTOR rotationDegree = DirectX::g_XMZero);
 	void Draw(float x, float y, const Transform2D& transform2d = Transform2D::initialValue());
 	void Copy(const SPRITE_DATA* rhv) {
 		left = rhv->left; top = rhv->top; width = rhv->width; height = rhv->height; ofsX = rhv->ofsX; ofsY = rhv->ofsY;
@@ -237,7 +216,9 @@ public:
 	~View();
 
 	bool doReflection;
-	Transform transform;
+	DirectX::XMVECTOR position;
+	DirectX::XMVECTOR scaling;
+	DirectX::XMVECTOR rotationDegree;
 
 	void Set();
 	// View, looks like a 3D textured sprite
@@ -255,12 +236,11 @@ class Cube
 private:
 	Primitive3D *pPrimitive;
 public:
-	Cube(const XMFLOAT3 &position, const XMFLOAT3 &size, const UINTCOLOR &blendColor);
+	Cube(DirectX::FXMVECTOR position, DirectX::FXMVECTOR size, const UINTCOLOR &blendColor);
 	~Cube();
-	XMFLOAT3	position;
-	XMFLOAT3	size;
+	DirectX::XMVECTOR	position;
+	DirectX::XMVECTOR	size;
 	UINTCOLOR	blendColor;
-	Transform	transform;
 
 	void Draw();
 
@@ -290,17 +270,22 @@ struct MeshFile
 struct MeshData
 {
 	int fileNO;
-	Transform preSetTransform;
+
+	DirectX::XMVECTOR scalingAdjustion;
+	DirectX::XMVECTOR positionAdjustion;
+	DirectX::XMVECTOR rotationAdjustion;
+	DirectX::XMMATRIX world;
+
 	MeshData(int fileNO, 
-		XMFLOAT3 preSetScale = XMFLOAT3(1, 1, 1), 
-		XMFLOAT3 preSetPosition = XMFLOAT3(0, 0, 0), 
-		XMFLOAT3 preSetEulerDegreeAngle = XMFLOAT3(0, 0, 0)):fileNO(fileNO) 
+		DirectX::XMFLOAT3 preSetScale = DirectX::XMFLOAT3(1, 1, 1), 
+		DirectX::XMFLOAT3 preSetPosition = DirectX::XMFLOAT3(0, 0, 0),
+		DirectX::XMFLOAT3 preSetRotationDegree = DirectX::XMFLOAT3(0, 0, 0)):fileNO(fileNO),world(DirectX::XMMatrixIdentity())
 	{
-		preSetTransform.scaling = preSetScale;
-		preSetTransform.position = preSetPosition;
-		preSetTransform.eulerDegreeAngle = preSetEulerDegreeAngle;
+		scalingAdjustion = DirectX::XMLoadFloat3(&preSetScale);
+		positionAdjustion = DirectX::XMLoadFloat3(&preSetPosition);
+		rotationAdjustion = DirectX::XMLoadFloat3(&preSetRotationDegree);
 	};
-	void Draw(const Transform &transform = Transform::initialValue(), const int& frame = 0);
+	void XM_CALLCONV Draw(DirectX::FXMVECTOR position, DirectX::FXMVECTOR scaling, DirectX::FXMVECTOR rotationDegree, const int& frame = 0);
 
 };
 

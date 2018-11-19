@@ -40,7 +40,7 @@ int progress = 0;
 
 SceneTitle::SceneTitle()
 {
-	Scene::init();
+	Scene::Init();
 	//pTextureManager->loadTextures(e_loadTexture);		// 2D画像の一括ロード
 	//std::thread loadThread_1(loadTextureProgress);
 	//loadThread_1.detach();
@@ -61,7 +61,7 @@ SceneTitle::SceneTitle()
 	std::thread loadThread(loadMeshesProgress, nullptr, &progress);
 	loadThread.detach();
 
-	pPlayerManager->init();
+	pPlayerManager->Init();
 
 
 }
@@ -80,15 +80,15 @@ void SceneTitle::Update()
 	switch (step) {
 	case STEP::INIT:
 
-		MFAudioPlay(BGM_TITLE, true);
+		GLC::MFAudioPlay(BGM_TITLE, true);
 		step = STEP::BEGIN;
 		//break;
 
 	case STEP::BEGIN:
 		if (Input::KEY_TRACKER.pressed.Enter || Input::PAD_TRACKER.start == Input::PAD_TRACKER.PRESSED)
 		{
-			MFAudioStop(BGM_TITLE);
-			MFAudioPlay(SE_START);
+			GLC::MFAudioStop(BGM_TITLE);
+			GLC::MFAudioPlay(SE_START);
 			changeScene(SCENE_MAIN);
 			break;
 		}
@@ -108,7 +108,7 @@ void SceneTitle::Draw()
 
 	pBG->Draw();
 	// -210F
-	e_fbxItemFloor.Draw();
+	//e_fbxItemFloor.Draw();
 	//e_fbxItemBox.draw();
 	
 	//static OBJ3D temp = g_player;

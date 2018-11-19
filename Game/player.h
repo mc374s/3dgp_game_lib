@@ -26,7 +26,7 @@ public:
 	Player();
 	~Player();
 
-	void init();
+	void Init();
 	void Update();
 	void Draw();
 
@@ -43,7 +43,7 @@ public:
 	PlayerManager();
 	~PlayerManager();
 
-	void init();
+	void Init();
 	void Update();
 	void Draw();
 

@@ -9,6 +9,6 @@ enum AUDIO_NO
 	SE_START,
 };
 
-extern RESOURCE_DATA audio_data[];
+extern GLC::NUMBERED_FILE audio_data[];
 
 #endif // !_SOUND_DATA_H_

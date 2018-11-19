@@ -97,7 +97,7 @@ void OBJ2D::Draw()
 		}
 		transform2D.rgba = transform2D.rgba >> 8 << 8 | alpha;
 		//pSprData->draw(pos.x, pos.y, &transform2D);
-		pSprData->Draw(pos, transform2D, transform);
+		pSprData->Draw(pos, transform2D, transform.position, transform.rotationDegree);
 	}
 
 }
@@ -204,7 +204,7 @@ ObjManager::~ObjManager()
 
 }
 
-void ObjManager::init() 
+void ObjManager::Init() 
 {
 
 }

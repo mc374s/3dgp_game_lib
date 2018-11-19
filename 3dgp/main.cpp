@@ -1,6 +1,4 @@
-﻿#include "3dgp.h"
-
-#include "framework.h"
+﻿#include "framework.h"
 
 #include "../Game/game.h"
 #include "../Game/sound_data.h"
@@ -9,9 +7,11 @@
 #include <thread>
 #include <tchar.h>
 
+using namespace GLC;
+
 LRESULT CALLBACK fnWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
-	framework *f = reinterpret_cast<framework*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+	Framework *f = reinterpret_cast<Framework*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 	return f ? f->handle_message(hwnd, msg, wparam, lparam) : DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
@@ -38,8 +38,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, LPWSTR cmd_line
 
 	//MessageBox(0, L"main.cpp run", L"main", MB_OK);
 
-	pMFAudioManager->loadAudios(audio_data);
-
+	MFAudioManager::getInstance()->loadAudios(audio_data);
 
 	RECT rc = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
@@ -58,11 +57,11 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, LPWSTR cmd_line
 	
 
 
-	framework f(hwnd);
+	Framework f(hwnd);
 	srand(unsigned int(time(NULL)));
 	pTextureManager->LoadTextures(e_loadTexture);		// 2D画像の一括ロード
 
-	framework::changeScene(SCENE_TITLE);
+	Framework::changeScene(SCENE_TITLE);
 
 
 	ShowWindow(hwnd, cmd_show);

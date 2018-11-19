@@ -6,18 +6,17 @@
 
 #include "Keyboard.h"
 #include "GamePad.h"
-using namespace DirectX;
 
 class Input {
 
 public:
-	static std::unique_ptr<Keyboard>			pKeyboard;
-	static Keyboard::State						KEY_BOARD;
-	static Keyboard::KeyboardStateTracker		KEY_TRACKER;
+	static std::unique_ptr<DirectX::Keyboard>			pKeyboard;
+	static DirectX::Keyboard::State						KEY;
+	static DirectX::Keyboard::KeyboardStateTracker		KEY_TRACKER;
 
-	static std::unique_ptr<DirectX::GamePad>	pGamePad;
-	static GamePad::State						GAME_PAD;
-	static GamePad::ButtonStateTracker			PAD_TRACKER;
+	static std::unique_ptr<DirectX::GamePad>			pGamePad;
+	static DirectX::GamePad::State						PAD;
+	static DirectX::GamePad::ButtonStateTracker			PAD_TRACKER;
 
 	static bool isAnyKeyDown;
 };

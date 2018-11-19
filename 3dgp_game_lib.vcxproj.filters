@@ -107,6 +107,9 @@
     <ClInclude Include="3dgp\input.h">
       <Filter>3dgp\Headers</Filter>
     </ClInclude>
+    <ClInclude Include="3dgp\directxtk.h">
+      <Filter>3dgp\Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="3dgp\blend.cpp">
@@ -173,6 +176,12 @@
       <Filter>3dgp\Sources</Filter>
     </ClCompile>
     <ClCompile Include="3dgp\input.cpp">
+      <Filter>3dgp\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="3dgp\directxtk.cpp">
+      <Filter>3dgp\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="3dgp\3dgp_math.cpp">
       <Filter>3dgp\Sources</Filter>
     </ClCompile>
   </ItemGroup>

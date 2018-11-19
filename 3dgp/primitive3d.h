@@ -3,7 +3,6 @@
 
 #include <d3d11.h>
 #include <DirectXMath.h>
-using namespace DirectX;
 
 enum GEOMETRY_TYPE
 {
@@ -17,19 +16,19 @@ class Primitive3D
 private:
 	struct vertex3D
 	{
-		XMFLOAT3 position;
-		XMFLOAT4 color;
-		XMFLOAT3 normal;
+		DirectX::XMFLOAT3 position;
+		DirectX::XMFLOAT4 color;
+		DirectX::XMFLOAT3 normal;
 	};
 
 	struct PROJECTION_CBUFFER
 	{
-		XMMATRIX world;					//ワールド変換行列
-		XMMATRIX view;					//ビュー変換行列
-		XMMATRIX projection;			//プロジェクション変換行列
-		XMMATRIX worldViewProjection;	//ワールド・ビュー・プロジェクション合成行列
-		XMFLOAT4 materialColor;			//材質色
-		XMFLOAT4 lightDirection;		//ライト進行行列
+		DirectX::XMMATRIX world;					//ワールド変換行列
+		DirectX::XMMATRIX view;					//ビュー変換行列
+		DirectX::XMMATRIX projection;			//プロジェクション変換行列
+		DirectX::XMMATRIX worldViewProjection;	//ワールド・ビュー・プロジェクション合成行列
+		DirectX::XMFLOAT4 materialColor;			//材質色
+		DirectX::XMFLOAT4 lightDirection;		//ライト進行行列
 	};
 private:
 
@@ -68,7 +67,7 @@ public:
 
 	virtual void Initialize(ID3D11Device *pDevice, const int &type = GEOMETRY_CUBE, const int &latitudeNum = 2, const int &longitudeNum = 6);
 
-	void XM_CALLCONV Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, FXMVECTOR blendColor = g_XMOne);
+	void XM_CALLCONV Draw(ID3D11DeviceContext *pDeviceContext, DirectX::FXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection, DirectX::FXMVECTOR blendColor = DirectX::g_XMOne);
 };
 
 

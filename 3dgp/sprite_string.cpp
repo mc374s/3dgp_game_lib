@@ -1,6 +1,8 @@
 #include "sprite_string.h"
 #include "sprite.h"
 
+using namespace DirectX;
+
 Sprite* SpriteString::s_pSprString = nullptr;
 
 Sprite* SpriteString::Initialize(ID3D11Device* pDevice, char *pFilename)
@@ -16,7 +18,7 @@ Sprite* SpriteString::Initialize(ID3D11Device* pDevice, char *pFilename)
 	return SpriteString::s_pSprString;
 }
 
-void SpriteString::DrawString(ID3D11DeviceContext* pDeviceConetxt, int drawX, int drawY, char* pIn, FXMVECTOR blendColor, int format, int sizeX, int sizeY, float rotateAngle, Sprite *pSprStringFont)
+void XM_CALLCONV SpriteString::DrawString(ID3D11DeviceContext* pDeviceConetxt, int drawX, int drawY, char* pIn, FXMVECTOR blendColor, int format, int sizeX, int sizeY, float rotateAngle, Sprite *pSprStringFont)
 {
 	int adjustX = 0, marginX = -sizeX*0.4;
 	if (format == STR_CENTER && pIn)

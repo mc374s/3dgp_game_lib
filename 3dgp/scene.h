@@ -17,7 +17,7 @@ public:
 
 	Scene *pNextScene;
 
-	virtual void init() {
+	virtual void Init() {
 		timer = 0;
 		step = 0;
 		pNextScene = nullptr;
@@ -30,7 +30,7 @@ public:
 
 	virtual void changeScene(Scene* pTargetScene) {
 		pTargetScene->pNextScene = nullptr;
-		pTargetScene->init();
+		pTargetScene->Init();
 		pNextScene = pTargetScene;
 	};
 };

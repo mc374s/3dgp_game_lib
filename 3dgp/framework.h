@@ -19,16 +19,16 @@ class Scene;
 class Primitive3D;
 
 
-class framework
+class Framework
 {
 private:
-	static Scene* s_pScene;
+	static Scene* pScene;
 	bool isFocused = true;
 
 public:
 	static void changeScene(Scene* pNextScene) {
 		if (pNextScene) {
-			s_pScene = pNextScene;
+			pScene = pNextScene;
 		}
 	};
 
@@ -51,12 +51,12 @@ public:
 
 	UINT createDeviceFlags = 0;
 
-	static ID3D11Device*			s_pDevice;
-	static ID3D11DeviceContext*		s_pDeviceContext;
+	static ID3D11Device*			pDevice;
+	static ID3D11DeviceContext*		pDeviceContext;
 
 
-	static ID3D11RenderTargetView*	s_pRenderTargetView;
-	static ID3D11DepthStencilView*	s_pDepthStencilView;
+	static ID3D11RenderTargetView*	pRenderTargetView;
+	static ID3D11DepthStencilView*	pDepthStencilView;
 	ID3D11DepthStencilState*		pDepthStencilState;
 
 	D3D_DRIVER_TYPE					driverType = D3D_DRIVER_TYPE_NULL;
@@ -81,7 +81,7 @@ public:
 		"SCREEN"
 	};
 
-	framework(HWND _hwnd) /*: hwnd(hwnd)*/
+	Framework(HWND _hwnd) /*: hwnd(hwnd)*/
 	{
 		//MessageBox(0, L"Constructor called", L"framework", MB_OK);
 		if (!Initialize(_hwnd)) {
@@ -89,7 +89,7 @@ public:
 			return;
 		}
 	}
-	~framework()
+	~Framework()
 	{
 		Release();
 	}

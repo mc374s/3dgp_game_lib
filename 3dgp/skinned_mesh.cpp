@@ -1,6 +1,6 @@
-﻿#include "resources_manager.h"
+﻿#include "skinned_mesh.h"
 
-#include "skinned_mesh.h"
+#include "resources_manager.h"
 
 //#include <crtdbg.h>
 #include <functional>
@@ -8,6 +8,8 @@
 #pragma comment(lib,"libfbxsdk-md")
 #include <fbxsdk.h>
 using namespace fbxsdk;
+
+using namespace DirectX;
 
 
 void FetchBoneInfluences(const FbxMesh *pFbxMesh, std::vector<SkinnedMesh::BoneInfluencesPerContralPoint> &influences)

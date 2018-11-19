@@ -3,7 +3,6 @@
 
 #include <d3d11.h>
 #include <DirectXMath.h>
-using namespace DirectX;
 
 #include <vector>
 
@@ -20,7 +19,7 @@ public:
 	};
 	struct Bone
 	{
-		XMMATRIX transform;
+		DirectX::XMMATRIX transform;
 	};
 
 	typedef std::vector<BoneInfluence> BoneInfluencesPerContralPoint;
@@ -38,27 +37,27 @@ public:
 private:
 	struct vertex3D
 	{
-		XMFLOAT3 position;
-		XMFLOAT4 color;
-		XMFLOAT4 normal;
-		XMFLOAT2 texcoord;
+		DirectX::XMFLOAT3 position;
+		DirectX::XMFLOAT4 color;
+		DirectX::XMFLOAT4 normal;
+		DirectX::XMFLOAT2 texcoord;
 		float boneWeight[MAX_BONE_INFLUENCES] = { 0.0f,0.0f,0.0f,0.0f };
 		int boneIndices[MAX_BONE_INFLUENCES] = {};
 	};
 	struct VS_CBUFFER_PROJECTION
 	{
-		XMMATRIX world;					//ワールド変換行列
-		XMMATRIX view;					//ビュー変換行列
-		XMMATRIX projection;			//プロジェクション変換行列
-		XMMATRIX worldViewProjection;	//ワールド・ビュー・プロジェクション合成行列
-		XMFLOAT4 materialColor;			//材質色
-		XMFLOAT4 lightDirection;		//ライト進行行列
+		DirectX::XMMATRIX world;					//ワールド変換行列
+		DirectX::XMMATRIX view;					//ビュー変換行列
+		DirectX::XMMATRIX projection;			//プロジェクション変換行列
+		DirectX::XMMATRIX worldViewProjection;	//ワールド・ビュー・プロジェクション合成行列
+		DirectX::XMFLOAT4 materialColor;			//材質色
+		DirectX::XMFLOAT4 lightDirection;		//ライト進行行列
 
-		XMMATRIX boneTransforms[MAX_BONES]; //ボーン影響変換行列
+		DirectX::XMMATRIX boneTransforms[MAX_BONES]; //ボーン影響変換行列
 	};
 	struct Material
 	{
-		XMFLOAT4 color = { 0.8f,0.8f,0.8f,1.0f };
+		DirectX::XMFLOAT4 color = { 0.8f,0.8f,0.8f,1.0f };
 		ID3D11ShaderResourceView* pShaderResourceView = NULL;
 	};
 	struct Subset 
@@ -72,7 +71,7 @@ private:
 		ID3D11Buffer* vertexBuffer;
 		ID3D11Buffer* indexBuffer;
 		std::vector<Subset> subsetsList;
-		XMMATRIX globalTransform = XMMatrixIdentity();
+		DirectX::XMMATRIX globalTransform = DirectX::XMMatrixIdentity();
 		SkeletalAnimation skeletalAnimation;
 	};
 
@@ -95,7 +94,7 @@ private:
 
 
 	std::vector<Mesh> meshesList;
-	XMMATRIX coordinateConversion = {
+	DirectX::XMMATRIX coordinateConversion = {
 		1.0f, 0.0f, 0.0f, 0.0f,
 		0.0f, 0.0f, 1.0f, 0.0f,
 		0.0f, 1.0f, 0.0f, 0.0f,
@@ -119,7 +118,7 @@ public:
 	//param(animationFrame) Set to 0 means always loop this fbx animation
 	//param(elapsedTime) How many ms this frame used
 	//
-	void XM_CALLCONV Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, bool isWireframe = false, const int& animationFrame = 0, float elapsedTime = 1 / 60.0f);
+	void XM_CALLCONV Draw(ID3D11DeviceContext *pDeviceContext, DirectX::FXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection, bool isWireframe = false, const int& animationFrame = 0, float elapsedTime = 1 / 60.0f);
 };
 
 

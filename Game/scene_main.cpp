@@ -18,9 +18,9 @@ SceneMain::SceneMain()
 
 }
 
-void SceneMain::init()
+void SceneMain::Init()
 {
-	Scene::init();
+	Scene::Init();
 }
 
 SceneMain::~SceneMain()
@@ -42,7 +42,7 @@ void SceneMain::Update()
 	switch (step)
 	{
 	case STEP::INIT:
-		MFAudioPlay(BGM_MAIN, true);
+		GLC::MFAudioPlay(BGM_MAIN, true);
 		step = STEP::BEGIN;
 
 		//break;
@@ -51,8 +51,8 @@ void SceneMain::Update()
 		gameMain();
 		if (Input::KEY_TRACKER.pressed.Enter || Input::PAD_TRACKER.start == Input::PAD_TRACKER.PRESSED)
 		{
-			MFAudioStop(BGM_MAIN);
-			MFAudioPlay(SE_START);
+			GLC::MFAudioStop(BGM_MAIN);
+			GLC::MFAudioPlay(SE_START);
 			changeScene(SCENE_TITLE);
 			break;
 		}

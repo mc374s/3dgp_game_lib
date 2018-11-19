@@ -1,7 +1,9 @@
-﻿#include "resources_manager.h"
+﻿#include "render_target.h"
+#include "resources_manager.h"
 
-#include "render_target.h"
 #include "camera.h"
+
+using namespace DirectX;
 
 bool RenderTarget::Initialize(ID3D11Device* pDevice)
 {
@@ -196,9 +198,9 @@ void RenderTarget::Draw(ID3D11DeviceContext* pDeviceContext)
 	pDeviceContext->ClearRenderTargetView(pRenderTargetView, ClearColor);
 	pDeviceContext->OMSetRenderTargets(1, &pRenderTargetView, NULL);
 
-	Camera::mainCamera.viewPort.Width = virtualWidth;
-	Camera::mainCamera.viewPort.Height = virtualHeight;
-	pDeviceContext->RSSetViewports(1, &Camera::mainCamera.viewPort);
+	GLC::mainCamera.viewPort.Width = virtualWidth;
+	GLC::mainCamera.viewPort.Height = virtualHeight;
+	pDeviceContext->RSSetViewports(1, &GLC::mainCamera.viewPort);
 }
 
 void RenderTarget::Draw(ID3D11DeviceContext* pDeviceContext, vertex pCoordNDC[])
@@ -218,7 +220,7 @@ void RenderTarget::Draw(ID3D11DeviceContext* pDeviceContext, vertex pCoordNDC[])
 
 }
 
-void RenderTarget::Draw(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, float rotateAngle, FXMVECTOR blendColor, bool doReflection)
+void XM_CALLCONV RenderTarget::Draw(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, float rotateAngle, FXMVECTOR blendColor, bool doReflection)
 {
 	if ((int)srcWidth == 0 || (int)srcHeight == 0)
 	{

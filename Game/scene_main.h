@@ -16,7 +16,7 @@ public:
 	SceneMain();
 	~SceneMain();
 
-	void init();
+	void Init();
 	void Update();
 	void Draw();
 
