@@ -1,6 +1,9 @@
 ﻿#ifndef _SCENE_TITLE_H_
 #define _SCENE_TITLE_H_
 
+#include "../3dgp/template.h"
+#include "../3dgp/scene.h"
+
 class OBJ2D;
 
 // SceneTitleクラスの定義

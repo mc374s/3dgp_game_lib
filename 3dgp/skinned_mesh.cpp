@@ -389,8 +389,6 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const 
 		for (u_int i = 0; i < vertexCount; ++i)
 		{
 			vertices[i] = verticesList[i];
-			//vertices[i].position = ToNDC(vertices[i].position);
-			//vertices[i].color = diffuse.color;
 		}
 		for (int i = 0; i < indexCount; i++)
 		{
@@ -583,7 +581,7 @@ void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRI
 	//static XMVECTOR lightDirection = { 0.0f,0.0f,1.0f,0.0f };
 	//lightDirection = Camera::mainCamera.focusPosition - Camera::mainCamera.eyePosition;
 	updateCbuffer.lightDirection = { XMVectorGetZ(view.r[0]), XMVectorGetZ(view.r[1]), XMVectorGetZ(view.r[2]), 1 };
-	updateCbuffer.materialColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	updateCbuffer.materialColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 0.5f);
 
 	// Play Fbx Animation	
 	XMMATRIX tansformation;

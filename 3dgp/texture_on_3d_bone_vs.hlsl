@@ -48,7 +48,7 @@ VS_OUT main(float4 position : POSITION, float4 color : COLOR, float2 texcoord : 
 	//vout.color.a = materialColor.a;
 
     vout.color = materialColor * color * max(0, -dot(L, N));
-	vout.color.a = color.a;
+	//vout.color.a = color.a;
 
 	if (unInfluenceCount != boneIndex) {
 		//vout.color = influence;

@@ -1,6 +1,8 @@
 ﻿#ifndef _SPRDATA_H_
 #define	_SPRDATA_H_
 
+#include "game.h"
+
 // ラベル定義
 enum TEX_NO {
 

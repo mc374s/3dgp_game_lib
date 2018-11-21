@@ -1,6 +1,8 @@
 ﻿#ifndef _OBJ2D_H_
 #define _OBJ2D_H_
 
+#include "game.h"
+
 #define OBJ_MAX_NUM	(16)
 
 class OBJ2D

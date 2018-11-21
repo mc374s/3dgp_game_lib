@@ -1,8 +1,6 @@
-#include "game.h"
 #include "player.h"
 
 #include "mesh_data.h"
-#include "../3dgp/camera.h"
 #include "../3dgp/directxtk.h"
 
 Player::Player()
@@ -21,8 +19,8 @@ void Player::Init()
 	speedMax.x = P_WALK_SPEED_MAX;
 	meshData = &e_fbxPlayerWalk;
 
-	size.minPos = Vector3(-0.5, 0, -0.2);
-	size.maxPos = Vector3(0.5, 2, 0.2);
+	size.minPos = Vector3(-0.4f, 0, -0.2f);
+	size.maxPos = Vector3(0.4f, 1.64f, 0.2f);
 	collision = size;
 
 }

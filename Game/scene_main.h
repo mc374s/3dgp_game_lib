@@ -1,6 +1,8 @@
 ﻿#ifndef _SCENE_MAIN_H_
 #define _SCENE_MAIN_H_
 
+#include "../3dgp/template.h"
+#include "../3dgp/scene.h"
 
 class OBJ2D;
 

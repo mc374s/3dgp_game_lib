@@ -1,10 +1,10 @@
-﻿#include "game.h"
+﻿#include "scene_title.h"
+
+//#include "game.h"
 #include "sprite_data.h"
 #include "sound_data.h"
 #include "obj2d.h"
 #include "scene_main.h"
-
-#include "scene_title.h"
 
 #include "mesh_data.h"
 
@@ -12,6 +12,7 @@
 
 #include "player.h"
 
+#include "stage.h"
 
 
 //void loadTextureProgress()
@@ -62,6 +63,7 @@ SceneTitle::SceneTitle()
 	loadThread.detach();
 
 	pPlayerManager->Init();
+	Game::mainStage.Init();
 
 
 }
@@ -113,8 +115,11 @@ void SceneTitle::Draw()
 	
 	//static OBJ3D temp = g_player;
 
+
+
 	// -60F
 	pPlayerManager->Draw();
+	Game::mainStage.Draw();
 
 
 

@@ -1,8 +1,8 @@
 ﻿#ifndef _GAME_H_
 #define	_GAME_H_
 
-#include "../3dgp/mf_audio.h"
 #include "../3dgp/game_system.h"
+#include "../3dgp/mf_audio.h"
 #include "../3dgp/template.h"
 #include "../3dgp/scene.h"
 
@@ -34,9 +34,6 @@ struct Transform
 
 
 #define DEBUG
-
-#include <vector>
-
 
 #define GROUND_HEIGHT (600)
 

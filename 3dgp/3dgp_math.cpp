@@ -65,8 +65,7 @@ bool XM_CALLCONV SphereHitAABB(DirectX::FXMVECTOR centerA, float radiusA, Direct
 	XMStoreFloat3(&minB, minPosB);
 	XMStoreFloat3(&maxB, maxPosB);
 
-
-	XMFLOAT3 closestPoint(0, 0, 0); // On AABB's Surface 
+	XMFLOAT3 closestPoint(0, 0, 0); // Should be Setting to AABB's Surface 
 	closestPoint = center;
 	if (closestPoint.x < minB.x) {
 		closestPoint.x = minB.x;

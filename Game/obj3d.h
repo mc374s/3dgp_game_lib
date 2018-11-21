@@ -1,6 +1,8 @@
 #ifndef _OBJ3D_H_
 #define _OBJ3D_H_
 
+#include "game.h"
+
 class OBJ3D
 {
 protected:

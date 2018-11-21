@@ -1,6 +1,8 @@
 ﻿#ifndef _SOUND_DATA_H_
 #define _SOUND_DATA_H_
 
+#include "../3dgp/mf_audio.h"
+
 enum AUDIO_NO
 {
 	BGM_TITLE,

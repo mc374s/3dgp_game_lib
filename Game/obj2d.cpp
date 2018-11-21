@@ -1,7 +1,4 @@
-﻿#include "game.h"
-#include "obj2d.h"
-
-#include "sprite_data.h"
+﻿#include "obj2d.h"
 
 /////////////////////////////////////////////////////////////////
 // Class OBJ2D Function

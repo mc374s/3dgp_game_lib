@@ -1,4 +1,3 @@
-#include "game.h"
 #include "obj3d.h"
 
 /////////////////////////////////////////////////////////////////
@@ -74,7 +73,6 @@ void OBJ3D::Update()
 	if (moveFunc) {
 		(this->*moveFunc)();
 	}
-	//pos.y = initPos.y - SCROLL_Y;
 }
 
 void OBJ3D::Draw()
