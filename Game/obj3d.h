@@ -4,7 +4,7 @@
 class OBJ3D
 {
 protected:
-	virtual void memberCopy(const OBJ3D& inputObj);
+	virtual void MemberCopy(const OBJ3D& inputObj);
 
 public:
 	OBJ3D();
@@ -42,7 +42,7 @@ public:
 
 	virtual void Draw();
 
-	static int searchSet(OBJ3D** begin, int max);
+	static int SearchSet(OBJ3D** begin, int max);
 
 
 };

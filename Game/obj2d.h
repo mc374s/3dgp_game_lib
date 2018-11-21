@@ -8,7 +8,7 @@ class OBJ2D
 private:
 
 public:
-	virtual void memberCopy(const OBJ2D& inputObj);
+	virtual void MemberCopy(const OBJ2D& inputObj);
 	OBJ2D();
 	OBJ2D(const OBJ2D& inputObj);
 	virtual ~OBJ2D();
@@ -43,7 +43,7 @@ public:
 
 	virtual void Draw();
 
-	static int searchSet(OBJ2D** ppBegin, int max);
+	static int SearchSet(OBJ2D** ppBegin, int max);
 
 
 };
@@ -61,7 +61,7 @@ public:
 
 	SPRITE_DATA* pAnimeData;
 
-	virtual void memberCopy(const OBJ2DEX& inputObj);
+	virtual void MemberCopy(const OBJ2DEX& inputObj);
 	OBJ2DEX();
 	OBJ2DEX(const OBJ2DEX& inputObj);
 	virtual ~OBJ2DEX();

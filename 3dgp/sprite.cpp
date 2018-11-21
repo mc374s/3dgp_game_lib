@@ -347,10 +347,11 @@ void XM_CALLCONV Sprite::Draw(ID3D11DeviceContext* pDeviceContext, float drawX, 
 void XM_CALLCONV Sprite::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, FXMVECTOR blendColor, float rotateAngle, bool doCenterRotation, float rotatePosX, float rotatePosY, bool doReflection, int scaleMode)
 {
 	//static PROJECTION_CBUFFER updateCbuffer;
-	updateCbuffer.world = world;
-	updateCbuffer.view = view;
-	updateCbuffer.projection = projection;
-	updateCbuffer.worldViewProjection = world*view*projection;
+	
+	XMStoreFloat4x4(&updateCbuffer.world, world);
+	XMStoreFloat4x4(&updateCbuffer.view, view);
+	XMStoreFloat4x4(&updateCbuffer.projection, projection);
+	XMStoreFloat4x4(&updateCbuffer.worldViewProjection, world*view*projection);
 	updateCbuffer.lightDirection = { XMVectorGetZ(view.r[0]), XMVectorGetZ(view.r[1]), XMVectorGetZ(view.r[2]), 1 };
 	XMStoreFloat4(&updateCbuffer.materialColor, blendColor);
 	//lightDirection = Camera::mainCamera.focusPosition - Camera::mainCamera.eyePosition;

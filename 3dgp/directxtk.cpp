@@ -95,7 +95,7 @@ void XM_CALLCONV DXTK::DrawGrid(ID3D11DeviceContext* pDeviceContext, FXMMATRIX w
 
 }
 
-void XM_CALLCONV DXTK::DrawAABB(ID3D11DeviceContext* pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, FXMVECTOR minPos, FXMVECTOR maxPos, GXMVECTOR color)
+void XM_CALLCONV DXTK::DrawAABB(ID3D11DeviceContext* pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, FXMVECTOR minPos, FXMVECTOR maxPos, FXMVECTOR color)
 {
 	BatchEffect->SetWorld(world);
 	BatchEffect->SetView(view);
@@ -108,11 +108,11 @@ void XM_CALLCONV DXTK::DrawAABB(ID3D11DeviceContext* pDeviceContext, FXMMATRIX w
 
 	Batch->Begin();
 
-	static XMFLOAT3 min, max;
+	XMFLOAT3 min, max;
 	XMStoreFloat3(&min, minPos);
 	XMStoreFloat3(&max, maxPos);
 
-	static XMFLOAT4 colorF;
+	XMFLOAT4 colorF;
 	XMStoreFloat4(&colorF, color);
 
 	static const int LINE_NUM_DOUBLE = 24;
@@ -151,7 +151,7 @@ void XM_CALLCONV DXTK::DrawAABB(ID3D11DeviceContext* pDeviceContext, FXMMATRIX w
 	Batch->End();
 }
 
-void XM_CALLCONV DXTK::DrawSphere(ID3D11DeviceContext* pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, FXMVECTOR centerPos, float radius, GXMVECTOR color)
+void XM_CALLCONV DXTK::DrawSphere(ID3D11DeviceContext* pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, FXMVECTOR centerPos, float radius, FXMVECTOR color)
 {
 	BatchEffect->SetWorld(world);
 	BatchEffect->SetView(view);
@@ -164,13 +164,13 @@ void XM_CALLCONV DXTK::DrawSphere(ID3D11DeviceContext* pDeviceContext, FXMMATRIX
 
 	Batch->Begin();
 
-	static XMFLOAT4 colorF;
+	XMFLOAT4 colorF;
 	XMStoreFloat4(&colorF, color);
 
 	static const int CIRCLE_NUM = 3;
 	static const int POINT_NUM = 36;
 
-	VertexPositionColor vertices[CIRCLE_NUM][POINT_NUM];
+	VertexPositionColor vertices[CIRCLE_NUM][POINT_NUM + 1];
 
 	for (int circle = 0; circle < CIRCLE_NUM; ++circle)
 	{
@@ -190,8 +190,8 @@ void XM_CALLCONV DXTK::DrawSphere(ID3D11DeviceContext* pDeviceContext, FXMMATRIX
 			}
 			vertices[circle][point].color = colorF;
 		}
-
-		Batch->Draw(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP, vertices[circle], POINT_NUM);
+		vertices[circle][POINT_NUM] = vertices[circle][0];
+		Batch->Draw(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP, vertices[circle], POINT_NUM + 1);
 	}
 
 	Batch->End();

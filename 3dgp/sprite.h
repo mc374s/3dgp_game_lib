@@ -32,12 +32,12 @@ private:
 	struct PROJECTION_CBUFFER
 	{
 		// TODO : Change to XMFLOAT4X4
-		DirectX::XMMATRIX world;				//ワールド変換行列
-		DirectX::XMMATRIX view;					//ビュー変換行列
-		DirectX::XMMATRIX projection;			//プロジェクション変換行列
-		DirectX::XMMATRIX worldViewProjection;	//ワールド・ビュー・プロジェクション合成行列
-		DirectX::XMFLOAT4 materialColor;		//材質色
-		DirectX::XMFLOAT4 lightDirection;		//ライト進行行列
+		DirectX::XMFLOAT4X4 world;				//ワールド変換行列
+		DirectX::XMFLOAT4X4 view;					//ビュー変換行列
+		DirectX::XMFLOAT4X4 projection;			//プロジェクション変換行列
+		DirectX::XMFLOAT4X4 worldViewProjection;	//ワールド・ビュー・プロジェクション合成行列
+		DirectX::XMFLOAT4	materialColor;		//材質色
+		DirectX::XMFLOAT4	lightDirection;		//ライト進行行列
 	}updateCbuffer;
 
 private:

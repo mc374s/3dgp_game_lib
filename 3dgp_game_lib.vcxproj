@@ -107,10 +107,12 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>.\3dgp\DirectXTK-master\Inc;.\3dgp\FBXSDK\2016.1.2\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>.\3dgp\DirectXTK-master\Bin\Desktop_2015\Win32\Debug;.\3dgp\FBXSDK\2016.1.2\lib\vs2015\x86\debug</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -179,6 +181,7 @@
     <ClInclude Include="Game\scene_title.h" />
     <ClInclude Include="Game\sound_data.h" />
     <ClInclude Include="Game\sprite_data.h" />
+    <ClInclude Include="Game\stage.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="3dgp\3dgp_math.cpp" />
@@ -205,6 +208,7 @@
     <ClCompile Include="Game\scene_title.cpp" />
     <ClCompile Include="Game\sound_data.cpp" />
     <ClCompile Include="Game\sprite_data.cpp" />
+    <ClCompile Include="Game\stage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="3dgp\texture_off.hlsli" />

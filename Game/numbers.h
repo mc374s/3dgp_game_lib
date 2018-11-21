@@ -9,7 +9,7 @@ private:
 	SPRITE_DATA sprData;
 
 public:
-	virtual void memberCopy(const Numbers& inputObj);
+	virtual void MemberCopy(const Numbers& inputObj);
 	//Numbers();
 	Numbers(const Numbers& inputObj);
 	virtual ~Numbers();

@@ -10,7 +10,7 @@ OBJ2D::OBJ2D()
 	Clear();
 }
 
-void OBJ2D::memberCopy(const OBJ2D& inputObj)
+void OBJ2D::MemberCopy(const OBJ2D& inputObj)
 {
 	pos = inputObj.pos;
 	initPos = inputObj.initPos;
@@ -44,7 +44,7 @@ void OBJ2D::memberCopy(const OBJ2D& inputObj)
 
 OBJ2D::OBJ2D(const OBJ2D& inputObj)
 {
-	memberCopy(inputObj);
+	MemberCopy(inputObj);
 }
 
 OBJ2D::~OBJ2D() 
@@ -54,7 +54,7 @@ OBJ2D::~OBJ2D()
 
 const OBJ2D& OBJ2D::operator=(const OBJ2D& right)
 {
-	memberCopy(right);
+	MemberCopy(right);
 	return *this;
 }
 
@@ -102,7 +102,7 @@ void OBJ2D::Draw()
 
 }
 
-int OBJ2D::searchSet(OBJ2D** ppBegin, int max) 
+int OBJ2D::SearchSet(OBJ2D** ppBegin, int max) 
 {
 	for (int i = 0; i < max; i++)
 	{
@@ -123,9 +123,9 @@ OBJ2DEX::OBJ2DEX()
 	Clear();
 }
 
-void OBJ2DEX::memberCopy(const OBJ2DEX& inputObj)
+void OBJ2DEX::MemberCopy(const OBJ2DEX& inputObj)
 {
-	OBJ2D::memberCopy(inputObj);
+	OBJ2D::MemberCopy(inputObj);
 	aframe = inputObj.aframe;
 	animeNO = inputObj.animeNO;
 	animeCounter = inputObj.animeCounter;
@@ -134,7 +134,7 @@ void OBJ2DEX::memberCopy(const OBJ2DEX& inputObj)
 
 OBJ2DEX::OBJ2DEX(const OBJ2DEX& inputObj):OBJ2D(inputObj)
 {
-	memberCopy(inputObj);
+	MemberCopy(inputObj);
 }
 
 OBJ2DEX::~OBJ2DEX()
@@ -144,7 +144,7 @@ OBJ2DEX::~OBJ2DEX()
 
 const OBJ2DEX& OBJ2DEX::operator=(const OBJ2DEX& right)
 {
-	memberCopy(right);
+	MemberCopy(right);
 	return *this;
 }
 

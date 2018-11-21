@@ -19,7 +19,7 @@ public:
 	};
 	struct Bone
 	{
-		DirectX::XMMATRIX transform;
+		DirectX::XMFLOAT4X4 transform;
 	};
 
 	typedef std::vector<BoneInfluence> BoneInfluencesPerContralPoint;
@@ -46,15 +46,15 @@ private:
 	};
 	struct VS_CBUFFER_PROJECTION
 	{
-		DirectX::XMMATRIX world;					//ワールド変換行列
-		DirectX::XMMATRIX view;					//ビュー変換行列
-		DirectX::XMMATRIX projection;			//プロジェクション変換行列
-		DirectX::XMMATRIX worldViewProjection;	//ワールド・ビュー・プロジェクション合成行列
+		DirectX::XMFLOAT4X4 world;					//ワールド変換行列
+		DirectX::XMFLOAT4X4 view;					//ビュー変換行列
+		DirectX::XMFLOAT4X4 projection;				//プロジェクション変換行列
+		DirectX::XMFLOAT4X4 worldViewProjection;	//ワールド・ビュー・プロジェクション合成行列
 		DirectX::XMFLOAT4 materialColor;			//材質色
-		DirectX::XMFLOAT4 lightDirection;		//ライト進行行列
+		DirectX::XMFLOAT4 lightDirection;			//ライト進行行列
 
-		DirectX::XMMATRIX boneTransforms[MAX_BONES]; //ボーン影響変換行列
-	};
+		DirectX::XMFLOAT4X4 boneTransforms[MAX_BONES]; //ボーン影響変換行列
+	}updateCbuffer;
 	struct Material
 	{
 		DirectX::XMFLOAT4 color = { 0.8f,0.8f,0.8f,1.0f };
@@ -71,7 +71,11 @@ private:
 		ID3D11Buffer* vertexBuffer;
 		ID3D11Buffer* indexBuffer;
 		std::vector<Subset> subsetsList;
-		DirectX::XMMATRIX globalTransform = DirectX::XMMatrixIdentity();
+		DirectX::XMFLOAT4X4 globalTransform = {
+			1.f,0,0,0,
+			0,1.f,0,0,
+			0,0,1.f,0,
+			0,0,0,1.f };
 		SkeletalAnimation skeletalAnimation;
 	};
 
@@ -94,7 +98,7 @@ private:
 
 
 	std::vector<Mesh> meshesList;
-	DirectX::XMMATRIX coordinateConversion = {
+	DirectX::XMFLOAT4X4 coordinateConversion = {
 		1.0f, 0.0f, 0.0f, 0.0f,
 		0.0f, 0.0f, 1.0f, 0.0f,
 		0.0f, 1.0f, 0.0f, 0.0f,

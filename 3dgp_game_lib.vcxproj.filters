@@ -110,6 +110,9 @@
     <ClInclude Include="3dgp\directxtk.h">
       <Filter>3dgp\Headers</Filter>
     </ClInclude>
+    <ClInclude Include="Game\stage.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="3dgp\blend.cpp">
@@ -183,6 +186,9 @@
     </ClCompile>
     <ClCompile Include="3dgp\3dgp_math.cpp">
       <Filter>3dgp\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\stage.cpp">
+      <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

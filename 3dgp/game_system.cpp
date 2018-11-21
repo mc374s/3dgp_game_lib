@@ -231,7 +231,9 @@ void XM_CALLCONV MeshData::Draw(FXMVECTOR position, FXMVECTOR scaling, FXMVECTOR
 
 		XMVECTOR rotation = XMQuaternionRotationRollPitchYawFromVector(rotateAdd);
 
+		//XMMATRIX worldXMatrix;
 		world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), scaleMul, g_XMZero, rotation, translation);
+		//XMStoreFloat4x4(&world, worldXMatrix);
 
 		pMeshManager->meshAt(fileNO)->data->Draw(Framework::pDeviceContext, world, GLC::mainCamera.view, GLC::mainCamera.projection, false, frame);
 	}

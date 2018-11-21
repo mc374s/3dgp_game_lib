@@ -11,7 +11,6 @@
 using namespace DirectX::SimpleMath;
 
 
-
 struct Transform
 {
 	Vector3 position;

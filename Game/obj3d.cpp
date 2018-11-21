@@ -8,7 +8,7 @@ OBJ3D::OBJ3D()
 	Clear();
 }
 
-void OBJ3D::memberCopy(const OBJ3D& inputObj)
+void OBJ3D::MemberCopy(const OBJ3D& inputObj)
 {
 	/*initPos = inputObj.initPos;
 	setPos = inputObj.setPos;
@@ -38,7 +38,7 @@ void OBJ3D::memberCopy(const OBJ3D& inputObj)
 
 OBJ3D::OBJ3D(const OBJ3D& inputObj)
 {
-	memberCopy(inputObj);
+	MemberCopy(inputObj);
 }
 
 OBJ3D::~OBJ3D()
@@ -48,7 +48,7 @@ OBJ3D::~OBJ3D()
 
 const OBJ3D& OBJ3D::operator=(const OBJ3D& rhv)
 {
-	memberCopy(rhv);
+	MemberCopy(rhv);
 	return *this;
 }
 
@@ -87,7 +87,7 @@ void OBJ3D::Draw()
 
 }
 
-int OBJ3D::searchSet(OBJ3D** begin, int max)
+int OBJ3D::SearchSet(OBJ3D** begin, int max)
 {
 	for (int i = 0; i < max; i++)
 	{

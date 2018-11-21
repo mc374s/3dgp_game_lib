@@ -14,7 +14,7 @@
 #define P_JUMP_V0 (sqrt(2.0f*P_GF*P_JUMP_HEIGHT))
 
 
-class Player : public OBJ3D
+__declspec(align(16)) class Player : public OBJ3D
 {
 private:
 
@@ -22,6 +22,8 @@ private:
 public:
 
 	int keyCode;
+	AABB size;
+	AABB collision;
 
 	Player();
 	~Player();

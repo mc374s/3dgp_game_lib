@@ -21,7 +21,7 @@ Numbers::Numbers(SPRITE_DATA* pFontData)
 	}
 }
 
-void Numbers::memberCopy(const Numbers& inputObj)
+void Numbers::MemberCopy(const Numbers& inputObj)
 {
 	pos = inputObj.pos;
 	speed = inputObj.speed;
@@ -44,7 +44,7 @@ void Numbers::memberCopy(const Numbers& inputObj)
 
 Numbers::Numbers(const Numbers& inputObj)
 {
-	memberCopy(inputObj);
+	MemberCopy(inputObj);
 }
 
 Numbers::~Numbers()
@@ -54,7 +54,7 @@ Numbers::~Numbers()
 
 const Numbers& Numbers::operator=(const Numbers& right)
 {
-	memberCopy(right);
+	MemberCopy(right);
 	return *this;
 }
 

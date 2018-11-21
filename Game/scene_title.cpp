@@ -108,7 +108,7 @@ void SceneTitle::Draw()
 
 	pBG->Draw();
 	// -210F
-	//e_fbxItemFloor.Draw();
+	e_fbxItemFloor.Draw(DirectX::g_XMZero, DirectX::g_XMOne, DirectX::g_XMZero);
 	//e_fbxItemBox.draw();
 	
 	//static OBJ3D temp = g_player;

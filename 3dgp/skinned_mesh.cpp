@@ -75,7 +75,7 @@ void FetchBoneMatrices(FbxMesh* pFbxMesh, std::vector<SkinnedMesh::Bone> &skelet
 			FbxAMatrix transform = referenceGlobalCurrentPosition.Inverse() * clusterGlobalCurrentPosition * clusterGlobalInitPosition.Inverse()*referenceGlobalInitPosition;
 
 			// Convert FbxAMatrix(transform) to XMFLOAT4X4(bone.transform)
-			bone.transform = XMMatrixSet(
+			bone.transform = XMFLOAT4X4(
 				transform.mData[0][0], transform.mData[0][1], transform.mData[0][2], transform.mData[0][3],
 				transform.mData[1][0], transform.mData[1][1], transform.mData[1][2], transform.mData[1][3],
 				transform.mData[2][0], transform.mData[2][1], transform.mData[2][2], transform.mData[2][3],
@@ -137,7 +137,12 @@ void FetchAnimations(FbxMesh *pFbxMesh, SkinnedMesh::SkeletalAnimation &skeletal
 SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const bool exchangeAxisYwithAxisZ)
 {
 	if (!exchangeAxisYwithAxisZ){
-		coordinateConversion = XMMatrixIdentity();
+		coordinateConversion = {
+			1.0f, 0.0f, 0.0f, 0.0f,
+			0.0f, 1.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 1.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f,
+		};
 	}
 
 	// Create the FBX SDK manager
@@ -232,7 +237,7 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const 
 
 		// Fetch global transform matrix
 		FbxAMatrix globalTransform = pFbxMesh->GetNode()->EvaluateGlobalTransform(0);
-		mesh.globalTransform = XMMatrixSet(
+		mesh.globalTransform = XMFLOAT4X4(
 			globalTransform.mData[0][0], globalTransform.mData[0][1], globalTransform.mData[0][2], globalTransform.mData[0][3],
 			globalTransform.mData[1][0], globalTransform.mData[1][1], globalTransform.mData[1][2], globalTransform.mData[1][3],
 			globalTransform.mData[2][0], globalTransform.mData[2][1], globalTransform.mData[2][2], globalTransform.mData[2][3],
@@ -573,15 +578,15 @@ void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRI
 	worldViewProjection *= view;
 	worldViewProjection *= projection;
 
-	static VS_CBUFFER_PROJECTION updateCbuffer;
-	updateCbuffer.view = view;
-	updateCbuffer.projection = projection;
+	XMStoreFloat4x4(&updateCbuffer.view, view);
+	XMStoreFloat4x4(&updateCbuffer.projection, projection);
 	//static XMVECTOR lightDirection = { 0.0f,0.0f,1.0f,0.0f };
 	//lightDirection = Camera::mainCamera.focusPosition - Camera::mainCamera.eyePosition;
 	updateCbuffer.lightDirection = { XMVectorGetZ(view.r[0]), XMVectorGetZ(view.r[1]), XMVectorGetZ(view.r[2]), 1 };
 	updateCbuffer.materialColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	// Play Fbx Animation	
+	XMMATRIX tansformation;
 	for (Mesh &mesh : meshesList)
 	{
 		if (mesh.skeletalAnimation.size() > 0) {
@@ -606,9 +611,10 @@ void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRI
 			}
 			mesh.skeletalAnimation.animationTick += elapsedTime;
 		}
+		tansformation = XMLoadFloat4x4(&mesh.globalTransform)*XMLoadFloat4x4(&coordinateConversion);
+		XMStoreFloat4x4(&updateCbuffer.world, tansformation*world);
+		XMStoreFloat4x4(&updateCbuffer.worldViewProjection, tansformation*worldViewProjection);
 
-		updateCbuffer.world = mesh.globalTransform*coordinateConversion*world;
-		updateCbuffer.worldViewProjection = mesh.globalTransform*coordinateConversion*worldViewProjection;
 		pDeviceContext->UpdateSubresource(pConstantBuffer, 0, NULL, &updateCbuffer, 0, 0);
 		Draw(pDeviceContext, isWireframe, mesh);
 	}
