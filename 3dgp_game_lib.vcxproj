@@ -171,6 +171,7 @@
     <ClInclude Include="3dgp\sprite.h" />
     <ClInclude Include="3dgp\sprite_string.h" />
     <ClInclude Include="3dgp\template.h" />
+    <ClInclude Include="Game\collision_detection.h" />
     <ClInclude Include="Game\game.h" />
     <ClInclude Include="Game\mesh_data.h" />
     <ClInclude Include="Game\numbers.h" />
@@ -199,6 +200,7 @@
     <ClCompile Include="3dgp\skinned_mesh.cpp" />
     <ClCompile Include="3dgp\sprite.cpp" />
     <ClCompile Include="3dgp\sprite_string.cpp" />
+    <ClCompile Include="Game\collision_detection.cpp" />
     <ClCompile Include="Game\mesh_data.cpp" />
     <ClCompile Include="Game\numbers.cpp" />
     <ClCompile Include="Game\obj2d.cpp" />

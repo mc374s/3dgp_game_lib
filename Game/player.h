@@ -24,6 +24,7 @@ public:
 	int keyCode;
 	AABB size;
 	AABB collision;
+	DirectX::XMVECTOR collisionColor;
 
 	Player();
 	~Player();
@@ -48,6 +49,8 @@ public:
 	void Init();
 	void Update();
 	void Draw();
+
+	void DetectCollision(Collision* other);
 
 };
 

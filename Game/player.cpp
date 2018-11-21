@@ -140,10 +140,10 @@ void Player::Update()
 
 	GLC::mainCamera.upDirection = DirectX::XMVector3Normalize(GLC::mainCamera.upDirection);
 
-	// Update collision position;
+	// Update collision;
 	collision.minPos = Vector3(size.minPos) + transform.position;
 	collision.maxPos = Vector3(size.maxPos) + transform.position;
-	
+	collisionColor = DirectX::Colors::Green;
 }
 
 void Player::Draw()
@@ -158,22 +158,22 @@ void Player::Draw()
 	static XMMATRIX world;
 	world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), g_XMOne, g_XMZero, rotate, XMLoadFloat3(&transform.position));*/
 
-	static AABB testAABB(Vector3(5.0f, 0.0f, -0.2f), Vector3(6.0f, 1.0f, 0.2f));
-	DXTK::DrawAABB(Framework::pDeviceContext, Matrix::Identity, GLC::mainCamera.view, GLC::mainCamera.projection,
-		testAABB.minPos, testAABB.maxPos, DirectX::Colors::Green);
-	static Sphere testSphere(Vector3(-5.0f, 0.0f, -0.2f), 1);
-	DXTK::DrawSphere(Framework::pDeviceContext, Matrix::Identity, GLC::mainCamera.view, GLC::mainCamera.projection,
-		testSphere.center, testSphere.radius,DirectX::Colors::Magenta);
+	//static AABB testAABB(Vector3(5.0f, 0.0f, -0.2f), Vector3(6.0f, 1.0f, 0.2f));
+	//DXTK::DrawAABB(Framework::pDeviceContext, Matrix::Identity, GLC::mainCamera.view, GLC::mainCamera.projection,
+	//	testAABB.minPos, testAABB.maxPos, DirectX::Colors::Green);
+	//static Sphere testSphere(Vector3(-5.0f, 0.0f, -0.2f), 1);
+	//DXTK::DrawSphere(Framework::pDeviceContext, Matrix::Identity, GLC::mainCamera.view, GLC::mainCamera.projection,
+	//	testSphere.center, testSphere.radius,DirectX::Colors::Magenta);
 
-	//collision.minPos = DirectX::XMVector3Transform(size.minPos, world);
-	//collision.maxPos = DirectX::XMVector3Transform(size.maxPos, world);
-	DirectX::XMVECTOR color = DirectX::Colors::Green;
-	if (collision.HitJudgement(&testAABB) || collision.HitJudgement(&testSphere))
-	{
-		color = DirectX::Colors::Red;
-	}
+	////collision.minPos = DirectX::XMVector3Transform(size.minPos, world);
+	////collision.maxPos = DirectX::XMVector3Transform(size.maxPos, world);
+	//DirectX::XMVECTOR color = DirectX::Colors::Green;
+	//if (collision.HitJudgement(&testAABB) || collision.HitJudgement(&testSphere))
+	//{
+	//	color = DirectX::Colors::Red;
+	//}
 	DXTK::DrawAABB(Framework::pDeviceContext, Matrix::Identity, GLC::mainCamera.view, GLC::mainCamera.projection,
-		collision.minPos, collision.maxPos, color);
+		collision.minPos, collision.maxPos, collisionColor);
 
 
 #ifdef DEBUG
@@ -225,5 +225,15 @@ void PlayerManager::Draw()
 	if (pPlayer)
 	{
 		pPlayer->Draw();
+	}
+}
+
+void PlayerManager::DetectCollision(Collision* other)
+{
+	HitResult hitResult = pPlayer->collision.HitJudgement(other);
+	if (hitResult.isHitted)
+	{
+		pPlayer->collisionColor= DirectX::Colors::Red;
+
 	}
 }

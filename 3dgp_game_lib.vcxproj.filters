@@ -113,6 +113,9 @@
     <ClInclude Include="Game\stage.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="Game\collision_detection.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="3dgp\blend.cpp">
@@ -188,6 +191,9 @@
       <Filter>3dgp\Sources</Filter>
     </ClCompile>
     <ClCompile Include="Game\stage.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\collision_detection.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>

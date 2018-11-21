@@ -30,6 +30,12 @@ inline DirectX::XMVECTOR XMConvertUIntToColor(UINTCOLOR inColor)
 	return DirectX::XMLoadFloat4(&rgba);
 }
 
+struct HitResult
+{
+	bool isHitted;
+	DirectX::XMVECTOR direction;
+};
+
 struct Collision
 {
 	enum TYPE {
@@ -39,7 +45,7 @@ struct Collision
 	};
 	int type = _SPHERE;
 
-	virtual bool HitJudgement(const Collision* other);
+	virtual HitResult& HitJudgement(const Collision* other);
 };
 
 struct Sphere :public Collision
@@ -66,10 +72,10 @@ struct AABB :public Collision
 	AABB(DirectX::FXMVECTOR minPos, DirectX::FXMVECTOR maxPos) :minPos(minPos), maxPos(maxPos) { type = _AABB; };
 };
 
-bool XM_CALLCONV SphereHitSphere(DirectX::FXMVECTOR centerA, float radiusA, DirectX::FXMVECTOR centerB, float radiusB);
-bool XM_CALLCONV AABBHitAABB(DirectX::FXMVECTOR minPosA, DirectX::FXMVECTOR maxPosA, DirectX::FXMVECTOR minPosB, DirectX::FXMVECTOR maxPosB);
+HitResult& XM_CALLCONV SphereHitSphere(DirectX::FXMVECTOR centerA, float radiusA, DirectX::FXMVECTOR centerB, float radiusB);
+HitResult& XM_CALLCONV AABBHitAABB(DirectX::FXMVECTOR minPosA, DirectX::FXMVECTOR maxPosA, DirectX::FXMVECTOR minPosB, DirectX::FXMVECTOR maxPosB);
 
-bool XM_CALLCONV SphereHitAABB(DirectX::FXMVECTOR centerA, float radiusA, DirectX::FXMVECTOR minPosB, DirectX::FXMVECTOR maxPosB);
+HitResult& XM_CALLCONV SphereHitAABB(DirectX::FXMVECTOR centerA, float radiusA, DirectX::FXMVECTOR minPosB, DirectX::FXMVECTOR maxPosB);
 
 
 

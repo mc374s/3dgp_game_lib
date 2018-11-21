@@ -13,7 +13,7 @@
 #include "player.h"
 
 #include "stage.h"
-
+#include "collision_detection.h"
 
 //void loadTextureProgress()
 //{
@@ -63,8 +63,7 @@ SceneTitle::SceneTitle()
 	loadThread.detach();
 
 	pPlayerManager->Init();
-	Game::mainStage.Init();
-
+	pMainStage->Init();
 
 }
 
@@ -96,6 +95,7 @@ void SceneTitle::Update()
 		}
 
 		pPlayerManager->Update();
+		Game::DetectAllCollision();
 
 		break;
 	default:
@@ -119,8 +119,8 @@ void SceneTitle::Draw()
 
 	// -60F
 	pPlayerManager->Draw();
-	Game::mainStage.Draw();
-
+	pMainStage->Draw();
+	
 
 
 #ifdef  DEBUG

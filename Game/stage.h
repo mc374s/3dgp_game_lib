@@ -15,7 +15,7 @@ private:
 public:
 	Stage();
 	~Stage();
-	
+
 	std::vector<OBJ3D> pObjList;
 	std::vector<Collision*> pCollisionList;
 
@@ -23,10 +23,15 @@ public:
 	void Update();
 	void Draw();
 
+
+	static Stage* GetInstance() {
+		static Stage instance;
+		return &instance;
+	};
 };
 
-extern Stage mainStage;
+#define pMainStage (Game::Stage::GetInstance())
 
-}
+};
 
 #endif // !_STAGE_H_

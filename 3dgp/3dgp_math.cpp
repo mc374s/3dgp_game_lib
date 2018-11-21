@@ -2,68 +2,106 @@
 
 using namespace DirectX;
 
-bool Collision::HitJudgement(const Collision* other)
+HitResult& Collision::HitJudgement(const Collision* other)
 {
-	bool isHitted = false;
+	HitResult hitResult;
+	int directionAdjustion = 1;
 	const Collision* A = this;
 	const Collision* B = other;
 	switch (type | other->type)
 	{
 	case _SPHERE | _SPHERE:
-		isHitted = SphereHitSphere(((Sphere*)this)->center, ((Sphere*)this)->radius, ((Sphere*)other)->center, ((Sphere*)other)->radius);
+		hitResult = SphereHitSphere(((Sphere*)this)->center, ((Sphere*)this)->radius, ((Sphere*)other)->center, ((Sphere*)other)->radius);
 		break;
 	case _SPHERE | _AABB:
 		if (type == _AABB)
 		{
 			A = other;
 			B = this;
+			directionAdjustion = -1;
 		}
-		isHitted = SphereHitAABB(((Sphere*)A)->center, ((Sphere*)A)->radius, ((AABB*)B)->minPos, ((AABB*)B)->maxPos);
+		hitResult = SphereHitAABB(((Sphere*)A)->center, ((Sphere*)A)->radius, ((AABB*)B)->minPos, ((AABB*)B)->maxPos);
 		break;
 	case _AABB | _AABB:
-		isHitted = AABBHitAABB(((AABB*)this)->minPos, ((AABB*)this)->maxPos, ((AABB*)other)->minPos, ((AABB*)other)->maxPos);
+		hitResult = AABBHitAABB(((AABB*)this)->minPos, ((AABB*)this)->maxPos, ((AABB*)other)->minPos, ((AABB*)other)->maxPos);
 		break;
 	default:
 		break;
 	}
-	
-	return isHitted;
+
+	hitResult.direction *= directionAdjustion;
+	return hitResult;
 }
 
-bool XM_CALLCONV SphereHitSphere(DirectX::FXMVECTOR centerA, float radiusA, DirectX::FXMVECTOR centerB, float radiusB)
+HitResult& XM_CALLCONV SphereHitSphere(DirectX::FXMVECTOR centerA, float radiusA, DirectX::FXMVECTOR centerB, float radiusB)
 {
+	HitResult hitResult;
+	hitResult.direction = XMVector3Normalize(XMVectorSubtract(centerB, centerA));
+
 	if (XMVectorGetX(XMVector3Length(centerB - centerA)) > radiusA + radiusB)
 	{
-		return false;
+		hitResult.isHitted = false;
 	}
 	else
 	{
-		return true;
+		hitResult.isHitted = true;
 	}
+
+	return hitResult;
 }
 
-bool XM_CALLCONV AABBHitAABB(DirectX::FXMVECTOR minPosA, DirectX::FXMVECTOR maxPosA, DirectX::FXMVECTOR minPosB, DirectX::FXMVECTOR maxPosB)
+HitResult& XM_CALLCONV AABBHitAABB(DirectX::FXMVECTOR minPosA, DirectX::FXMVECTOR maxPosA, DirectX::FXMVECTOR minPosB, DirectX::FXMVECTOR maxPosB)
 {
+	HitResult hitResult;
 	XMFLOAT3 minA, maxA, minB, maxB;
 	XMStoreFloat3(&minA, minPosA);
 	XMStoreFloat3(&maxA, maxPosA);
 	XMStoreFloat3(&minB, minPosB);
 	XMStoreFloat3(&maxB, maxPosB);
-	if (minA.x > maxB.x) return false;
-	if (maxA.x < minB.x) return false;
-	if (minA.y > maxB.y) return false;
-	if (maxA.y < minB.y) return false;
-	if (minA.z > maxB.z) return false;
-	if (maxA.z < minB.z) return false;
-	return true;
+
+	XMVECTOR centerA = (minPosA + maxPosA)*0.5f, centerB = (minPosB + maxPosB)*0.5f;
+	hitResult.direction = XMVector3Normalize(XMVectorSubtract(centerB, centerA));
+
+	hitResult.isHitted = false;
+	if (minA.x > maxB.x)
+	{
+		return hitResult;
+	}
+	if (maxA.x < minB.x)
+	{
+		return hitResult;
+	}
+	if (minA.y > maxB.y)
+	{
+		return hitResult;
+	}
+	if (maxA.y < minB.y)
+	{
+		return hitResult;
+	}
+	if (minA.z > maxB.z)
+	{
+		return hitResult;
+	}
+	if (maxA.z < minB.z)
+	{
+		return hitResult;
+	}
+	hitResult.isHitted = true;
+	return hitResult;
 }
 
-bool XM_CALLCONV SphereHitAABB(DirectX::FXMVECTOR centerA, float radiusA, DirectX::FXMVECTOR minPosB, DirectX::FXMVECTOR maxPosB)
+HitResult& XM_CALLCONV SphereHitAABB(DirectX::FXMVECTOR centerA, float radiusA, DirectX::FXMVECTOR minPosB, DirectX::FXMVECTOR maxPosB)
 {
+	HitResult hitResult;
 	XMFLOAT3 center, minB, maxB;
 	XMStoreFloat3(&center, centerA);
 	XMStoreFloat3(&minB, minPosB);
 	XMStoreFloat3(&maxB, maxPosB);
+
+	XMVECTOR centerB = (minPosB + maxPosB)*0.5f;
+	hitResult.direction = XMVector3Normalize(XMVectorSubtract(centerB, centerA));
+	hitResult.isHitted = false;
 
 	XMFLOAT3 closestPoint(0, 0, 0); // Should be Setting to AABB's Surface 
 	closestPoint = center;
@@ -87,7 +125,8 @@ bool XM_CALLCONV SphereHitAABB(DirectX::FXMVECTOR centerA, float radiusA, Direct
 	}
 	// Distance of closestPoint and Sphere's center Bigger then Shpere's radius, not hitted
 	if (XMVectorGetX(XMVector3Length(XMVectorSubtract(XMLoadFloat3(&closestPoint), centerA))) > radiusA) {
-		return false;
+		return hitResult;
 	}
-	return true;
+	hitResult.isHitted = true;
+	return hitResult;
 }
