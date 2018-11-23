@@ -24,7 +24,9 @@ public:
 	int keyCode;
 	AABB size;
 	AABB collision;
-	DirectX::XMVECTOR collisionColor;
+	Vector4 collisionColor;
+	Vector3 oldPos;
+	Vector3 moveDirection;
 
 	Player();
 	~Player();

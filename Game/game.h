@@ -35,7 +35,7 @@ struct Transform
 
 #define DEBUG
 
-#define GROUND_HEIGHT (600)
+#define RESET_HEIGHT (-10)
 
 
 #define CAMERA_BEST_DISTANCE (0.66f)

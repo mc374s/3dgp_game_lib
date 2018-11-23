@@ -19,8 +19,11 @@ void Player::Init()
 	speedMax.x = P_WALK_SPEED_MAX;
 	meshData = &e_fbxPlayerWalk;
 
-	size.minPos = Vector3(-0.4f, 0, -0.2f);
-	size.maxPos = Vector3(0.4f, 1.64f, 0.2f);
+	//size = AABB(Vector3(0, 1.64f*0.5f, 0), Vector3(0.4f, 1.64f, 0.4f));
+	//size.center = Vector3(0, 1.64f*0.5f, 0);
+	//size.size = Vector3(0.4f, 1.64f, 0.4f);
+	size.minPos = Vector3(-0.2f, 0, -0.2f);
+	size.maxPos = Vector3(0.2f, 1.64f, 0.2f);
 	collision = size;
 
 }
@@ -28,6 +31,8 @@ void Player::Init()
 void Player::Update()
 {
 	keyCode = BasicInput();
+
+	oldPos = transform.position;
 
 	switch (keyCode & (PAD_LEFT | PAD_RIGHT))
 	{
@@ -75,6 +80,7 @@ void Player::Update()
 	if (frame > 0)
 	{
 		++frame;
+		// PreMotion, Stop Forward movement
 		if (frame < 24)
 		{
 			transform.position.x -= speed.x;
@@ -83,14 +89,17 @@ void Player::Update()
 		{
 			speed.y += P_JUMP_V0;
 		}
+		// Jumping
 		if (frame > 36 && speed.y > 0)
 		{
 			frame = 36;
 		}
+		// Dropping
 		if (frame > 60 && speed.y < 0)
 		{
 			frame = 60;
 		}
+		// Ending Jump, Also stop forward movement
 		if (frame > 72)
 		{
 			transform.position.x -= speed.x;
@@ -105,9 +114,9 @@ void Player::Update()
 	speed.y -= P_GF;
 	transform.position.y += speed.y;
 
-	if (transform.position.y < 0)
+	if (transform.position.y < RESET_HEIGHT)
 	{
-		transform.position.y = 0;
+		transform.position = Vector3::Zero;
 		speed.y = 0;
 	}
 
@@ -144,6 +153,9 @@ void Player::Update()
 	collision.minPos = Vector3(size.minPos) + transform.position;
 	collision.maxPos = Vector3(size.maxPos) + transform.position;
 	collisionColor = DirectX::Colors::Green;
+
+	moveDirection = transform.position - oldPos;
+	moveDirection.Normalize();
 }
 
 void Player::Draw()
@@ -178,9 +190,9 @@ void Player::Draw()
 
 #ifdef DEBUG
 	char buf[256];
-	sprintf_s(buf, "Player:\nPosX:%lf \nPosY:%lf \nPosZ:%lf \n",
-		transform.position.x, transform.position.y, transform.position.z);
-	DrawString(0, 300, buf);
+	sprintf_s(buf, "Player:\nPosX:%lf \nPosY:%lf \nPosZ:%lf \n SpeedX:%lf \nSpeedY:%lf \nSpeedZ:%lf \n",
+		transform.position.x, transform.position.y, transform.position.z, speed.x, speed.y, speed.z);
+	DrawString(0, 300, buf, 0xFFFFFFFF, STR_LEFT, 16, 16);
 
 #endif // DEBUG
 
@@ -231,9 +243,36 @@ void PlayerManager::Draw()
 void PlayerManager::DetectCollision(Collision* other)
 {
 	HitResult hitResult = pPlayer->collision.HitJudgement(other);
+	// 衝突したらプレイヤーを判定相手から外へ押し出し
 	if (hitResult.isHitted)
 	{
 		pPlayer->collisionColor= DirectX::Colors::Red;
-
+		//static Vector3 size = Vector3(pPlayer->size.maxPos) - Vector3(pPlayer->size.minPos);
+		//static float disFromCenterToVertex = size.x*size.x + size.y*size.y;
+		Vector2 direction = Vector2(Vector3(pPlayer->size.maxPos) - Vector3(pPlayer->size.minPos));
+		direction.Normalize();
+		static float dotRangeUpAndDown = -fabsf(Vector2::UnitY.Dot(direction));
+		static float dotRangeLeftAndRight = -fabsf(Vector2::UnitX.Dot(direction));
+		
+		if (Vector3::Left.Dot(hitResult.direction) < dotRangeLeftAndRight && Vector3::Left.Dot(pPlayer->moveDirection) < 0)
+		{
+			pPlayer->speed.x = 0;
+			pPlayer->transform.position.x = Vector3(hitResult.closestPoint).x - Vector3(pPlayer->size.maxPos).x/* - 0.001f*/;
+		}
+		else if (Vector3::Right.Dot(hitResult.direction) < dotRangeLeftAndRight && Vector3::Right.Dot(pPlayer->moveDirection) < 0)
+		{
+			pPlayer->speed.x = 0;
+			pPlayer->transform.position.x = Vector3(hitResult.closestPoint).x + Vector3(pPlayer->size.maxPos).x/* + 0.001f*/;
+		}
+		else if (Vector3::Up.Dot(hitResult.direction) < dotRangeUpAndDown && Vector3::Up.Dot(pPlayer->moveDirection) < 0)
+		{
+			pPlayer->speed.y = 0;
+			pPlayer->transform.position.y = Vector3(hitResult.closestPoint).y/* + 0.001f*/;
+		}
+		else if (Vector3::Down.Dot(hitResult.direction) < dotRangeUpAndDown && Vector3::Down.Dot(pPlayer->moveDirection) < 0)
+		{
+			pPlayer->speed.y = 0;
+			pPlayer->transform.position.y = Vector3(hitResult.closestPoint).y - Vector3(DirectX::XMVectorSubtract(pPlayer->size.maxPos, pPlayer->size.minPos)).y/* - 0.001f*/;
+		}
 	}
 }

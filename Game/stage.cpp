@@ -38,6 +38,7 @@ struct StageData {
 
 
 StageData stageData[] = {
+	StageData(nullptr,	Vector3(0,0,0),		&AABB(Vector3(-20,-0.2f,-20), Vector3(20,0,20))),
 	StageData(nullptr,	Vector3(5,1,0),		&AABB(Vector3(2.5f,1,-1), Vector3(7.5f,1.2f,1))),
 	StageData(nullptr,	Vector3(-5,2,0),	&AABB(Vector3(-7.5f,2,-1), Vector3(-2.5f,2.2f,1))),
 	StageData(nullptr,	Vector3(10,2,0),	&AABB(Vector3(7.5,2,-1), Vector3(12.5f,2.2f,1))),

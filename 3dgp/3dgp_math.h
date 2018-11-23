@@ -34,6 +34,7 @@ struct HitResult
 {
 	bool isHitted;
 	DirectX::XMVECTOR direction;
+	DirectX::XMVECTOR closestPoint;
 };
 
 struct Collision
@@ -68,8 +69,19 @@ struct AABB :public Collision
 {
 	DirectX::XMVECTOR minPos;
 	DirectX::XMVECTOR maxPos;
+	//DirectX::XMVECTOR center;
+	//DirectX::XMFLOAT3 size;
 	AABB() { type = _AABB; };
-	AABB(DirectX::FXMVECTOR minPos, DirectX::FXMVECTOR maxPos) :minPos(minPos), maxPos(maxPos) { type = _AABB; };
+	AABB(DirectX::FXMVECTOR minPos, DirectX::FXMVECTOR maxPos) :minPos(minPos), maxPos(maxPos) { 
+		type = _AABB;
+		//center = (minPos + maxPos)*0.5f;
+		//DirectX::XMStoreFloat3(&size, (maxPos - minPos));
+	};
+	//AABB(DirectX::FXMVECTOR center, DirectX::XMFLOAT3 size) :center(center), size(size) {
+	//	type = _AABB;
+	//	minPos = center - XMLoadFloat3(&size)*0.5f;
+	//	maxPos = center + XMLoadFloat3(&size)*0.5f;
+	//};
 };
 
 HitResult& XM_CALLCONV SphereHitSphere(DirectX::FXMVECTOR centerA, float radiusA, DirectX::FXMVECTOR centerB, float radiusB);

@@ -36,7 +36,6 @@ HitResult& Collision::HitJudgement(const Collision* other)
 HitResult& XM_CALLCONV SphereHitSphere(DirectX::FXMVECTOR centerA, float radiusA, DirectX::FXMVECTOR centerB, float radiusB)
 {
 	HitResult hitResult;
-	hitResult.direction = XMVector3Normalize(XMVectorSubtract(centerB, centerA));
 
 	if (XMVectorGetX(XMVector3Length(centerB - centerA)) > radiusA + radiusB)
 	{
@@ -46,6 +45,8 @@ HitResult& XM_CALLCONV SphereHitSphere(DirectX::FXMVECTOR centerA, float radiusA
 	{
 		hitResult.isHitted = true;
 	}
+	hitResult.direction = XMVector3Normalize(XMVectorSubtract(centerB, centerA));
+	hitResult.closestPoint = centerB - hitResult.direction*radiusB;
 
 	return hitResult;
 }
@@ -59,8 +60,30 @@ HitResult& XM_CALLCONV AABBHitAABB(DirectX::FXMVECTOR minPosA, DirectX::FXMVECTO
 	XMStoreFloat3(&minB, minPosB);
 	XMStoreFloat3(&maxB, maxPosB);
 
-	XMVECTOR centerA = (minPosA + maxPosA)*0.5f, centerB = (minPosB + maxPosB)*0.5f;
-	hitResult.direction = XMVector3Normalize(XMVectorSubtract(centerB, centerA));
+	XMVECTOR centerA = (minPosA + maxPosA)*0.5f;
+
+	XMFLOAT3 closestPoint(0, 0, 0); // Should be Setting to AABB's Surface 
+	XMStoreFloat3(&closestPoint, centerA);
+	if (closestPoint.x < minB.x) {
+		closestPoint.x = minB.x;
+	}
+	if (closestPoint.x > maxB.x) {
+		closestPoint.x = maxB.x;
+	}
+	if (closestPoint.y < minB.y) {
+		closestPoint.y = minB.y;
+	}
+	if (closestPoint.y > maxB.y) {
+		closestPoint.y = maxB.y;
+	}
+	if (closestPoint.z < minB.z) {
+		closestPoint.z = minB.z;
+	}
+	if (closestPoint.z > maxB.z) {
+		closestPoint.z = maxB.z;
+	}
+	hitResult.closestPoint = XMLoadFloat3(&closestPoint);
+	hitResult.direction = XMVector3Normalize(XMVectorSubtract(hitResult.closestPoint, centerA));
 
 	hitResult.isHitted = false;
 	if (minA.x > maxB.x)
@@ -94,17 +117,14 @@ HitResult& XM_CALLCONV AABBHitAABB(DirectX::FXMVECTOR minPosA, DirectX::FXMVECTO
 HitResult& XM_CALLCONV SphereHitAABB(DirectX::FXMVECTOR centerA, float radiusA, DirectX::FXMVECTOR minPosB, DirectX::FXMVECTOR maxPosB)
 {
 	HitResult hitResult;
-	XMFLOAT3 center, minB, maxB;
-	XMStoreFloat3(&center, centerA);
+	XMFLOAT3 minB, maxB;
 	XMStoreFloat3(&minB, minPosB);
 	XMStoreFloat3(&maxB, maxPosB);
 
-	XMVECTOR centerB = (minPosB + maxPosB)*0.5f;
-	hitResult.direction = XMVector3Normalize(XMVectorSubtract(centerB, centerA));
 	hitResult.isHitted = false;
 
 	XMFLOAT3 closestPoint(0, 0, 0); // Should be Setting to AABB's Surface 
-	closestPoint = center;
+	XMStoreFloat3(&closestPoint, centerA);
 	if (closestPoint.x < minB.x) {
 		closestPoint.x = minB.x;
 	}
@@ -123,10 +143,14 @@ HitResult& XM_CALLCONV SphereHitAABB(DirectX::FXMVECTOR centerA, float radiusA, 
 	if (closestPoint.z > maxB.z) {
 		closestPoint.z = maxB.z;
 	}
+
+	hitResult.closestPoint = XMLoadFloat3(&closestPoint);
+	hitResult.direction = XMVector3Normalize(XMVectorSubtract(hitResult.closestPoint, centerA));
+
+
 	// Distance of closestPoint and Sphere's center Bigger then Shpere's radius, not hitted
-	if (XMVectorGetX(XMVector3Length(XMVectorSubtract(XMLoadFloat3(&closestPoint), centerA))) > radiusA) {
-		return hitResult;
+	if (XMVectorGetX(XMVector3Length(XMVectorSubtract(hitResult.closestPoint, centerA))) <= radiusA) {
+		hitResult.isHitted = true;
 	}
-	hitResult.isHitted = true;
 	return hitResult;
 }
