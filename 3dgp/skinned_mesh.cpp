@@ -581,7 +581,7 @@ void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRI
 	//static XMVECTOR lightDirection = { 0.0f,0.0f,1.0f,0.0f };
 	//lightDirection = Camera::mainCamera.focusPosition - Camera::mainCamera.eyePosition;
 	updateCbuffer.lightDirection = { XMVectorGetZ(view.r[0]), XMVectorGetZ(view.r[1]), XMVectorGetZ(view.r[2]), 1 };
-	updateCbuffer.materialColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 0.5f);
+	updateCbuffer.materialColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.5f);
 
 	// Play Fbx Animation	
 	XMMATRIX tansformation;

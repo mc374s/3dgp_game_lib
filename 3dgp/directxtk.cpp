@@ -50,7 +50,7 @@ void XM_CALLCONV DXTK::DrawGrid(ID3D11DeviceContext* pDeviceContext, FXMMATRIX w
 	BatchEffect->Apply(pDeviceContext);
 
 	pDeviceContext->IASetInputLayout(pBatchInputLayout);
-	//pDeviceContext->OMSetDepthStencilState(States->DepthDefault(), 1);
+	pDeviceContext->OMSetDepthStencilState(States->DepthDefault(), 1);
 
 	Batch->Begin();
 

@@ -28,7 +28,7 @@ void OBJ3D::MemberCopy(const OBJ3D& inputObj)
 	meshData = inputObj.meshData;
 	moveFunc = inputObj.moveFunc;
 
-	isHitAble = inputObj.isHitAble;*/
+	isHitable = inputObj.isHitable;*/
 
 	memcpy(this, &inputObj, sizeof(OBJ3D));
 	meshData = inputObj.meshData;

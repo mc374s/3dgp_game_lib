@@ -485,20 +485,6 @@ void Framework::Draw(float elapsed_time/*Elapsed seconds from last frame*/)
 
 	MyBlending::setMode(pDeviceContext, BLEND_NONE);
 
-	pDeviceContext->OMSetDepthStencilState(pDepthStencilState, 1);
-	const XMVECTORF32 xaxis = { 20.f, 0.f, 0.f };
-	const XMVECTORF32 yaxis = { 0.f, 0.f, 20.f };
-	DXTK::DrawGrid(pDeviceContext, XMMatrixIdentity(), mainCamera.view, mainCamera.projection, xaxis, yaxis, g_XMZero, 20, 20, Colors::Gray);
-
-	const XMVECTORF32 minPos = { -0.5f, 0.0f, 0.5f };
-	const XMVECTORF32 maxPos = { 0.5f, 1.64f, -0.5f };
-	//DXTK::DrawAABB(pDeviceContext, XMMatrixIdentity(), mainCamera.view, mainCamera.projection, minPos, maxPos, Colors::Green);
-
-
-	//pPrimitive3D[0]->Draw(s_pDeviceContext, XMMatrixIdentity(), XMFLOAT3(2.0f, 0.01f, 0.01f), 0xFF0000FF);
-	//pPrimitive3D[0]->Draw(s_pDeviceContext, XMMatrixIdentity(), XMFLOAT3(0.01f, 2.0f, 0.01f), 0x00FF00FF);
-	//spPrimitive3D[0]->Draw(s_pDeviceContext, XMMatrixIdentity(), XMFLOAT3(0.01f, 0.01f, 2.0f), 0x0000FFFF);
-
 	// -5F
 	char buf[256];
 	sprintf_s(buf, "mainCamera: \nPosX: %f \nPosY: %f \nPosZ: %lf \nDistance: %f \n",

@@ -59,10 +59,10 @@ struct Sphere :public Collision
 
 struct Plane :public Collision
 {
-	DirectX::XMVECTOR direction;
+	DirectX::XMVECTOR normal;
 	float disToOrigin;
 	Plane();
-	Plane(DirectX::FXMVECTOR direction, float disToOrigin) :direction(direction), disToOrigin(disToOrigin) { type = _PLANE; };
+	Plane(DirectX::FXMVECTOR normal, float disToOrigin) :normal(normal), disToOrigin(disToOrigin) { type = _PLANE; };
 };
 
 struct AABB :public Collision

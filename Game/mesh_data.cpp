@@ -4,7 +4,7 @@
 MeshFile e_sequencedFbxFiles[] = {
 	{ PLAYER_WALK,			"./Data/FbxFiles/walk_meter.fbx" },
 	//{ PLAYER_RUN,			"./Data/FbxFiles/run.fbx" },
-	{ PLAYER_JUMP,			"./Data/FbxFiles/jump2.fbx" },
+	//{ PLAYER_JUMP,			"./Data/FbxFiles/jump2.fbx" },
 
 	//{ ITEM_SWORD,			"./Data/FbxFiles/sword.fbx" },
 	//{ ITEM_FLOOR,			"./Data/FbxFiles/street_meter.fbx" },

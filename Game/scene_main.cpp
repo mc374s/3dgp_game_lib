@@ -1,13 +1,22 @@
-﻿#include "game.h"
+﻿#include "scene_main.h"
+
+#include "game.h"
 #include "sprite_data.h"
 #include "sound_data.h"
 #include "obj2d.h"
 
 #include "scene_title.h"
 
-#include "scene_main.h"
+#include "mesh_data.h"
 
-float SCROLL_Y = 0;
+#include "player.h"
+
+#include "stage.h"
+#include "collision_detection.h"
+
+#include "skill_construction.h"
+
+
 
 SceneMain::SceneMain()
 {
@@ -16,11 +25,17 @@ SceneMain::SceneMain()
 	pBG->pSprData = &e_sprMainBG;
 	pBG->transform2D.scaleX = pBG->transform2D.scaleY = 1280.0f / 1920.0f;
 
+	skillConstructPanel = new SkillConstructionPanel;
+	isPanelVisible = false;
+
 }
 
 void SceneMain::Init()
 {
 	Scene::Init();
+
+	pPlayerManager->Init();
+	pMainStage->Init();
 }
 
 SceneMain::~SceneMain()
@@ -31,12 +46,16 @@ SceneMain::~SceneMain()
 		pNextScene = nullptr;
 	}
 	SAFE_DELETE(pBG);
+	SAFE_DELETE(skillConstructPanel)
 };
 
 void SceneMain::Update()
 {	
 	if (pause()){
 		return;
+	}
+	if (Input::KEY_TRACKER.pressed.P) {
+		isPanelVisible = !isPanelVisible;
 	}
 
 	switch (step)
@@ -56,6 +75,12 @@ void SceneMain::Update()
 			changeScene(SCENE_TITLE);
 			break;
 		}
+
+
+		pPlayerManager->Update();
+		Game::DetectAllCollision();
+
+
 		break;
 	case STEP::END:
 		timer++;
@@ -71,7 +96,26 @@ void SceneMain::Draw()
 {
 	View::Clear();
 
+
+
 	pBG->Draw();
+
+	// -210F
+	e_fbxItemFloor.Draw(DirectX::g_XMZero, DirectX::g_XMOne, DirectX::g_XMZero);
+	//e_fbxItemBox.draw();
+
+	//static OBJ3D temp = g_player;
+
+
+
+	// -60F
+	pPlayerManager->Draw();
+	pMainStage->Draw();
+
+
+	if (isPanelVisible && skillConstructPanel) {
+		skillConstructPanel->Draw();
+	}
 
 
 #ifdef  DEBUG

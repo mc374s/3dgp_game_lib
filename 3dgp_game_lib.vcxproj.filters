@@ -116,6 +116,9 @@
     <ClInclude Include="Game\collision_detection.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="Game\skill_construction.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="3dgp\blend.cpp">
@@ -194,6 +197,9 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Game\collision_detection.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\skill_construction.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>

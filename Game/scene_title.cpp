@@ -6,14 +6,9 @@
 #include "obj2d.h"
 #include "scene_main.h"
 
-#include "mesh_data.h"
-
 #include <thread>
 
-#include "player.h"
-
-#include "stage.h"
-#include "collision_detection.h"
+#include "mesh_data.h"
 
 //void loadTextureProgress()
 //{
@@ -62,8 +57,8 @@ SceneTitle::SceneTitle()
 	std::thread loadThread(loadMeshesProgress, nullptr, &progress);
 	loadThread.detach();
 
-	pPlayerManager->Init();
-	pMainStage->Init();
+	changeScene(SCENE_MAIN);
+
 
 }
 
@@ -94,8 +89,6 @@ void SceneTitle::Update()
 			break;
 		}
 
-		pPlayerManager->Update();
-		Game::DetectAllCollision();
 
 		break;
 	default:
@@ -107,19 +100,7 @@ void SceneTitle::Update()
 void SceneTitle::Draw()
 {
 	View::Clear();
-
 	pBG->Draw();
-	// -210F
-	e_fbxItemFloor.Draw(DirectX::g_XMZero, DirectX::g_XMOne, DirectX::g_XMZero);
-	//e_fbxItemBox.draw();
-	
-	//static OBJ3D temp = g_player;
-
-
-
-	// -60F
-	pPlayerManager->Draw();
-	pMainStage->Draw();
 	
 
 

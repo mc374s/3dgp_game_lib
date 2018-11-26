@@ -71,6 +71,20 @@ Sprite::Sprite(ID3D11Device* pDevice)
 
 	pShaderResourceView = NULL;
 
+	// create depth stencil state
+	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
+	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
+	depthStencilDesc.DepthEnable = FALSE;
+	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+
+	hr = pDevice->CreateDepthStencilState(&depthStencilDesc, &pDepthStencilState);
+	if (FAILED(hr))
+	{
+		MessageBox(0, L"Create DepthStencilState failed", L"Sprite::Initialize", 0);
+		return;
+	}
+
 }
 
 

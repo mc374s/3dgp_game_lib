@@ -25,7 +25,7 @@ public:
 	Vector3 speedMax;
 
 	Vector3 size;
-	bool isHitAble;
+	bool isHitable;
 
 	Transform2D transform2D;
 	Transform transform;

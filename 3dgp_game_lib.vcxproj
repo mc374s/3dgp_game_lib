@@ -180,6 +180,7 @@
     <ClInclude Include="Game\player.h" />
     <ClInclude Include="Game\scene_main.h" />
     <ClInclude Include="Game\scene_title.h" />
+    <ClInclude Include="Game\skill_construction.h" />
     <ClInclude Include="Game\sound_data.h" />
     <ClInclude Include="Game\sprite_data.h" />
     <ClInclude Include="Game\stage.h" />
@@ -208,6 +209,7 @@
     <ClCompile Include="Game\player.cpp" />
     <ClCompile Include="Game\scene_main.cpp" />
     <ClCompile Include="Game\scene_title.cpp" />
+    <ClCompile Include="Game\skill_construction.cpp" />
     <ClCompile Include="Game\sound_data.cpp" />
     <ClCompile Include="Game\sprite_data.cpp" />
     <ClCompile Include="Game\stage.cpp" />

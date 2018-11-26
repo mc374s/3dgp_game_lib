@@ -75,6 +75,11 @@ void Stage::Update()
 
 void Stage::Draw()
 {
+
+	const DirectX::XMVECTORF32 xaxis = { 20.f, 0.f, 0.f };
+	const DirectX::XMVECTORF32 yaxis = { 0.f, 0.f, 20.f };
+	DXTK::DrawGrid(Framework::pDeviceContext, DirectX::XMMatrixIdentity(), GLC::mainCamera.view, GLC::mainCamera.projection,
+		xaxis, yaxis, DirectX::g_XMZero, 20, 20, DirectX::Colors::Gray);
 	for (auto &it : pObjList)
 	{
 		it.Draw();

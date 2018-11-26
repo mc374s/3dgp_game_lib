@@ -32,7 +32,7 @@ void OBJ2D::MemberCopy(const OBJ2D& inputObj)
 	pfMove = inputObj.pfMove;
 
 	setAlpha = inputObj.setAlpha;
-	isHitAble = inputObj.isHitAble;
+	isHitable = inputObj.isHitable;
 
 	//memcpy(this, &inputObj, sizeof(OBJ2D));
 	//pSprData = inputObj.pSprData;
@@ -96,7 +96,6 @@ void OBJ2D::Draw()
 		//pSprData->draw(pos.x, pos.y, &transform2D);
 		pSprData->Draw(pos, transform2D, transform.position, transform.rotationDegree);
 	}
-
 }
 
 int OBJ2D::SearchSet(OBJ2D** ppBegin, int max) 

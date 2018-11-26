@@ -22,7 +22,7 @@ public:
 	
 
 	Vector3 size;
-	bool isHitAble;
+	bool isHitable;
 
 	Transform transform;
 	Matrix world;
