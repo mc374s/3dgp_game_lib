@@ -17,8 +17,7 @@ void Player::Init()
 	Clear();
 	speedAcc.x = P_WALK_SPEED;
 	speedMax.x = P_WALK_SPEED_MAX;
-	meshData = &fbxPlayerModel;
-	//meshData->animation = &fbxPlayerStandby;
+	meshData = &fbxPlayerStandby;
 	moveFunc = &Player::Standby;
 
 	//size = AABB(Vector3(0, 1.64f*0.5f, 0), Vector3(0.4f, 1.64f, 0.4f));
@@ -148,7 +147,7 @@ void Player::Standby()
 	switch (step) {
 	case STEP::INIT:
 		frame = 0;
-		meshData->animation = &fbxPlayerRun;
+		meshData = &fbxPlayerStandby;
 		speed = Vector3(0, 0, 0);
 		step = STEP::BEGIN;
 		//break;
@@ -165,7 +164,7 @@ void Player::Run()
 	switch (step) {
 	case STEP::INIT:
 		moveFunc = &Player::Run;
-		meshData->animation = &fbxPlayerRun;
+		meshData = &fbxPlayerRun;
 		frame = 0;
 		step = STEP::BEGIN;
 		//break
@@ -224,7 +223,7 @@ void Player::Jump()
 	switch (step) {
 	case STEP::INIT:
 		moveFunc = &Player::Jump;
-		meshData->animation = &fbxPlayerJump;
+		meshData = &fbxPlayerJump;
 		frame = 0;
 		step = STEP::BEGIN;
 		//break;

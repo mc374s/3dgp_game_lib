@@ -568,7 +568,7 @@ void SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, bool isWireframe, co
 	}
 }
 
-void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, bool isWireframe, const int& animationFrame, float elapsedTime, std::vector<Mesh>* animationMeshesList)
+void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, bool isWireframe, const int& animationFrame, float elapsedTime)
 {
 	XMMATRIX worldViewProjection(world);
 	worldViewProjection *= view;
@@ -586,14 +586,9 @@ void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRI
 	Skeletal skeletal;
 	SkeletalAnimation* skeletalAnimation;
 
-	std::vector<Mesh>::iterator animation = meshesList.begin();
-	if (animationMeshesList && animationMeshesList->size() > 0) {
-		animation = (*animationMeshesList).begin();
-	}
-	
-	for (std::vector<Mesh>::iterator mesh = meshesList.begin(), end = meshesList.end(); mesh < end; ++mesh, ++animation)
+	for each (Mesh mesh in meshesList)
 	{
-		skeletalAnimation = &animation->skeletalAnimation;
+		skeletalAnimation = &mesh.skeletalAnimation;
 		if (skeletalAnimation->size() > 0) {
 			if (animationFrame == 0)
 			{
@@ -616,13 +611,13 @@ void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRI
 			}
 			skeletalAnimation->animationTick += elapsedTime;
 		}
-		tansformation = XMLoadFloat4x4(&animation->globalTransform)*XMLoadFloat4x4(&coordinateConversion);
+		tansformation = XMLoadFloat4x4(&mesh.globalTransform)*XMLoadFloat4x4(&coordinateConversion);
 		XMStoreFloat4x4(&updateCbuffer.world, tansformation*world);
 		XMStoreFloat4x4(&updateCbuffer.worldViewProjection, tansformation*worldViewProjection);
 
 		pDeviceContext->UpdateSubresource(pConstantBuffer, 0, NULL, &updateCbuffer, 0, 0);
 
-		Draw(pDeviceContext, isWireframe, *mesh);
+		Draw(pDeviceContext, isWireframe, mesh);
 	}
 }
 

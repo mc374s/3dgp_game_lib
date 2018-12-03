@@ -234,15 +234,8 @@ void XM_CALLCONV MeshData::Draw(FXMVECTOR position, FXMVECTOR scaling, FXMVECTOR
 		//XMMATRIX worldXMatrix;
 		world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), scaleMul, g_XMZero, rotation, translation);
 		//XMStoreFloat4x4(&world, worldXMatrix);
-		if (animation && pMeshManager->meshAt(animation->fileNO)->data) {
-			pMeshManager->meshAt(fileNO)->data->Draw(Framework::pDeviceContext, world, GLC::mainCamera.view, GLC::mainCamera.projection,
-				false, frame, Framework::frameTime, 
-				&(pMeshManager->meshAt(animation->fileNO)->data->meshesList));
-		}
-		else {
-			pMeshManager->meshAt(fileNO)->data->Draw(Framework::pDeviceContext, world, GLC::mainCamera.view, GLC::mainCamera.projection,
-				false, frame, Framework::frameTime);
-		}
+		pMeshManager->meshAt(fileNO)->data->Draw(Framework::pDeviceContext, world, GLC::mainCamera.view, GLC::mainCamera.projection,
+			false, frame, Framework::frameTime);
 	}
 }
 
@@ -317,7 +310,7 @@ void MeshManager::ReleaseMeshes()
 {
 	for (int i = 0; i < MAX_MESH_FILE_NUM; i++)
 	{
-		if (meshes[i] && meshes[i]->data)
+		if (meshes[i])
 		{
 			delete meshes[i]->data;
 			delete meshes[i];

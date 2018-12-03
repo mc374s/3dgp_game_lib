@@ -275,15 +275,13 @@ struct MeshData
 	DirectX::XMVECTOR positionAdjustion;
 	DirectX::XMVECTOR rotationAdjustion;
 	DirectX::XMMATRIX world;
-	MeshData* animation;
 
 	MeshData(int fileNO, 
 		DirectX::XMFLOAT3 preSetScale = DirectX::XMFLOAT3(1, 1, 1), 
 		DirectX::XMFLOAT3 preSetPosition = DirectX::XMFLOAT3(0, 0, 0),
 		DirectX::XMFLOAT3 preSetRotationDegree = DirectX::XMFLOAT3(0, 0, 0)) 
 		:fileNO(fileNO), 
-		world(DirectX::XMMatrixIdentity()),
-		animation(nullptr)
+		world(DirectX::XMMatrixIdentity())
 	{
 		scalingAdjustion = DirectX::XMLoadFloat3(&preSetScale);
 		positionAdjustion = DirectX::XMLoadFloat3(&preSetPosition);

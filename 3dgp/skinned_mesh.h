@@ -123,8 +123,7 @@ public:
 	//param(elapsedTime) How many ms this frame used
 	//
 	void XM_CALLCONV Draw(ID3D11DeviceContext *pDeviceContext, DirectX::FXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection,
-		bool isWireframe = false, const int& animationFrame = 0, float elapsedTime = 1 / 60.0f,
-		std::vector<Mesh>* animationMeshesList = nullptr);
+		bool isWireframe = false, const int& animationFrame = 0, float elapsedTime = 1 / 60.0f);
 };
 
 
