@@ -7,7 +7,7 @@
 #include <vector>
 
 #define MAX_BONE_INFLUENCES (4)
-#define MAX_BONES (32)
+#define MAX_BONES (128)
 
 class SkinnedMesh
 {
@@ -97,7 +97,6 @@ private:
 	ID3D11PixelShader*			pPixelShader;
 
 
-	std::vector<Mesh> meshesList;
 	DirectX::XMFLOAT4X4 coordinateConversion = {
 		1.0f, 0.0f, 0.0f, 0.0f,
 		0.0f, 0.0f, 1.0f, 0.0f,
@@ -109,6 +108,7 @@ private:
 
 public:
 	int frame = 0;
+	std::vector<Mesh> meshesList;
 
 	SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const bool exchangeAxisYwithAxisZ = false);
 	virtual ~SkinnedMesh();
@@ -122,7 +122,9 @@ public:
 	//param(animationFrame) Set to 0 means always loop this fbx animation
 	//param(elapsedTime) How many ms this frame used
 	//
-	void XM_CALLCONV Draw(ID3D11DeviceContext *pDeviceContext, DirectX::FXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection, bool isWireframe = false, const int& animationFrame = 0, float elapsedTime = 1 / 60.0f);
+	void XM_CALLCONV Draw(ID3D11DeviceContext *pDeviceContext, DirectX::FXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection,
+		bool isWireframe = false, const int& animationFrame = 0, float elapsedTime = 1 / 60.0f,
+		std::vector<Mesh>* animationMeshesList = nullptr);
 };
 
 

@@ -35,6 +35,13 @@ public:
 	void Update();
 	void Draw();
 
+	//void(Player*)();
+	void(Player::*moveFunc)();
+	void(Player::*lastMove)();
+	void Standby();
+	void Run();
+	void Jump();
+
 };
 
 

@@ -27,6 +27,8 @@ ID3D11DeviceContext*    Framework::pDeviceContext = NULL;
 ID3D11RenderTargetView*	Framework::pRenderTargetView = NULL;
 ID3D11DepthStencilView*	Framework::pDepthStencilView = NULL;
 
+double					Framework::frameTime = 0.0f;
+
 //ID3D11RenderTargetView* framework::s_pRenderTargetView = NULL;
 
 bool Framework::Initialize(HWND _hwnd)

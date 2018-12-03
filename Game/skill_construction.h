@@ -35,9 +35,6 @@ public:
 		//P1_EQUIPPED,
 		//P2_EQUIPPED,
 
-		P1_CURSOR,
-		P2_CURSOR,
-
 		MAX_NUM_PANEL
 	};
 	enum SKILL
@@ -48,11 +45,12 @@ public:
 		D,
 		E,
 
-		MAX_NUM_SKILL=25
+		MAX_NUM_SKILL=18
 	};
 
 	UIOBJ panel[MAX_NUM_PANEL];
 	UIOBJ skillIcon[MAX_NUM_SKILL];
+	UIOBJ cursorP1, cursorP2;
 	
 	void Update();
 	void Draw();

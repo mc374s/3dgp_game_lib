@@ -2,9 +2,12 @@
 
 // 
 MeshFile e_sequencedFbxFiles[] = {
-	{ PLAYER_WALK,			"./Data/FbxFiles/walk_meter.fbx" },
-	//{ PLAYER_RUN,			"./Data/FbxFiles/run.fbx" },
-	//{ PLAYER_JUMP,			"./Data/FbxFiles/jump2.fbx" },
+
+	{ PLAYER_MODEL,			"./Data/FbxFiles/BoxMan/idle.fbx" },
+	{ PLAYER_STANDBY,		"./Data/FbxFiles/BoxMan/idle.fbx" },
+	//{ PLAYER_WALK,		"./Data/FbxFiles/Karate Warrior Mecanim Animation Pack Free/Characters/Karate@Run.fbx" },
+	{ PLAYER_RUN,			"./Data/FbxFiles/BoxMan/runpose.fbx" },
+	{ PLAYER_JUMP,			"./Data/FbxFiles/BoxMan/jump.fbx" },
 
 	//{ ITEM_SWORD,			"./Data/FbxFiles/sword.fbx" },
 	//{ ITEM_FLOOR,			"./Data/FbxFiles/street_meter.fbx" },
@@ -13,10 +16,12 @@ MeshFile e_sequencedFbxFiles[] = {
 	{ -1, NULL },
 };
 
+MeshData fbxPlayerModel = MeshData(PLAYER_MODEL, /*Vector3(0.05, 0.05, 0.05)*/Vector3(1, 1, 1), Vector3(0, 0, 0), Vector3(0, 90, 0));
 
-MeshData e_fbxPlayerWalk = MeshData(PLAYER_WALK, /*Vector3(0.05, 0.05, 0.05)*/Vector3(1, 1, 1), Vector3(0, 0, 0), Vector3(0, 90, 0));
-//MeshData e_fbxPlayerRun = MeshData(PLAYER_RUN, Vector3(0.05, 0.05, 0.05));
-MeshData e_fbxPlayerJump = MeshData(PLAYER_JUMP, Vector3(1, 1, 1), Vector3(0, 0, 0), Vector3(0, 90, 0));
+MeshData fbxPlayerStandby = MeshData(PLAYER_STANDBY, /*Vector3(0.05, 0.05, 0.05)*/Vector3(1, 1, 1), Vector3(0, 0, 0), Vector3(0, 90, 0));
+//MeshData fbxPlayerWalk = MeshData(PLAYER_WALK, /*Vector3(0.05, 0.05, 0.05)*/Vector3(1, 1, 1), Vector3(0, 0, 0), Vector3(0, 90, 0));
+MeshData fbxPlayerRun = MeshData(PLAYER_RUN, /*Vector3(0.05, 0.05, 0.05)*/Vector3(1, 1, 1), Vector3(0, 0, 0), Vector3(0, 90, 0));
+MeshData fbxPlayerJump = MeshData(PLAYER_JUMP, Vector3(1, 1, 1), Vector3(0, 0, 0), Vector3(0, 90, 0));
 
 //MeshData e_fbxItemSword = MeshData(ITEM_SWORD, Vector3(0.05, 0.05, 0.05));
 MeshData e_fbxItemFloor = MeshData(ITEM_FLOOR, Vector3(1, 1, 1), Vector3(0, -0.09, 0), Vector3(0, 0, 0));

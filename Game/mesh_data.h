@@ -6,8 +6,10 @@
 // Fbx Files numbering
 enum FBX_FILE_NO
 {
-	PLAYER_WALK,
-	//PLAYER_RUN,
+	PLAYER_MODEL,
+	PLAYER_STANDBY,
+	//PLAYER_WALK,
+	PLAYER_RUN,
 	PLAYER_JUMP,
 	//
 	//ITEM_SWORD,
@@ -18,10 +20,14 @@ enum FBX_FILE_NO
 // Fbx files' path to be loaded
 extern MeshFile e_sequencedFbxFiles[];
 
+// Player Model
+extern MeshData fbxPlayerModel;
+
 // Player Animation
-extern MeshData e_fbxPlayerWalk;
-//extern MeshData e_fbxPlayerRun;
-extern MeshData e_fbxPlayerJump;
+extern MeshData fbxPlayerStandby;
+//extern MeshData fbxPlayerWalk;
+extern MeshData fbxPlayerRun;
+extern MeshData fbxPlayerJump;
 
 //extern MeshData e_fbxItemSword;
 extern MeshData e_fbxItemFloor;

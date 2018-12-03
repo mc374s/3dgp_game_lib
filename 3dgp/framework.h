@@ -34,7 +34,7 @@ public:
 
 	const double MIN_FRAME_TIME_DAFAULT = 1.0 / (double)FPS;
 	double minFrameTime = MIN_FRAME_TIME_DAFAULT;
-	double frameTime = 0.0f;
+	static double frameTime;
 	LARGE_INTEGER timeStart;
 	LARGE_INTEGER timeEnd;
 	LARGE_INTEGER timeFreq;

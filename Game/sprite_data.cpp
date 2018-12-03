@@ -18,6 +18,8 @@ LOAD_TEXTURE e_loadTexture[] = {
 	{ TEX_BG_TITLE,					"./Data/Images/BG/title.jpg" },
 	{ TEX_BG_MAIN,					"./Data/Images/BG/main.jpg" },
 
+	{ TEX_WHITE,					"./Data/Images/white.png" },
+
 	{ -1, NULL },
 };
 
@@ -33,6 +35,8 @@ SPRITE_LEFTTOP e_sprTitleBG = SPRITE_LEFTTOP(TEX_BG_TITLE, 0, 0, 1920, 1080);
 // UI関係
 
 SPRITE_CENTER e_sprNumbers = SPRITE_CENTER(TEX_NUMBERS, 0, 0, 76, 118);
+
+SPRITE_CENTER sprCenterWhite = SPRITE_CENTER(TEX_WHITE, 0, 0, 64, 64);
 
 
 //******************************************************************************

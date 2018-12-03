@@ -11,6 +11,7 @@ enum TEX_NO {
 	TEX_BG_TITLE,
 	TEX_BG_MAIN,
 
+	TEX_WHITE,
 };
 
 
@@ -27,6 +28,8 @@ extern SPRITE_LEFTTOP e_sprTitleBG;
 // UI関係
 
 extern SPRITE_CENTER e_sprNumbers;
+
+extern SPRITE_CENTER sprCenterWhite;
 
 // Effect関係
 

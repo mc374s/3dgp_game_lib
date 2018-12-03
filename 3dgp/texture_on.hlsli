@@ -15,6 +15,6 @@ cbuffer PROJECTION_CBUFFER : register(b0)
 	row_major matrix worldViewProjection;
 	float4 materialColor;
 	float4 lightDirection;
-	// UNIT.21
+	
 	row_major matrix boneTransforms[MAX_BONES];
 };

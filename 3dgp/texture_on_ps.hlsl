@@ -7,7 +7,7 @@ float4 main(VS_OUT pin) : SV_TARGET
 {
 
 	//return pin.color;
-	// UNIT.04
+	
 	//return diffuse_map.Sample(diffuse_map_sampler_state, pin.texcoord);
 
 	float4 color = diffuse_map.Sample(diffuse_map_sampler_state, pin.texcoord);

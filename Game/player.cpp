@@ -17,7 +17,9 @@ void Player::Init()
 	Clear();
 	speedAcc.x = P_WALK_SPEED;
 	speedMax.x = P_WALK_SPEED_MAX;
-	meshData = &e_fbxPlayerWalk;
+	meshData = &fbxPlayerModel;
+	//meshData->animation = &fbxPlayerStandby;
+	moveFunc = &Player::Standby;
 
 	//size = AABB(Vector3(0, 1.64f*0.5f, 0), Vector3(0.4f, 1.64f, 0.4f));
 	//size.center = Vector3(0, 1.64f*0.5f, 0);
@@ -34,91 +36,34 @@ void Player::Update()
 
 	oldPos = transform.position;
 
-	switch (keyCode & (PAD_LEFT | PAD_RIGHT))
+
+	if (keyCode & (PAD_LEFT | PAD_RIGHT) && moveFunc == &Player::Standby) {
+		step = STEP::INIT;
+		lastMove = moveFunc;
+		moveFunc = &Player::Run;
+	}
+	if (keyCode & PAD_TRG1 && moveFunc != &Player::Jump)
 	{
-	case PAD_LEFT:
-		speed.x -= speedAcc.x;
-		transform.rotationDegree.y = 180;
-		break;
-	case PAD_RIGHT:
-		speed.x += speedAcc.x;
-		transform.rotationDegree.y = 0;
-		break;
-	default:
-		if (speed.x > 0) {
-			speed.x -= speedAcc.x / 2;
-			if (speed.x < 0) speed.x = 0;
-		}
-		if (speed.x < 0) {
-			speed.x += speedAcc.x / 2;
-			if (speed.x > 0) speed.x = 0;
-		}
-		break;
+		step = STEP::INIT;
+		lastMove = moveFunc;
+		moveFunc = &Player::Jump;
+	}
+
+	if (moveFunc) {
+		(this->*moveFunc)();
 	}
 	
-	if (speed.x > speedMax.x)
-	{
-		speed.x = speedMax.x;
-	}
-	if (speed.x < -speedMax.x)
-	{
-		speed.x = -speedMax.x;
-	}
 
-	/*if (fabsf(speed.x - 0.0f) > FLT_EPSILON)
-	{
-		frame = 0;
-		meshData = &e_fbxPlayerWalk;
-	}*/
-	transform.position.x += speed.x;
-
-	if (keyCode & PAD_TRG1)
-	{
-		meshData = &e_fbxPlayerJump;
-		++frame;
-	}
-	if (frame > 0)
-	{
-		++frame;
-		// PreMotion, Stop Forward movement
-		if (frame < 24)
-		{
-			transform.position.x -= speed.x;
-		}
-		if (frame == 24)
-		{
-			speed.y += P_JUMP_V0;
-		}
-		// Jumping
-		if (frame > 36 && speed.y > 0)
-		{
-			frame = 36;
-		}
-		// Dropping
-		if (frame > 60 && speed.y < 0)
-		{
-			frame = 60;
-		}
-		// Ending Jump, Also stop forward movement
-		if (frame > 72)
-		{
-			transform.position.x -= speed.x;
-		}
-		if (frame > 83)
-		{
-			frame = 0;
-			meshData = &e_fbxPlayerWalk;
-		}
-
-	}
 	speed.y -= P_GF;
-	transform.position.y += speed.y;
+	transform.position += speed;
 
 	if (transform.position.y < RESET_HEIGHT)
 	{
 		transform.position = Vector3::Zero;
 		speed.y = 0;
 	}
+
+
 
 	static float cameraY = 2, cameraZ = -9;
 	if (Input::KEY.I)
@@ -197,6 +142,127 @@ void Player::Draw()
 #endif // DEBUG
 
 }
+
+void Player::Standby()
+{
+	switch (step) {
+	case STEP::INIT:
+		frame = 0;
+		meshData->animation = &fbxPlayerRun;
+		speed = Vector3(0, 0, 0);
+		step = STEP::BEGIN;
+		//break;
+	case STEP::BEGIN:
+
+		break;
+	default:
+		break;
+	}
+}
+
+void Player::Run()
+{
+	switch (step) {
+	case STEP::INIT:
+		moveFunc = &Player::Run;
+		meshData->animation = &fbxPlayerRun;
+		frame = 0;
+		step = STEP::BEGIN;
+		//break
+	case STEP::BEGIN:
+		//++frame;
+		switch (keyCode & (PAD_LEFT | PAD_RIGHT))
+		{
+		case PAD_LEFT:
+			speed.x -= speedAcc.x;
+			transform.rotationDegree.y = 180;
+			break;
+		case PAD_RIGHT:
+			speed.x += speedAcc.x;
+			transform.rotationDegree.y = 0;
+			break;
+		default:
+			if (speed.x > 0) {
+				speed.x -= speedAcc.x / 2;
+				if (speed.x < 0) {
+					speed.x = 0;
+				}
+			}
+			if (speed.x < 0) {
+				speed.x += speedAcc.x / 2;
+				if (speed.x > 0) {
+					speed.x = 0;
+				}
+			}
+			if (fabsf(speed.x - 0.0f) < FLT_EPSILON) {
+				speed.x = 0;
+				step = STEP::FINISH;
+			}
+			break;
+		}
+
+		if (speed.x > speedMax.x)
+		{
+			speed.x = speedMax.x;
+		}
+		if (speed.x < -speedMax.x)
+		{
+			speed.x = -speedMax.x;
+		}
+		break;
+	case STEP::FINISH:
+		moveFunc = &Player::Standby;
+		step = STEP::INIT;
+		break;
+	default:
+		break;
+	}
+}
+
+void Player::Jump()
+{
+	switch (step) {
+	case STEP::INIT:
+		moveFunc = &Player::Jump;
+		meshData->animation = &fbxPlayerJump;
+		frame = 0;
+		step = STEP::BEGIN;
+		//break;
+	case STEP::BEGIN:
+		++frame;
+		// PreMotion, Stop Forward movement
+		if (frame < 24) {
+			transform.position.x -= speed.x;
+		}
+		if (frame == 24) {
+			speed.y += P_JUMP_V0;
+		}
+		// Jumping
+		if (frame > 36 && speed.y > 0) {
+			frame = 36;
+		}
+		// Dropping
+		if (frame > 60 && speed.y < 0) {
+			frame = 60;
+		}
+		// Ending Jump, Also stop forward movement
+		if (frame > 72) {
+			transform.position.x -= speed.x;
+		}
+		if (frame > 83) {
+			step = STEP::FINISH;
+		}
+		break;
+	case STEP::FINISH:
+		moveFunc = &Player::Standby;
+		step = STEP::INIT;
+		break;
+	default:
+		break;
+	}
+}
+
+
 
 
 PlayerManager::PlayerManager()

@@ -1,5 +1,7 @@
 #include "skill_construction.h"
 
+#include "sprite_data.h"
+
 UIOBJ::UIOBJ()
 {
 }
@@ -60,21 +62,25 @@ SkillConstructionPanel::SkillConstructionPanel()
 
 
 	// アイコンのサイズとマージンによって、パネル内の相対位置を算出(改行を含め)
-	Vector3 skillIconSize(50, 50, 0);
+	Vector3 skillIconSize(sprCenterWhite.width, sprCenterWhite.height, 0);
 	Vector3 margin(50, 50, 0);
 
 	int marginedSize = skillIconSize.x + margin.x;
-	int column = panel[BOTTOM].size.x / marginedSize;// 一行のアイコンの数
-	int adjustX = (panel[BOTTOM].size.x - column*marginedSize + margin.x) / 2;
-	int adjustY = adjustX;
+	int column = panel[BOTTOM].size.x / marginedSize + 1;// 一行のアイコンの数
+	int adjustX = (panel[BOTTOM].size.x - column*marginedSize + margin.x) / 2 + skillIconSize.x / 2;
+	int adjustY = skillIconSize.y / 2 + 20;
 	for (int i = 0, j = 0; i < SKILL::MAX_NUM_SKILL; ++i) {
 		skillIcon[i].parent = &panel[BOTTOM];
+		skillIcon[i].pSprData = &sprCenterWhite;
 		skillIcon[i].size = skillIconSize;
 		skillIcon[i].pos.x = i%column * marginedSize + adjustX;
 		skillIcon[i].pos.y = i / column * marginedSize + adjustY;
 		
 		skillIcon[i].transform2D.rgba = 0x0000FFFF;
 	}
+
+	cursorP1.parent = this;
+	cursorP2.parent = this;
 
 }
 

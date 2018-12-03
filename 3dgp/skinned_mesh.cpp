@@ -294,9 +294,7 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const 
 						pUVFilePath[meshFileFloderPathLength] = '\0';
 						strcat_s(pUVFilePath, uvFilePathLength, pUVFileName);
 						
-						//ID3D11Resource *temp;
 						RM::LoadShaderResourceView(pDevice, &subset.diffuse.pShaderResourceView, pUVFilePath, nullptr);
-						//SAFE_RELEASE(temp);
 						
 						SAFE_DELETE(pUVFilePath);
 						
@@ -570,7 +568,7 @@ void SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, bool isWireframe, co
 	}
 }
 
-void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, bool isWireframe, const int& animationFrame, float elapsedTime)
+void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, bool isWireframe, const int& animationFrame, float elapsedTime, std::vector<Mesh>* animationMeshesList)
 {
 	XMMATRIX worldViewProjection(world);
 	worldViewProjection *= view;
@@ -585,36 +583,46 @@ void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRI
 
 	// Play Fbx Animation	
 	XMMATRIX tansformation;
-	for (Mesh &mesh : meshesList)
+	Skeletal skeletal;
+	SkeletalAnimation* skeletalAnimation;
+
+	std::vector<Mesh>::iterator animation = meshesList.begin();
+	if (animationMeshesList && animationMeshesList->size() > 0) {
+		animation = (*animationMeshesList).begin();
+	}
+	
+	for (std::vector<Mesh>::iterator mesh = meshesList.begin(), end = meshesList.end(); mesh < end; ++mesh, ++animation)
 	{
-		if (mesh.skeletalAnimation.size() > 0) {
+		skeletalAnimation = &animation->skeletalAnimation;
+		if (skeletalAnimation->size() > 0) {
 			if (animationFrame == 0)
 			{
-				frame = mesh.skeletalAnimation.animationTick / mesh.skeletalAnimation.samplingTime;
+				frame = skeletalAnimation->animationTick / skeletalAnimation->samplingTime;
 			}
 			else
 			{
 				frame = animationFrame;
 			}
 
-			if (frame > mesh.skeletalAnimation.size() - 1) {
+			if (frame > skeletalAnimation->size() - 1) {
 				frame = 0;
-				mesh.skeletalAnimation.animationTick = 0;
+				skeletalAnimation->animationTick = 0;
 			}
-			Skeletal skeletal = mesh.skeletalAnimation.at(frame);
+			skeletal = skeletalAnimation->at(frame);
 			size_t bonesNum = skeletal.size();
 			_ASSERT_EXPR(bonesNum < MAX_BONES, L"The bonesNum exceeds MAX_BONES!");
 			for (size_t i = 0; i < bonesNum; i++) {
 				updateCbuffer.boneTransforms[i] = skeletal[i].transform;
 			}
-			mesh.skeletalAnimation.animationTick += elapsedTime;
+			skeletalAnimation->animationTick += elapsedTime;
 		}
-		tansformation = XMLoadFloat4x4(&mesh.globalTransform)*XMLoadFloat4x4(&coordinateConversion);
+		tansformation = XMLoadFloat4x4(&animation->globalTransform)*XMLoadFloat4x4(&coordinateConversion);
 		XMStoreFloat4x4(&updateCbuffer.world, tansformation*world);
 		XMStoreFloat4x4(&updateCbuffer.worldViewProjection, tansformation*worldViewProjection);
 
 		pDeviceContext->UpdateSubresource(pConstantBuffer, 0, NULL, &updateCbuffer, 0, 0);
-		Draw(pDeviceContext, isWireframe, mesh);
+
+		Draw(pDeviceContext, isWireframe, *mesh);
 	}
 }
 
