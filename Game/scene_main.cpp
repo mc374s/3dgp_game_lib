@@ -68,7 +68,7 @@ void SceneMain::Update()
 	case STEP::BEGIN:
 
 		gameMain();
-		if (Input::KEY_TRACKER.pressed.Enter || Input::PAD_TRACKER.start == Input::PAD_TRACKER.PRESSED)
+		if (Input::KEY_TRACKER.pressed.Enter || Input::PAD_TRACKER[0].start == Input::PAD_TRACKER[0].PRESSED)
 		{
 			GLC::MFAudioStop(BGM_MAIN);
 			GLC::MFAudioPlay(SE_START);
@@ -100,17 +100,14 @@ void SceneMain::Draw()
 
 	pBG->Draw();
 
-	// -210F
-	e_fbxItemFloor.Draw(DirectX::g_XMZero, DirectX::g_XMOne, DirectX::g_XMZero);
-	//e_fbxItemBox.draw();
-
-	//static OBJ3D temp = g_player;
-
-
 
 	// -60F
 	pPlayerManager->Draw();
 	pMainStage->Draw();
+
+
+	// -210F
+	e_fbxItemFloor.Draw(DirectX::g_XMZero, DirectX::g_XMOne, DirectX::g_XMZero);
 
 
 	if (isPanelVisible && skillConstructPanel) {
@@ -135,7 +132,7 @@ void SceneMain::Draw()
 bool SceneMain::pause()
 {
 	static int pressTimer = 0;
-	if ((Input::KEY_TRACKER.pressed.Space || Input::PAD_TRACKER.menu == Input::PAD_TRACKER.PRESSED)) {
+	if ((Input::KEY_TRACKER.pressed.Space || Input::PAD_TRACKER[0].menu == Input::PAD_TRACKER[0].PRESSED)) {
 		isPaused = true;
 	}
 
@@ -143,11 +140,11 @@ bool SceneMain::pause()
 	{
 		pressTimer++;
 
-		if ((Input::KEY_TRACKER.released.C || Input::PAD_TRACKER.x == Input::PAD_TRACKER.RELEASED))
+		if ((Input::KEY_TRACKER.released.C || Input::PAD_TRACKER[0].x == Input::PAD_TRACKER[0].RELEASED))
 		{
 
 		}
-		if (pressTimer > 15 && (Input::KEY_TRACKER.pressed.Space || Input::PAD_TRACKER.start == Input::PAD_TRACKER.PRESSED))
+		if (pressTimer > 15 && (Input::KEY_TRACKER.pressed.Space || Input::PAD_TRACKER[0].start == Input::PAD_TRACKER[0].PRESSED))
 		{
 			pressTimer = 0;
 			isPaused = false;

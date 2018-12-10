@@ -2,7 +2,7 @@
 
 using namespace DirectX;
 
-HitResult& Collision::HitJudgement(const Collision* other)
+HitResult Collision::HitJudgement(const Collision* other)
 {
 	HitResult hitResult;
 	int directionAdjustion = 1;
@@ -33,7 +33,7 @@ HitResult& Collision::HitJudgement(const Collision* other)
 	return hitResult;
 }
 
-HitResult& XM_CALLCONV SphereHitSphere(DirectX::FXMVECTOR centerA, float radiusA, DirectX::FXMVECTOR centerB, float radiusB)
+HitResult XM_CALLCONV SphereHitSphere(DirectX::FXMVECTOR centerA, float radiusA, DirectX::FXMVECTOR centerB, float radiusB)
 {
 	HitResult hitResult;
 
@@ -51,7 +51,7 @@ HitResult& XM_CALLCONV SphereHitSphere(DirectX::FXMVECTOR centerA, float radiusA
 	return hitResult;
 }
 
-HitResult& XM_CALLCONV AABBHitAABB(DirectX::FXMVECTOR minPosA, DirectX::FXMVECTOR maxPosA, DirectX::FXMVECTOR minPosB, DirectX::FXMVECTOR maxPosB)
+HitResult XM_CALLCONV AABBHitAABB(DirectX::FXMVECTOR minPosA, DirectX::FXMVECTOR maxPosA, DirectX::FXMVECTOR minPosB, DirectX::FXMVECTOR maxPosB)
 {
 	HitResult hitResult;
 	XMFLOAT3 minA, maxA, minB, maxB;
@@ -114,7 +114,7 @@ HitResult& XM_CALLCONV AABBHitAABB(DirectX::FXMVECTOR minPosA, DirectX::FXMVECTO
 	return hitResult;
 }
 
-HitResult& XM_CALLCONV SphereHitAABB(DirectX::FXMVECTOR centerA, float radiusA, DirectX::FXMVECTOR minPosB, DirectX::FXMVECTOR maxPosB)
+HitResult XM_CALLCONV SphereHitAABB(DirectX::FXMVECTOR centerA, float radiusA, DirectX::FXMVECTOR minPosB, DirectX::FXMVECTOR maxPosB)
 {
 	HitResult hitResult;
 	XMFLOAT3 minB, maxB;

@@ -209,8 +209,9 @@ int Framework::Run()
 	return 0;
 	}*/
 	srand((unsigned int)time(NULL));
-
-	Input::PAD_TRACKER.Reset();
+	for (int padIndex = 0; padIndex < Input::MAX_PLAYER_COUNT; ++padIndex) {
+		Input::PAD_TRACKER[padIndex].Reset();
+	}
 
 	Input::KEY_TRACKER.Reset();
 
@@ -260,9 +261,13 @@ int Framework::Run()
 			Input::KEY = Input::pKeyboard->GetState();
 			Input::KEY_TRACKER.Update(Input::KEY);
 
-			Input::PAD = Input::pGamePad->GetState(0);
-			Input::PAD_TRACKER.Update(Input::PAD);
-			DirectX::BasicEffect;
+			for (int padIndex = 0; padIndex < Input::MAX_PLAYER_COUNT; ++padIndex) {
+				if (Input::PAD[padIndex].IsConnected()) {
+					Input::PAD[padIndex] = Input::pGamePad->GetState(padIndex);
+					Input::PAD_TRACKER[padIndex].Update(Input::PAD[padIndex]);
+				}
+			}
+			//DirectX::BasicEffect;
 
 			//preTime = timeGetTime();
 			timer->tick();
@@ -300,13 +305,11 @@ LRESULT CALLBACK Framework::handle_message(HWND _hwnd, UINT msg, WPARAM wparam, 
 	switch (msg)
 	{
 	case WM_PAINT:
-	{
 		PAINTSTRUCT ps;
 		HDC hdc;
 		hdc = BeginPaint(_hwnd, &ps);
 		EndPaint(_hwnd, &ps);
 		break;
-	}
 	case WM_ACTIVATEAPP:
 		Keyboard::ProcessMessage(msg, wparam, lparam);
 		Input::pGamePad->Resume();
@@ -405,7 +408,8 @@ void Framework::Update(float elapsed_time/*Elapsed seconds from last frame*/)
 			aXY = -XM_PIDIV2;
 			aZY = XM_1DIVPI;
 			d = XM_PI;
-			mainCamera = oldCamera;
+			GLC::mainCamera = oldCamera;
+			//mainCamera = oldCamera;
 		}
 		else
 		{

@@ -10,6 +10,7 @@ enum FBX_FILE_NO
 	//PLAYER_WALK,
 	PLAYER_RUN,
 	PLAYER_JUMP,
+	PLAYER_ATTACK,
 	//
 	//ITEM_SWORD,
 	ITEM_FLOOR,
@@ -26,6 +27,7 @@ extern MeshData fbxPlayerStandby;
 //extern MeshData fbxPlayerWalk;
 extern MeshData fbxPlayerRun;
 extern MeshData fbxPlayerJump;
+extern MeshData fbxPlayerAttack;
 
 //extern MeshData e_fbxItemSword;
 extern MeshData e_fbxItemFloor;

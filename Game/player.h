@@ -41,6 +41,7 @@ public:
 	void Standby();
 	void Run();
 	void Jump();
+	void Attack();
 
 };
 

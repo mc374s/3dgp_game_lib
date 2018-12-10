@@ -10,6 +10,8 @@
 
 #include "3dgp_math.h"
 
+
+//#define _XM_NO_INTRINSICS_ 
 #include <DirectXMath.h>
 
 //*****************************************************************************************************************************
@@ -190,7 +192,7 @@ public:
 
 #define pTextureManager (TextureManager::getInstance())
 
-int BasicInput();
+int BasicInput(int playerNO = 0);
 
 void DrawString(int posX = 0, int posY = 0, char *pTextBuf = nullptr, UINTCOLOR textColor = 0xFFFFFFFF, int format = STR_LEFT, int characterSizeX = 32, int characterSizeY = 32, float characterRotateAngle = .0f);
 
@@ -287,7 +289,7 @@ struct MeshData
 		positionAdjustion = DirectX::XMLoadFloat3(&preSetPosition);
 		rotationAdjustion = DirectX::XMLoadFloat3(&preSetRotationDegree);
 	};
-	void XM_CALLCONV Draw(DirectX::FXMVECTOR position, DirectX::FXMVECTOR scaling, DirectX::FXMVECTOR rotationDegree, const int& frame = 0);
+	void XM_CALLCONV Draw(DirectX::FXMVECTOR position, DirectX::FXMVECTOR scaling, DirectX::FXMVECTOR rotationDegree, const int& frame = 0, int* maxFrame = nullptr);
 
 };
 

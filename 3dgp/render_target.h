@@ -2,6 +2,7 @@
 #define _RENDER_TARGET_H_
 
 #include <d3d11.h>
+//#define _XM_NO_INTRINSICS_ 
 #include <DirectXMath.h>
 
 class RenderTarget

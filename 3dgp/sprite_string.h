@@ -6,6 +6,7 @@
 #define	STR_CENTER (1)
 
 #include <d3d11.h>
+//#define _XM_NO_INTRINSICS_ 
 #include <DirectXMath.h>
 
 class Sprite;

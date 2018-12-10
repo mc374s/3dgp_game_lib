@@ -2,6 +2,7 @@
 #define _SKINNED_MESH_H_
 
 #include <d3d11.h>
+//#define _XM_NO_INTRINSICS_ 
 #include <DirectXMath.h>
 
 #include <vector>
@@ -110,7 +111,7 @@ public:
 	int frame = 0;
 	std::vector<Mesh> meshesList;
 
-	SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const bool exchangeAxisYwithAxisZ = false);
+	SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const bool exchangeAxisYwithAxisZ = false, int* maxFrame = nullptr);
 	virtual ~SkinnedMesh();
 
 	//
@@ -123,7 +124,7 @@ public:
 	//param(elapsedTime) How many ms this frame used
 	//
 	void XM_CALLCONV Draw(ID3D11DeviceContext *pDeviceContext, DirectX::FXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection,
-		bool isWireframe = false, const int& animationFrame = 0, float elapsedTime = 1 / 60.0f);
+		bool isWireframe = false,const int& animationFrame = 0, float elapsedTime = 1 / 60.0f, int* stopFrame = nullptr);
 };
 
 

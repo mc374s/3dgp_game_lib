@@ -2,6 +2,9 @@
 #define _DIRECTXTK_H_
 
 
+//#define _XM_NO_INTRINSICS_
+#include <DirectXMath.h>
+
 #include "CommonStates.h"
 #include "Effects.h"
 #include "GamePad.h"
@@ -11,6 +14,7 @@
 #include "PrimitiveBatch.h"
 #include "ScreenGrab.h"
 #include "VertexTypes.h"
+
 
 class DXTK 
 {

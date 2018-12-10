@@ -7,6 +7,8 @@
 
 #pragma comment(lib,"libfbxsdk-md")
 #include <fbxsdk.h>
+#include "directxtk.h"
+
 using namespace fbxsdk;
 
 using namespace DirectX;
@@ -54,6 +56,9 @@ void FetchBoneMatrices(FbxMesh* pFbxMesh, std::vector<SkinnedMesh::Bone> &skelet
 			SkinnedMesh::Bone &bone = skeletal.at(clusterIndex);
 
 			FbxCluster *pCluster = pSkin->GetCluster(clusterIndex);
+			//
+			FbxNode* linked_node = pCluster->GetLink();
+			_RPTN(_CRT_WARN, "%s:\n", linked_node->GetName());
 
 			// This matrix transform coordinates of the initial pose from mesh spece to global space
 			FbxAMatrix referenceGlobalInitPosition;
@@ -134,7 +139,7 @@ void FetchAnimations(FbxMesh *pFbxMesh, SkinnedMesh::SkeletalAnimation &skeletal
 
 }
 
-SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const bool exchangeAxisYwithAxisZ)
+SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const bool exchangeAxisYwithAxisZ, int* maxFrame)
 {
 	if (!exchangeAxisYwithAxisZ){
 		coordinateConversion = {
@@ -562,13 +567,13 @@ void SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, bool isWireframe, co
 	//pDeviceContext->DrawIndexed(indexCount, 0, 0);
 	pDeviceContext->IASetVertexBuffers(0, 1, &mesh.vertexBuffer, &pStrides, &pOffsets);
 	pDeviceContext->IASetIndexBuffer(mesh.indexBuffer, DXGI_FORMAT_R16_UINT, 0);
-	for (Subset subset : mesh.subsetsList) {
+	for each (Subset subset in mesh.subsetsList) {
 		pDeviceContext->PSSetShaderResources(0, 1, &subset.diffuse.pShaderResourceView);
 		pDeviceContext->DrawIndexed(subset.startIndex + subset.IndexCount, 0, 0);
 	}
 }
 
-void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, bool isWireframe, const int& animationFrame, float elapsedTime)
+void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, bool isWireframe,const int& animationFrame, float elapsedTime, int* stopFrame)
 {
 	XMMATRIX worldViewProjection(world);
 	worldViewProjection *= view;
@@ -579,14 +584,14 @@ void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRI
 	//static XMVECTOR lightDirection = { 0.0f,0.0f,1.0f,0.0f };
 	//lightDirection = Camera::mainCamera.focusPosition - Camera::mainCamera.eyePosition;
 	updateCbuffer.lightDirection = { XMVectorGetZ(view.r[0]), XMVectorGetZ(view.r[1]), XMVectorGetZ(view.r[2]), 1 };
-	updateCbuffer.materialColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.5f);
+	updateCbuffer.materialColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	// Play Fbx Animation	
 	XMMATRIX tansformation;
 	Skeletal skeletal;
 	SkeletalAnimation* skeletalAnimation;
 
-	for each (Mesh mesh in meshesList)
+	for(Mesh& mesh: meshesList)
 	{
 		skeletalAnimation = &mesh.skeletalAnimation;
 		if (skeletalAnimation->size() > 0) {
@@ -601,6 +606,9 @@ void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRI
 
 			if (frame > skeletalAnimation->size() - 1) {
 				frame = 0;
+				if (stopFrame) {
+					*stopFrame = skeletalAnimation->size();
+				}
 				skeletalAnimation->animationTick = 0;
 			}
 			skeletal = skeletalAnimation->at(frame);

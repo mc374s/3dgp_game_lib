@@ -1,5 +1,8 @@
 ﻿#include "game_system.h"
 
+
+
+
 #include "blend.h"
 #include "sprite.h"
 #include "render_target.h"
@@ -81,38 +84,75 @@ void TextureManager::ReleaseTexture()
 }
 
 
-int  BasicInput()
+int  BasicInput(int playerNO)
 {
 	int command = 0x0;
 
-	if (Input::KEY.Up || Input::PAD.IsLeftThumbStickUp()) {
+	if (playerNO >= Input::MAX_PLAYER_COUNT || playerNO < 0) {
+		_RPT0(_CRT_ERROR, "Error playerNO");
+		return -1;
+	}
+	if (playerNO == 0) {
+		if (Input::KEY.Up) {
+			command |= PAD_UP;
+		}
+		if (Input::KEY.Down) {
+			command |= PAD_DOWN;
+		}
+		if (Input::KEY.Left) {
+			command |= PAD_LEFT;
+		}
+		if (Input::KEY.Right) {
+			command |= PAD_RIGHT;
+		}
+		if (Input::KEY_TRACKER.pressed.Enter) {
+			command |= PAD_START;
+		}
+		if (Input::KEY_TRACKER.pressed.Escape) {
+			command |= PAD_BACK;
+		}
+		if (Input::KEY_TRACKER.pressed.Z) {
+			command |= PAD_TRG1;
+		}
+		if (Input::KEY_TRACKER.pressed.X) {
+			command |= PAD_TRG2;
+		}
+		if (Input::KEY_TRACKER.pressed.C) {
+			command |= PAD_TRG3;
+		}
+		if (Input::KEY_TRACKER.pressed.V) {
+			command |= PAD_TRG4;
+		}
+	}
+
+	if (Input::PAD[playerNO].IsLeftThumbStickUp()) {
 		command |= PAD_UP;
 	}
-	if (Input::KEY.Down || Input::PAD.IsLeftThumbStickDown()) {
+	if (Input::PAD[playerNO].IsLeftThumbStickDown()) {
 		command |= PAD_DOWN;
 	}
-	if (Input::KEY.Left || Input::PAD.IsLeftThumbStickLeft()){
+	if (Input::PAD[playerNO].IsLeftThumbStickLeft()){
 		command |= PAD_LEFT;
 	}
-	if (Input::KEY.Right || Input::PAD.IsLeftThumbStickRight()){
+	if (Input::PAD[playerNO].IsLeftThumbStickRight()){
 		command |= PAD_RIGHT;
 	}
-	if (Input::KEY_TRACKER.pressed.Enter || Input::PAD.IsStartPressed()) {
+	if (Input::PAD[playerNO].IsStartPressed()) {
 		command |= PAD_START;
 	}
-	if (Input::KEY_TRACKER.pressed.Escape || Input::PAD.IsBackPressed()) {
+	if (Input::PAD[playerNO].IsBackPressed()) {
 		command |= PAD_BACK;
 	}
-	if (Input::KEY_TRACKER.pressed.Z || Input::PAD.IsAPressed()) {
+	if (Input::PAD[playerNO].IsAPressed()) {
 		command |= PAD_TRG1;
 	}
-	if (Input::KEY_TRACKER.pressed.X || Input::PAD.IsBPressed()) {
+	if (Input::PAD[playerNO].IsBPressed()) {
 		command |= PAD_TRG2;
 	}
-	if (Input::KEY_TRACKER.pressed.C || Input::PAD.IsXPressed()) {
+	if (Input::PAD[playerNO].IsXPressed()) {
 		command |= PAD_TRG3;
 	}
-	if (Input::KEY_TRACKER.pressed.V || Input::PAD.IsYPressed()) {
+	if (Input::PAD[playerNO].IsYPressed()) {
 		command |= PAD_TRG4;
 	}
 
@@ -221,7 +261,7 @@ void Cube::Draw()
 
 // Skinned Mesh Data Management
 
-void XM_CALLCONV MeshData::Draw(FXMVECTOR position, FXMVECTOR scaling, FXMVECTOR rotationDegree, const int& frame)
+void XM_CALLCONV MeshData::Draw(FXMVECTOR position, FXMVECTOR scaling, FXMVECTOR rotationDegree, const int& frame, int* maxFrame)
 {
 	if (fileNO >= 0 && fileNO < MAX_MESH_FILE_NUM && pMeshManager->meshAt(fileNO) && pMeshManager->meshAt(fileNO)->data) {
 
@@ -235,7 +275,7 @@ void XM_CALLCONV MeshData::Draw(FXMVECTOR position, FXMVECTOR scaling, FXMVECTOR
 		world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), scaleMul, g_XMZero, rotation, translation);
 		//XMStoreFloat4x4(&world, worldXMatrix);
 		pMeshManager->meshAt(fileNO)->data->Draw(Framework::pDeviceContext, world, GLC::mainCamera.view, GLC::mainCamera.projection,
-			false, frame, Framework::frameTime);
+			false, frame/*, Framework::frameTime*/);
 	}
 }
 
@@ -314,7 +354,7 @@ void MeshManager::ReleaseMeshes()
 		{
 			delete meshes[i]->data;
 			delete meshes[i];
-			ZeroMemory(meshes[i], sizeof(*meshes[i]));
+			//ZeroMemory(meshes[i], sizeof(*meshes[i]));
 		}
 	}
 	ZeroMemory(meshes, sizeof(MeshFile)*MAX_MESH_FILE_NUM);

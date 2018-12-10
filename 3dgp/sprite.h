@@ -2,6 +2,7 @@
 #define _SPRITE_H_
 
 #include <d3d11.h>
+//#define _XM_NO_INTRINSICS_ 
 #include <DirectXMath.h>
 
 enum SCALE_MODE

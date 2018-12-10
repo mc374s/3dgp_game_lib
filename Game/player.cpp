@@ -41,11 +41,15 @@ void Player::Update()
 		lastMove = moveFunc;
 		moveFunc = &Player::Run;
 	}
-	if (keyCode & PAD_TRG1 && moveFunc != &Player::Jump)
-	{
+	if (keyCode & PAD_TRG1 && moveFunc != &Player::Jump){
 		step = STEP::INIT;
 		lastMove = moveFunc;
 		moveFunc = &Player::Jump;
+	}
+	if (keyCode & PAD_TRG2 && moveFunc != &Player::Attack) {
+		step = STEP::INIT;
+		lastMove = moveFunc;
+		moveFunc = &Player::Attack;
 	}
 
 	if (moveFunc) {
@@ -134,7 +138,7 @@ void Player::Draw()
 
 #ifdef DEBUG
 	char buf[256];
-	sprintf_s(buf, "Player:\nPosX:%lf \nPosY:%lf \nPosZ:%lf \n SpeedX:%lf \nSpeedY:%lf \nSpeedZ:%lf \n",
+	sprintf_s(buf, "Player:\nPosX:%lf \nPosY:%lf \nPosZ:%lf \nSpeedX:%lf \nSpeedY:%lf \nSpeedZ:%lf \n",
 		transform.position.x, transform.position.y, transform.position.z, speed.x, speed.y, speed.z);
 	DrawString(0, 300, buf, 0xFFFFFFFF, STR_LEFT, 16, 16);
 
@@ -251,6 +255,29 @@ void Player::Jump()
 		if (frame > 83) {
 			step = STEP::FINISH;
 		}
+		break;
+	case STEP::FINISH:
+		moveFunc = &Player::Standby;
+		step = STEP::INIT;
+		break;
+	default:
+		break;
+	}
+}
+
+void Player::Attack()
+{
+	switch (step) {
+	case STEP::INIT:
+		moveFunc = &Player::Attack;
+		meshData = &fbxPlayerAttack;
+		frame = 0;
+		step = STEP::BEGIN;
+		//break;
+	case STEP::BEGIN:
+		++frame;
+
+
 		break;
 	case STEP::FINISH:
 		moveFunc = &Player::Standby;

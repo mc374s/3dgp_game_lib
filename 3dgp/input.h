@@ -10,13 +10,16 @@
 class Input {
 
 public:
+
+
 	static std::unique_ptr<DirectX::Keyboard>			pKeyboard;
 	static DirectX::Keyboard::State						KEY;
 	static DirectX::Keyboard::KeyboardStateTracker		KEY_TRACKER;
 
+	static const int									MAX_PLAYER_COUNT = DirectX::GamePad::MAX_PLAYER_COUNT;
 	static std::unique_ptr<DirectX::GamePad>			pGamePad;
-	static DirectX::GamePad::State						PAD;
-	static DirectX::GamePad::ButtonStateTracker			PAD_TRACKER;
+	static DirectX::GamePad::State						PAD[MAX_PLAYER_COUNT];
+	static DirectX::GamePad::ButtonStateTracker			PAD_TRACKER[MAX_PLAYER_COUNT];
 
 	static bool isAnyKeyDown;
 };
