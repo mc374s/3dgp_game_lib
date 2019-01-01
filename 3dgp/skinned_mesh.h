@@ -121,10 +121,10 @@ public:
 
 	//
 	//param(animationFrame) Set to 0 means always loop this fbx animation
-	//param(elapsedTime) How many ms this frame used
+	//param(elapsedTime) How many seconds was last frame used
 	//
 	void XM_CALLCONV Draw(ID3D11DeviceContext *pDeviceContext, DirectX::FXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection,
-		bool isWireframe = false,const int& animationFrame = 0, float elapsedTime = 1 / 60.0f, int* stopFrame = nullptr);
+		bool isWireframe = false, int animationFrame = 0, float elapsedTime = 1 / 60.0f, int* stopFrame = nullptr);
 };
 
 

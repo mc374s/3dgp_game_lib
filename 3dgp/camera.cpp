@@ -9,7 +9,8 @@ Camera GLC::mainCamera;
 Camera::Camera():
 	eyePosition({ 1,1,-1,0 }), 
 	focusPosition({ 0,0,0,0 }), 
-	upDirection({ 0,1,0,0 })
+	upDirection({ 0,1,0,0 }),
+	FovAngleY(XM_PIDIV4)
 {
 	viewPort.Width = 1280;
 	viewPort.Height = 720;
@@ -29,5 +30,5 @@ void Camera::Clear()
 void Camera::Update()
 {
 	view = XMMatrixLookAtLH(eyePosition, focusPosition, upDirection);
-	projection = XMMatrixPerspectiveFovLH(XM_PIDIV4, viewPort.Width / viewPort.Height, 0.01f, 100.0f);
+	projection = XMMatrixPerspectiveFovLH(FovAngleY, viewPort.Width / viewPort.Height, 0.01f, 100.0f);
 }

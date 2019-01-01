@@ -5,11 +5,19 @@
 
 Player::Player()
 {
-	Clear();
+	
 }
 
 Player::~Player()
 {
+}
+
+void Player::Clear()
+{
+	OBJ3D::Clear();
+	size.minPos = Vector3(-0.2f, 0, -0.2f);
+	size.maxPos = Vector3(0.2f, 1.64f, 0.2f);
+	collision = size;
 }
 
 void Player::Init()
@@ -31,10 +39,7 @@ void Player::Init()
 
 void Player::Update()
 {
-	keyCode = BasicInput();
-
 	oldPos = transform.position;
-
 
 	if (keyCode & (PAD_LEFT | PAD_RIGHT) && moveFunc == &Player::Standby) {
 		step = STEP::INIT;
@@ -60,42 +65,10 @@ void Player::Update()
 	speed.y -= P_GF;
 	transform.position += speed;
 
-	if (transform.position.y < RESET_HEIGHT)
-	{
+	if (transform.position.y < RESET_HEIGHT) {
 		transform.position = Vector3::Zero;
 		speed.y = 0;
 	}
-
-
-
-	static float cameraY = 2, cameraZ = -9;
-	if (Input::KEY.I)
-	{
-		cameraY += 0.01f;
-	}
-	if (Input::KEY.K)
-	{
-		cameraY -= 0.01f;
-	}
-	if (Input::KEY.O)
-	{
-		cameraZ += 0.01f;
-	}
-	if (Input::KEY.U)
-	{
-		cameraZ -= 0.01f;
-	}
-	
-	GLC::mainCamera.eyePosition = transform.position + Vector3(0, cameraY, cameraZ);
-	GLC::mainCamera.focusPosition = transform.position + Vector3(0, 0.5f, 0);
-
-	Vector3 forword = DirectX::XMVectorSubtract(GLC::mainCamera.focusPosition, GLC::mainCamera.eyePosition);
-	forword.Normalize();
-	
-	float angle = forword.Dot(Vector3(0, 1, 0));
-	GLC::mainCamera.upDirection = Vector3(0, 1, 0) - forword*angle;
-
-	GLC::mainCamera.upDirection = DirectX::XMVector3Normalize(GLC::mainCamera.upDirection);
 
 	// Update collision;
 	collision.minPos = Vector3(size.minPos) + transform.position;
@@ -104,34 +77,13 @@ void Player::Update()
 
 	moveDirection = transform.position - oldPos;
 	moveDirection.Normalize();
+
 }
 
 void Player::Draw()
 {
 	OBJ3D::Draw();
 
-	/*Vector3 positionAdd = meshData->preSetTransform.position + transform.position;
-	Vector3 rotateAdd = (transform.eulerDegreeAngle)*0.01745f;
-
-	XMVECTOR rotate = XMQuaternionRotationRollPitchYaw(rotateAdd.x, rotateAdd.y, rotateAdd.z);
-
-	static XMMATRIX world;
-	world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), g_XMOne, g_XMZero, rotate, XMLoadFloat3(&transform.position));*/
-
-	//static AABB testAABB(Vector3(5.0f, 0.0f, -0.2f), Vector3(6.0f, 1.0f, 0.2f));
-	//DXTK::DrawAABB(Framework::pDeviceContext, Matrix::Identity, GLC::mainCamera.view, GLC::mainCamera.projection,
-	//	testAABB.minPos, testAABB.maxPos, DirectX::Colors::Green);
-	//static Sphere testSphere(Vector3(-5.0f, 0.0f, -0.2f), 1);
-	//DXTK::DrawSphere(Framework::pDeviceContext, Matrix::Identity, GLC::mainCamera.view, GLC::mainCamera.projection,
-	//	testSphere.center, testSphere.radius,DirectX::Colors::Magenta);
-
-	////collision.minPos = DirectX::XMVector3Transform(size.minPos, world);
-	////collision.maxPos = DirectX::XMVector3Transform(size.maxPos, world);
-	//DirectX::XMVECTOR color = DirectX::Colors::Green;
-	//if (collision.HitJudgement(&testAABB) || collision.HitJudgement(&testSphere))
-	//{
-	//	color = DirectX::Colors::Red;
-	//}
 	DXTK::DrawAABB(Framework::pDeviceContext, Matrix::Identity, GLC::mainCamera.view, GLC::mainCamera.projection,
 		collision.minPos, collision.maxPos, collisionColor);
 
@@ -146,147 +98,6 @@ void Player::Draw()
 
 }
 
-void Player::Standby()
-{
-	switch (step) {
-	case STEP::INIT:
-		frame = 0;
-		meshData = &fbxPlayerStandby;
-		speed = Vector3(0, 0, 0);
-		step = STEP::BEGIN;
-		//break;
-	case STEP::BEGIN:
-
-		break;
-	default:
-		break;
-	}
-}
-
-void Player::Run()
-{
-	switch (step) {
-	case STEP::INIT:
-		moveFunc = &Player::Run;
-		meshData = &fbxPlayerRun;
-		frame = 0;
-		step = STEP::BEGIN;
-		//break
-	case STEP::BEGIN:
-		//++frame;
-		switch (keyCode & (PAD_LEFT | PAD_RIGHT))
-		{
-		case PAD_LEFT:
-			speed.x -= speedAcc.x;
-			transform.rotationDegree.y = 180;
-			break;
-		case PAD_RIGHT:
-			speed.x += speedAcc.x;
-			transform.rotationDegree.y = 0;
-			break;
-		default:
-			if (speed.x > 0) {
-				speed.x -= speedAcc.x / 2;
-				if (speed.x < 0) {
-					speed.x = 0;
-				}
-			}
-			if (speed.x < 0) {
-				speed.x += speedAcc.x / 2;
-				if (speed.x > 0) {
-					speed.x = 0;
-				}
-			}
-			if (fabsf(speed.x - 0.0f) < FLT_EPSILON) {
-				speed.x = 0;
-				step = STEP::FINISH;
-			}
-			break;
-		}
-
-		if (speed.x > speedMax.x)
-		{
-			speed.x = speedMax.x;
-		}
-		if (speed.x < -speedMax.x)
-		{
-			speed.x = -speedMax.x;
-		}
-		break;
-	case STEP::FINISH:
-		moveFunc = &Player::Standby;
-		step = STEP::INIT;
-		break;
-	default:
-		break;
-	}
-}
-
-void Player::Jump()
-{
-	switch (step) {
-	case STEP::INIT:
-		moveFunc = &Player::Jump;
-		meshData = &fbxPlayerJump;
-		frame = 0;
-		step = STEP::BEGIN;
-		//break;
-	case STEP::BEGIN:
-		++frame;
-		// PreMotion, Stop Forward movement
-		if (frame < 24) {
-			transform.position.x -= speed.x;
-		}
-		if (frame == 24) {
-			speed.y += P_JUMP_V0;
-		}
-		// Jumping
-		if (frame > 36 && speed.y > 0) {
-			frame = 36;
-		}
-		// Dropping
-		if (frame > 60 && speed.y < 0) {
-			frame = 60;
-		}
-		// Ending Jump, Also stop forward movement
-		if (frame > 72) {
-			transform.position.x -= speed.x;
-		}
-		if (frame > 83) {
-			step = STEP::FINISH;
-		}
-		break;
-	case STEP::FINISH:
-		moveFunc = &Player::Standby;
-		step = STEP::INIT;
-		break;
-	default:
-		break;
-	}
-}
-
-void Player::Attack()
-{
-	switch (step) {
-	case STEP::INIT:
-		moveFunc = &Player::Attack;
-		meshData = &fbxPlayerAttack;
-		frame = 0;
-		step = STEP::BEGIN;
-		//break;
-	case STEP::BEGIN:
-		++frame;
-
-
-		break;
-	case STEP::FINISH:
-		moveFunc = &Player::Standby;
-		step = STEP::INIT;
-		break;
-	default:
-		break;
-	}
-}
 
 
 
@@ -297,74 +108,132 @@ PlayerManager::PlayerManager()
 PlayerManager::~PlayerManager()
 {
 	//SAFE_DELETE(pPlayer);
-	_mm_free(pPlayer);
+	for (int i = 0; i < Input::MAX_PLAYER_COUNT && i < playerNum; ++i) {
+		if (pPlayer[i]) {
+			_mm_free(pPlayer[i]);
+		}
+	}
 }
 
-void PlayerManager::Init()
+void PlayerManager::Init(int _playerNum, int playerType[])
 {
-	if (!pPlayer)
-	{
-		//pPlayer = new Player();
-		
-		// Heap memory Alignment
-		pPlayer = new (_mm_malloc(sizeof(Player), alignof(Player))) Player();
-		pPlayer->Init();
+	if (_playerNum <= Input::MAX_PLAYER_COUNT && _playerNum > 0) {
+		playerNum = _playerNum;
 	}
-	else
-	{
-		pPlayer->Init();
+	
+	for (int i = 0; i < Input::MAX_PLAYER_COUNT && i < playerNum; ++i) {
+		if (pPlayer[i]) {
+			_mm_free(pPlayer[i]);
+		}
+		switch (playerType[i]) {
+		case Player::TYPE::A:
+			pPlayer[i] = new (_mm_malloc(sizeof(PlayerA), alignof(PlayerA))) PlayerA();
+			break;
+		case Player::TYPE::B:
+			pPlayer[i] = new (_mm_malloc(sizeof(PlayerB), alignof(PlayerB))) PlayerB();
+			break;
+		default:
+			break;
+		}
+
+		pPlayer[i]->Init();
+		pPlayer[i]->controllerNO = i;
+
+		pPlayer[i]->transform.position.x += i * 2;
 	}
 }
 
 void PlayerManager::Update()
 {
-	if (pPlayer)
-	{
-		pPlayer->Update();
+	static float cameraY = 2, cameraZ = -9;
+	Vector3 centerPositions(0, 0, 0);
+	Vector3 minPosition(0, 0, 0), maxPosition(0, 0, 0);
+
+	for (int i = 0; i < playerNum; ++i) {
+		if (pPlayer[i]) {
+			pPlayer[i]->Update();
+			if (pPlayer[i]->transform.position.x < minPosition.x) {
+				minPosition.x = pPlayer[i]->transform.position.x;
+			}
+			if (pPlayer[i]->transform.position.x > maxPosition.x) {
+				maxPosition.x = pPlayer[i]->transform.position.x;
+			}
+		}
 	}
+
+	centerPositions = (minPosition + maxPosition) / 2.0f;
+
+
+	// Camera Work
+	if (Input::KEY.I) {
+		cameraY += 0.01f;
+	}
+	if (Input::KEY.K) {
+		cameraY -= 0.01f;
+	}
+	if (Input::KEY.O) {
+		cameraZ += 0.01f;
+	}
+	if (Input::KEY.U) {
+		cameraZ -= 0.01f;
+	}
+
+	GLC::mainCamera.eyePosition = centerPositions + Vector3(0, cameraY, cameraZ);
+	GLC::mainCamera.focusPosition = centerPositions + Vector3(0, 0.5f, 0);
+
+	Vector3 forword = DirectX::XMVectorSubtract(GLC::mainCamera.focusPosition, GLC::mainCamera.eyePosition);
+	forword.Normalize();
+
+	float angle = forword.Dot(Vector3(0, 1, 0));
+	GLC::mainCamera.upDirection = Vector3(0, 1, 0) - forword*angle;
+
+	GLC::mainCamera.upDirection = DirectX::XMVector3Normalize(GLC::mainCamera.upDirection);
+
 }
 
 void PlayerManager::Draw()
 {
-	if (pPlayer)
-	{
-		pPlayer->Draw();
+	for (int i = 0; i < playerNum; ++i) {
+		if (pPlayer[i]) {
+			pPlayer[i]->Draw();
+		}
 	}
 }
 
 void PlayerManager::DetectCollision(Collision* other)
 {
-	HitResult hitResult = pPlayer->collision.HitJudgement(other);
-	// 衝突したらプレイヤーを判定相手から外へ押し出し
-	if (hitResult.isHitted)
-	{
-		pPlayer->collisionColor= DirectX::Colors::Red;
-		//static Vector3 size = Vector3(pPlayer->size.maxPos) - Vector3(pPlayer->size.minPos);
-		//static float disFromCenterToVertex = size.x*size.x + size.y*size.y;
-		Vector2 direction = Vector2(Vector3(pPlayer->size.maxPos) - Vector3(pPlayer->size.minPos));
-		direction.Normalize();
-		static float dotRangeUpAndDown = -fabsf(Vector2::UnitY.Dot(direction));
-		static float dotRangeLeftAndRight = -fabsf(Vector2::UnitX.Dot(direction));
-		
-		if (Vector3::Left.Dot(hitResult.direction) < dotRangeLeftAndRight && Vector3::Left.Dot(pPlayer->moveDirection) < 0)
-		{
-			pPlayer->speed.x = 0;
-			pPlayer->transform.position.x = Vector3(hitResult.closestPoint).x - Vector3(pPlayer->size.maxPos).x/* - 0.001f*/;
-		}
-		else if (Vector3::Right.Dot(hitResult.direction) < dotRangeLeftAndRight && Vector3::Right.Dot(pPlayer->moveDirection) < 0)
-		{
-			pPlayer->speed.x = 0;
-			pPlayer->transform.position.x = Vector3(hitResult.closestPoint).x + Vector3(pPlayer->size.maxPos).x/* + 0.001f*/;
-		}
-		else if (Vector3::Up.Dot(hitResult.direction) < dotRangeUpAndDown && Vector3::Up.Dot(pPlayer->moveDirection) < 0)
-		{
-			pPlayer->speed.y = 0;
-			pPlayer->transform.position.y = Vector3(hitResult.closestPoint).y/* + 0.001f*/;
-		}
-		else if (Vector3::Down.Dot(hitResult.direction) < dotRangeUpAndDown && Vector3::Down.Dot(pPlayer->moveDirection) < 0)
-		{
-			pPlayer->speed.y = 0;
-			pPlayer->transform.position.y = Vector3(hitResult.closestPoint).y - Vector3(DirectX::XMVectorSubtract(pPlayer->size.maxPos, pPlayer->size.minPos)).y/* - 0.001f*/;
+	HitResult hitResult;
+	for (int i = 0; i < playerNum; ++i) {
+		if (pPlayer[i]) {
+			hitResult = pPlayer[i]->collision.HitJudgement(other);
+			// 衝突したらプレイヤーを判定相手から外へ押し出し
+			if (hitResult.isHitted) {
+				pPlayer[i]->collisionColor = DirectX::Colors::Red;
+				//static Vector3 size = Vector3(pPlayer[i]->size.maxPos) - Vector3(pPlayer[i]->size.minPos);
+				//static float disFromCenterToVertex = size.x*size.x + size.y*size.y;
+				Vector2 direction = Vector2(Vector3(pPlayer[i]->size.maxPos) - Vector3(pPlayer[i]->size.minPos));
+				direction.Normalize();
+				static float dotRangeUpAndDown = -fabsf(Vector2::UnitY.Dot(direction));
+				static float dotRangeLeftAndRight = -fabsf(Vector2::UnitX.Dot(direction));
+
+				if (Vector3::Left.Dot(hitResult.direction) < dotRangeLeftAndRight && Vector3::Left.Dot(pPlayer[i]->moveDirection) < 0) {
+					pPlayer[i]->speed.x = 0;
+					pPlayer[i]->transform.position.x = Vector3(hitResult.closestPoint).x - Vector3(pPlayer[i]->size.maxPos).x/* - 0.001f*/;
+				}
+				else if (Vector3::Right.Dot(hitResult.direction) < dotRangeLeftAndRight && Vector3::Right.Dot(pPlayer[i]->moveDirection) < 0) {
+					pPlayer[i]->speed.x = 0;
+					pPlayer[i]->transform.position.x = Vector3(hitResult.closestPoint).x + Vector3(pPlayer[i]->size.maxPos).x/* + 0.001f*/;
+				}
+				else if (Vector3::Up.Dot(hitResult.direction) < dotRangeUpAndDown && Vector3::Up.Dot(pPlayer[i]->moveDirection) < 0) {
+					pPlayer[i]->speed.y = 0;
+					pPlayer[i]->transform.position.y = Vector3(hitResult.closestPoint).y/* + 0.001f*/;
+				}
+				else if (Vector3::Down.Dot(hitResult.direction) < dotRangeUpAndDown && Vector3::Down.Dot(pPlayer[i]->moveDirection) < 0) {
+					pPlayer[i]->speed.y = 0;
+					pPlayer[i]->transform.position.y = Vector3(hitResult.closestPoint).y - Vector3(DirectX::XMVectorSubtract(pPlayer[i]->size.maxPos, pPlayer[i]->size.minPos)).y/* - 0.001f*/;
+				}
+			}
+
 		}
 	}
 }

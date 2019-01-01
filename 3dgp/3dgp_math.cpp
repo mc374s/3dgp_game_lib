@@ -14,8 +14,7 @@ HitResult Collision::HitJudgement(const Collision* other)
 		hitResult = SphereHitSphere(((Sphere*)this)->center, ((Sphere*)this)->radius, ((Sphere*)other)->center, ((Sphere*)other)->radius);
 		break;
 	case _SPHERE | _AABB:
-		if (type == _AABB)
-		{
+		if (type == _AABB) {
 			A = other;
 			B = this;
 			directionAdjustion = -1;
@@ -37,12 +36,10 @@ HitResult XM_CALLCONV SphereHitSphere(DirectX::FXMVECTOR centerA, float radiusA,
 {
 	HitResult hitResult;
 
-	if (XMVectorGetX(XMVector3Length(centerB - centerA)) > radiusA + radiusB)
-	{
+	if (XMVectorGetX(XMVector3Length(centerB - centerA)) > radiusA + radiusB) {
 		hitResult.isHitted = false;
 	}
-	else
-	{
+	else {
 		hitResult.isHitted = true;
 	}
 	hitResult.direction = XMVector3Normalize(XMVectorSubtract(centerB, centerA));
@@ -86,28 +83,22 @@ HitResult XM_CALLCONV AABBHitAABB(DirectX::FXMVECTOR minPosA, DirectX::FXMVECTOR
 	hitResult.direction = XMVector3Normalize(XMVectorSubtract(hitResult.closestPoint, centerA));
 
 	hitResult.isHitted = false;
-	if (minA.x > maxB.x)
-	{
+	if (minA.x > maxB.x) {
 		return hitResult;
 	}
-	if (maxA.x < minB.x)
-	{
+	if (maxA.x < minB.x) {
 		return hitResult;
 	}
-	if (minA.y > maxB.y)
-	{
+	if (minA.y > maxB.y) {
 		return hitResult;
 	}
-	if (maxA.y < minB.y)
-	{
+	if (maxA.y < minB.y) {
 		return hitResult;
 	}
-	if (minA.z > maxB.z)
-	{
+	if (minA.z > maxB.z) {
 		return hitResult;
 	}
-	if (maxA.z < minB.z)
-	{
+	if (maxA.z < minB.z) {
 		return hitResult;
 	}
 	hitResult.isHitted = true;

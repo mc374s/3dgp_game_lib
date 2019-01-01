@@ -207,6 +207,8 @@
     <ClCompile Include="Game\obj2d.cpp" />
     <ClCompile Include="Game\obj3d.cpp" />
     <ClCompile Include="Game\player.cpp" />
+    <ClCompile Include="Game\player_a.cpp" />
+    <ClCompile Include="Game\player_b.cpp" />
     <ClCompile Include="Game\scene_main.cpp" />
     <ClCompile Include="Game\scene_title.cpp" />
     <ClCompile Include="Game\skill_construction.cpp" />

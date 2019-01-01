@@ -84,79 +84,83 @@ void TextureManager::ReleaseTexture()
 }
 
 
-int  BasicInput(int playerNO)
+int BasicInput(int controllerNO)
 {
-	int command = 0x0;
+	int keyCode = 0x0;
 
-	if (playerNO >= Input::MAX_PLAYER_COUNT || playerNO < 0) {
-		_RPT0(_CRT_ERROR, "Error playerNO");
-		return -1;
+	if (controllerNO >= Input::MAX_PLAYER_COUNT || controllerNO < 0) {
+		_RPT0(_CRT_ERROR, "Illegal controllerNO");
+		return 0x0;
 	}
-	if (playerNO == 0) {
+	
+	if (controllerNO == 0) {
 		if (Input::KEY.Up) {
-			command |= PAD_UP;
+			keyCode |= PAD_UP;
 		}
 		if (Input::KEY.Down) {
-			command |= PAD_DOWN;
+			keyCode |= PAD_DOWN;
 		}
 		if (Input::KEY.Left) {
-			command |= PAD_LEFT;
+			keyCode |= PAD_LEFT;
 		}
 		if (Input::KEY.Right) {
-			command |= PAD_RIGHT;
+			keyCode |= PAD_RIGHT;
 		}
 		if (Input::KEY_TRACKER.pressed.Enter) {
-			command |= PAD_START;
+			keyCode |= PAD_START;
 		}
 		if (Input::KEY_TRACKER.pressed.Escape) {
-			command |= PAD_BACK;
+			keyCode |= PAD_BACK;
 		}
 		if (Input::KEY_TRACKER.pressed.Z) {
-			command |= PAD_TRG1;
+			keyCode |= PAD_TRG1;
 		}
 		if (Input::KEY_TRACKER.pressed.X) {
-			command |= PAD_TRG2;
+			keyCode |= PAD_TRG2;
 		}
 		if (Input::KEY_TRACKER.pressed.C) {
-			command |= PAD_TRG3;
+			keyCode |= PAD_TRG3;
 		}
 		if (Input::KEY_TRACKER.pressed.V) {
-			command |= PAD_TRG4;
+			keyCode |= PAD_TRG4;
 		}
 	}
+	//
+	if (Input::PAD[controllerNO].IsConnected()) {
+		if (Input::PAD[controllerNO].IsLeftThumbStickUp()) {
+			keyCode |= PAD_UP;
+		}
+		if (Input::PAD[controllerNO].IsLeftThumbStickDown()) {
+			keyCode |= PAD_DOWN;
+		}
+		if (Input::PAD[controllerNO].IsLeftThumbStickLeft()) {
+			keyCode |= PAD_LEFT;
+		}
+		if (Input::PAD[controllerNO].IsLeftThumbStickRight()) {
+			keyCode |= PAD_RIGHT;
+		}
+		if (Input::PAD[controllerNO].IsStartPressed()) {
+			keyCode |= PAD_START;
+		}
+		if (Input::PAD[controllerNO].IsBackPressed()) {
+			keyCode |= PAD_BACK;
+		}
+		if (Input::PAD[controllerNO].IsAPressed()) {
+			keyCode |= PAD_TRG1;
+		}
+		if (Input::PAD[controllerNO].IsBPressed()) {
+			keyCode |= PAD_TRG2;
+		}
+		if (Input::PAD[controllerNO].IsXPressed()) {
+			keyCode |= PAD_TRG3;
+		}
+		if (Input::PAD[controllerNO].IsYPressed()) {
+			keyCode |= PAD_TRG4;
+		}
 
-	if (Input::PAD[playerNO].IsLeftThumbStickUp()) {
-		command |= PAD_UP;
-	}
-	if (Input::PAD[playerNO].IsLeftThumbStickDown()) {
-		command |= PAD_DOWN;
-	}
-	if (Input::PAD[playerNO].IsLeftThumbStickLeft()){
-		command |= PAD_LEFT;
-	}
-	if (Input::PAD[playerNO].IsLeftThumbStickRight()){
-		command |= PAD_RIGHT;
-	}
-	if (Input::PAD[playerNO].IsStartPressed()) {
-		command |= PAD_START;
-	}
-	if (Input::PAD[playerNO].IsBackPressed()) {
-		command |= PAD_BACK;
-	}
-	if (Input::PAD[playerNO].IsAPressed()) {
-		command |= PAD_TRG1;
-	}
-	if (Input::PAD[playerNO].IsBPressed()) {
-		command |= PAD_TRG2;
-	}
-	if (Input::PAD[playerNO].IsXPressed()) {
-		command |= PAD_TRG3;
-	}
-	if (Input::PAD[playerNO].IsYPressed()) {
-		command |= PAD_TRG4;
 	}
 
-	return command;
+	return keyCode;
 }
 
 void DrawString(int x, int y, char *buf, UINTCOLOR color, int format, int sizeX, int sizeY, float angle)
@@ -211,7 +215,7 @@ void View::Set(float drawX, float drawY, float drawWidth, float drawHeight, floa
 	
 	XMVECTOR rotation = XMQuaternionRotationRollPitchYawFromVector(rotationDegree*0.01745f);
 
-	static XMMATRIX world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), scaling, g_XMZero, rotation, position);
+	XMMATRIX world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), scaling, g_XMZero, rotation, position);
 
 	pRenderTarget->Draw(Framework::pDeviceContext, world, GLC::mainCamera.view, GLC::mainCamera.projection, drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, rotateAngle, XMConvertUIntToColor(blendColor), doReflection);
 }

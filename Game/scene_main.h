@@ -25,7 +25,7 @@ public:
 	void Update();
 	void Draw();
 
-	bool pause();
+	bool Pause();
 	void gameMain();
 };
 

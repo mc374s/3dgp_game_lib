@@ -34,7 +34,12 @@ void SceneMain::Init()
 {
 	Scene::Init();
 
-	pPlayerManager->Init();
+	int playerType[Input::MAX_PLAYER_COUNT];
+
+	playerType[0] = Player::TYPE::A;
+	playerType[1] = Player::TYPE::B;
+
+	pPlayerManager->Init(2, playerType);
 	pMainStage->Init();
 }
 
@@ -51,7 +56,7 @@ SceneMain::~SceneMain()
 
 void SceneMain::Update()
 {	
-	if (pause()){
+	if (Pause()){
 		return;
 	}
 	if (Input::KEY_TRACKER.pressed.P) {
@@ -129,7 +134,7 @@ void SceneMain::Draw()
 
 }
 
-bool SceneMain::pause()
+bool SceneMain::Pause()
 {
 	static int pressTimer = 0;
 	if ((Input::KEY_TRACKER.pressed.Space || Input::PAD_TRACKER[0].menu == Input::PAD_TRACKER[0].PRESSED)) {

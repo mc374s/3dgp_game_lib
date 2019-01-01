@@ -262,10 +262,10 @@ int Framework::Run()
 			Input::KEY_TRACKER.Update(Input::KEY);
 
 			for (int padIndex = 0; padIndex < Input::MAX_PLAYER_COUNT; ++padIndex) {
-				if (Input::PAD[padIndex].IsConnected()) {
-					Input::PAD[padIndex] = Input::pGamePad->GetState(padIndex);
-					Input::PAD_TRACKER[padIndex].Update(Input::PAD[padIndex]);
-				}
+				Input::PAD[padIndex] = Input::pGamePad->GetState(padIndex);
+				Input::PAD_TRACKER[padIndex].Update(Input::PAD[padIndex]);
+				//if (Input::PAD[padIndex].IsConnected()) {
+				//}
 			}
 			//DirectX::BasicEffect;
 

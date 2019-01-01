@@ -202,6 +202,12 @@
     <ClCompile Include="Game\skill_construction.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="Game\player_a.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\player_b.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="3dgp\texture_off.hlsli">

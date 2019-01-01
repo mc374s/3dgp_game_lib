@@ -47,6 +47,7 @@ struct Collision
 		_SPHERE = 1 << 0,
 		_PLANE	= 1 << 1,
 		_AABB	= 1 << 2,
+		MAX_NUM
 	};
 	int type = _SPHERE;
 

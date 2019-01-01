@@ -21,6 +21,13 @@ private:
 
 public:
 
+	enum TYPE {
+		A=0,
+		B,
+		MAX_NUM
+	};
+
+	int controllerNO;
 	int keyCode;
 	AABB size;
 	AABB collision;
@@ -29,34 +36,76 @@ public:
 	Vector3 moveDirection;
 
 	Player();
-	~Player();
+	virtual ~Player();
 
-	void Init();
-	void Update();
-	void Draw();
+	virtual void Clear();
+	virtual void Init();
+	virtual void Update();
+	virtual void Draw();
 
 	//void(Player*)();
 	void(Player::*moveFunc)();
 	void(Player::*lastMove)();
-	void Standby();
-	void Run();
-	void Jump();
-	void Attack();
+
+	virtual void Standby() {};
+	virtual void Run() {};
+	virtual void Jump() {};
+	virtual void Attack() {};
 
 };
+
+class PlayerA:public Player
+{
+private:
+
+
+public:
+	PlayerA();
+	virtual ~PlayerA();
+
+	virtual void Init();
+	virtual void Update();
+
+	virtual void Standby();
+	virtual void Run();
+	virtual void Jump();
+	virtual void Attack();
+};
+
+class PlayerB :public Player
+{
+private:
+
+
+public:
+	PlayerB();
+	virtual ~PlayerB();
+
+	virtual void Init();
+	virtual void Update();
+
+	virtual void Standby();
+	virtual void Run();
+	virtual void Jump();
+	virtual void Attack();
+};
+
 
 
 
 class PlayerManager :public Singleton<PlayerManager> {
 
 private:
-	Player* pPlayer = nullptr;
+
+	Player* pPlayer[Input::MAX_PLAYER_COUNT] = { nullptr };
 
 public:
 	PlayerManager();
 	~PlayerManager();
 
-	void Init();
+	int playerNum;
+
+	void Init(int playerNum = 1, int playerType[] = {0});
 	void Update();
 	void Draw();
 

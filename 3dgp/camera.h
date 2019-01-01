@@ -10,10 +10,12 @@ namespace GLC{
 class Camera
 {
 public:
-	DirectX::XMVECTOR		eyePosition;
-	DirectX::XMVECTOR		focusPosition;
-	DirectX::XMVECTOR		upDirection;
-	D3D11_VIEWPORT			viewPort;
+	DirectX::XMVECTOR	eyePosition;
+	DirectX::XMVECTOR	focusPosition;
+	DirectX::XMVECTOR	upDirection;
+	D3D11_VIEWPORT		viewPort;
+	float				FovAngleY;
+
 
 	Camera();
 

@@ -58,7 +58,7 @@ void FetchBoneMatrices(FbxMesh* pFbxMesh, std::vector<SkinnedMesh::Bone> &skelet
 			FbxCluster *pCluster = pSkin->GetCluster(clusterIndex);
 			//
 			FbxNode* linked_node = pCluster->GetLink();
-			_RPTN(_CRT_WARN, "%s:\n", linked_node->GetName());
+			//_RPTN(_CRT_WARN, "%s:\n", linked_node->GetName());
 
 			// This matrix transform coordinates of the initial pose from mesh spece to global space
 			FbxAMatrix referenceGlobalInitPosition;
@@ -358,8 +358,7 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const 
 				vertex.normal.z = static_cast<float>(normal[2]);
 				vertex.color = subset.diffuse.color;
 				// Get UV coordinates
-				if (pFbxMesh->GetElementUVCount() > 0)
-				{
+				if (pFbxMesh->GetElementUVCount() > 0) {
 					FbxVector2 uv;
 					bool isUnmappedUV;
 					pFbxMesh->GetPolygonVertexUV(polygonIndex, vertexIndex, uvNamesList[0], uv, isUnmappedUV);
@@ -573,7 +572,7 @@ void SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, bool isWireframe, co
 	}
 }
 
-void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, bool isWireframe,const int& animationFrame, float elapsedTime, int* stopFrame)
+void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, bool isWireframe, int animationFrame, float elapsedTime, int* stopFrame)
 {
 	XMMATRIX worldViewProjection(world);
 	worldViewProjection *= view;
