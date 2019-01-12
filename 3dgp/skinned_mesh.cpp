@@ -14,6 +14,10 @@ using namespace fbxsdk;
 using namespace DirectX;
 
 
+#define SAFE_WRITE(pBuffer,size,pFile) {if(fwrite(pBuffer,size,1,pFile)<1){_RPT0(_CRT_ERROR, "File write error!\n"); return -1;}}
+#define SAFE_READ(pBuffer,size,pFile) {if(fread(pBuffer,size,1,pFile)<1){_RPT0(_CRT_ERROR, "File read error!\n"); return -1;}}
+
+
 void FetchBoneInfluences(const FbxMesh *pFbxMesh, std::vector<SkinnedMesh::BoneInfluencesPerContralPoint> &influences)
 {
 	const int controlPointsNum = pFbxMesh->GetControlPointsCount();
@@ -150,261 +154,291 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const 
 		};
 	}
 
-	// Create the FBX SDK manager
-	FbxManager* pFbxManager = FbxManager::Create();
-
-	// Create an IOSetting object, IOSROOT is defined in Fbxiosettingspath.h
-	pFbxManager->SetIOSettings(FbxIOSettings::Create(pFbxManager, IOSROOT));
-
-	// Create an importer
-	FbxImporter* pFbxImporter = FbxImporter::Create(pFbxManager, "");
-
-	// Initialize the importer
-	bool isImportSuccessed = false;
-	isImportSuccessed = pFbxImporter->Initialize(pFbxFileName, -1, pFbxManager->GetIOSettings());
-	_ASSERT_EXPR(isImportSuccessed, pFbxImporter->GetStatus().GetErrorString());
-
-	// Create a new scene, so it can be populated by the imported file
-	FbxScene* scene = FbxScene::Create(pFbxManager, "");
-
-	// Import the contents of the file into the scene
-	isImportSuccessed = pFbxImporter->Import(scene);
-	_ASSERT_EXPR(isImportSuccessed, pFbxImporter->GetStatus().GetErrorString());
-
-	// Convert mesh, NURBS and patch into triangle mesh
-	FbxGeometryConverter geometryConverter(pFbxManager);
-	geometryConverter.Triangulate(scene,/*replace*/true);
-
-	// Fetch node attributes and materials under this node recursively. Currently only mesh
-	std::vector<FbxNode*> fetchedMeshes;
-	std::function<void(FbxNode*)> traverse = [&](FbxNode* node) {
-		if (node) {
-			FbxNodeAttribute* pFbxNodeAttribute = node->GetNodeAttribute();
-			if (pFbxNodeAttribute) {
-				switch (pFbxNodeAttribute->GetAttributeType()) {
-				case FbxNodeAttribute::eMesh:
-					fetchedMeshes.push_back(node);
-					break;
-				}
-			}
-			for (int i = 0; i < node->GetChildCount(); i++) {
-				traverse(node->GetChild(i));
-			}
-		}
-	};
-	traverse(scene->GetRootNode());
-
 	// Get the Folder path
 	int meshFileFloderPathLength = 0;
-	char *pFileFolderPath = new char[strlen(pFbxFileName)];
-	for (int i = strlen(pFbxFileName); i >= 0; --i) {
+	//char *pFileFolderPath = new char[strlen(pFbxFileName)];
+	char pFileFolderPath[256];
+	char pFileName[256];
+	for (int i = strlen(pFbxFileName), length = i; i >= 0; --i) {
 		if (*(pFbxFileName + i) == '/' || *(pFbxFileName + i) == '\\') {
 			meshFileFloderPathLength = i + 1;
-			memcpy(pFileFolderPath, pFbxFileName, meshFileFloderPathLength);
+			strncpy_s(pFileFolderPath, pFbxFileName, meshFileFloderPathLength);
+			//memcpy(pFileFolderPath, pFbxFileName, meshFileFloderPathLength);
 			// Memcpy Does not copy the '\0'
-			pFileFolderPath[meshFileFloderPathLength] = '\0';
+			//pFileFolderPath[meshFileFloderPathLength] = '\0';
+
+			strcpy_s(pFileName, pFbxFileName + meshFileFloderPathLength);
+
 			break;
 		}
 	}
+	// Make Output File Path
+	char outputFileName[256] = "./Data/";
+	//strcpy_s(outputFileName, pFileFolderPath);
+	//strcat_s(outputFileName, "fbx_output/");
+	strcat_s(outputFileName, pFileName);
+	strcat_s(outputFileName, "_output");
 
-	//FbxMesh *pFbxMesh = fetchedMeshes.at(0)->GetMesh();		// Currently only one mesh
-	//FbxMesh *pFbxMesh = nullptr;
-	meshesList.resize(fetchedMeshes.size());
+	if (LoadFbxMeshData(pDevice, outputFileName)==0) {
 
-	for (size_t i = 0, max = fetchedMeshes.size(); i < max; i++) {
-		FbxMesh *pFbxMesh = fetchedMeshes.at(i)->GetMesh();
+	}
+	else {
+		// Create the FBX SDK manager
+		FbxManager* pFbxManager = FbxManager::Create();
 
+		// Create an IOSetting object, IOSROOT is defined in Fbxiosettingspath.h
+		pFbxManager->SetIOSettings(FbxIOSettings::Create(pFbxManager, IOSROOT));
 
-		// Fetch Bone Influences
-		std::vector<BoneInfluencesPerContralPoint> boneInfluences;
-		FetchBoneInfluences(pFbxMesh, boneInfluences);
+		// Create an importer
+		FbxImporter* pFbxImporter = FbxImporter::Create(pFbxManager, "");
 
-		Mesh &mesh = meshesList.at(i);
-		// Fetch mesh data
-		std::vector<vertex3D> verticesList;		// As for vertex buffer
-		std::vector<WORD> indicesList;			// As for index buffer
-		u_int vertexCount = 0;
+		// Initialize the importer
+		bool isImportSuccessed = false;
+		isImportSuccessed = pFbxImporter->Initialize(pFbxFileName, -1, pFbxManager->GetIOSettings());
+		_ASSERT_EXPR(isImportSuccessed, pFbxImporter->GetStatus().GetErrorString());
 
-		FbxStringList uvNamesList;
-		pFbxMesh->GetUVSetNames(uvNamesList);
+		// Create a new scene, so it can be populated by the imported file
+		FbxScene* scene = FbxScene::Create(pFbxManager, "");
 
-		const FbxVector4 *pControlPointsArray = pFbxMesh->GetControlPoints();
-		const int polygonsNum = pFbxMesh->GetPolygonCount();
+		// Import the contents of the file into the scene
+		isImportSuccessed = pFbxImporter->Import(scene);
+		_ASSERT_EXPR(isImportSuccessed, pFbxImporter->GetStatus().GetErrorString());
 
-		// Fetch Bone transform
-		//FbxTime::EMode timeMode = pFbxMesh->GetScene()->GetGlobalSettings().GetTimeMode();
-		//FbxTime frameTime;
-		//frameTime.SetTime(0, 0, 0, 1, 0, timeMode);
-		//fetchBoneMatrices(pFbxMesh, mesh.skeletal, frameTime * 20); // pose at frame 20 for testing
+		// Convert mesh, NURBS and patch into triangle mesh
+		FbxGeometryConverter geometryConverter(pFbxManager);
+		geometryConverter.Triangulate(scene,/*replace*/true);
 
-		// Fetch Animations
-		FetchAnimations(pFbxMesh, mesh.skeletalAnimation);
-
-		// Fetch global transform matrix
-		FbxAMatrix globalTransform = pFbxMesh->GetNode()->EvaluateGlobalTransform(0);
-		mesh.globalTransform = XMFLOAT4X4(
-			globalTransform.mData[0][0], globalTransform.mData[0][1], globalTransform.mData[0][2], globalTransform.mData[0][3],
-			globalTransform.mData[1][0], globalTransform.mData[1][1], globalTransform.mData[1][2], globalTransform.mData[1][3],
-			globalTransform.mData[2][0], globalTransform.mData[2][1], globalTransform.mData[2][2], globalTransform.mData[2][3],
-			globalTransform.mData[3][0], globalTransform.mData[3][1], globalTransform.mData[3][2], globalTransform.mData[3][3]
-		);
-		/*for (int row = 0, column = 0; row < 4; ++row) {
-			for (column = 0; column < 4; ++column) {
-				mesh.globalTransform(row, column) = static_cast<float>(globalTransform[row][column]);
-			}
-		}*/
-		// Fetch material properties
-		const int materialsNum = pFbxMesh->GetNode()->GetMaterialCount();
-		if (materialsNum > 0) {
-			mesh.subsetsList.resize(materialsNum);
-		}
-		else {
-			Subset dummyData;
-			RM::LoadShaderResourceView(pDevice, &dummyData.diffuse.pShaderResourceView, nullptr, nullptr);
-			mesh.subsetsList.push_back(dummyData);
-		}
-
-		for (int materialsIndex = 0; materialsIndex < materialsNum; materialsIndex++) {
-			Subset &subset = mesh.subsetsList.at(materialsIndex);
-
-			const FbxSurfaceMaterial *pSurfaceMaterial = pFbxMesh->GetNode()->GetMaterial(materialsIndex);
-			const FbxProperty property = pSurfaceMaterial->FindProperty(FbxSurfaceMaterial::sDiffuse);
-			const FbxProperty factor = pSurfaceMaterial->FindProperty(FbxSurfaceMaterial::sDisplacementFactor);
-			
-			if (property.IsValid() && factor.IsValid()) {
-				FbxDouble3 color = property.Get<FbxDouble3>();
-				double f = factor.Get<FbxDouble>();
-				subset.diffuse.color.x = static_cast<float>(color[0] * f);
-				subset.diffuse.color.y = static_cast<float>(color[1] * f);
-				subset.diffuse.color.z = static_cast<float>(color[2] * f);
-				subset.diffuse.color.w = 1.0f;
-			}
-			if (property.IsValid()) {
-				const int texturesNum = property.GetSrcObjectCount<FbxFileTexture>();
-				// Save the txtures number
-
-				if (texturesNum > 0) {
-
-					const FbxFileTexture *pTextureFile = property.GetSrcObject<FbxFileTexture>();
-					if (pTextureFile) {
-
-						const char *pUVFileName = pTextureFile->GetRelativeFileName();
-						// Create "diffuse.pShaderResourceView"
-
-						// Already get the mesh file's floder path
-						int uvFileNameLength = strlen(pUVFileName) + 1;
-						const int uvFilePathLength = meshFileFloderPathLength + uvFileNameLength;
-						char *pUVFilePath = new char[uvFilePathLength];
-						memcpy(pUVFilePath, pFileFolderPath, meshFileFloderPathLength);
-						pUVFilePath[meshFileFloderPathLength] = '\0';
-						strcat_s(pUVFilePath, uvFilePathLength, pUVFileName);
-						
-						RM::LoadShaderResourceView(pDevice, &subset.diffuse.pShaderResourceView, pUVFilePath, nullptr);
-						
-						SAFE_DELETE(pUVFilePath);
-						
+		// Fetch node attributes and materials under this node recursively. Currently only mesh
+		std::vector<FbxNode*> fetchedMeshes;
+		std::function<void(FbxNode*)> traverse = [&](FbxNode* node) {
+			if (node) {
+				FbxNodeAttribute* pFbxNodeAttribute = node->GetNodeAttribute();
+				if (pFbxNodeAttribute) {
+					switch (pFbxNodeAttribute->GetAttributeType()) {
+					case FbxNodeAttribute::eMesh:
+						fetchedMeshes.push_back(node);
+						break;
 					}
 				}
-				else {
-					RM::LoadShaderResourceView(pDevice, &subset.diffuse.pShaderResourceView, nullptr, nullptr);
+				for (int i = 0; i < node->GetChildCount(); i++) {
+					traverse(node->GetChild(i));
 				}
-
 			}
+		};
+		traverse(scene->GetRootNode());
 
-		}
+		//FbxMesh *pFbxMesh = fetchedMeshes.at(0)->GetMesh();		// Currently only one mesh
+		//FbxMesh *pFbxMesh = nullptr;
+		meshesList.resize(fetchedMeshes.size());
+
+		for (size_t i = 0, max = fetchedMeshes.size(); i < max; i++) {
+			FbxMesh *pFbxMesh = fetchedMeshes.at(i)->GetMesh();
 
 
+			// Fetch Bone Influences
+			std::vector<BoneInfluencesPerContralPoint> boneInfluences;
+			FetchBoneInfluences(pFbxMesh, boneInfluences);
 
-		if (materialsNum > 0)
-		{
-			// Count the faces of each material
-			for (int polygonIndex = 0; polygonIndex < polygonsNum; ++polygonIndex) {
-				const u_int materialIndex = pFbxMesh->GetElementMaterial()->GetIndexArray().GetAt(polygonIndex);
-				mesh.subsetsList.at(materialIndex).IndexCount += 3;
+			Mesh &mesh = meshesList.at(i);
+			// Fetch mesh data
+			//std::vector<Vertex3D> verticesList;		// As for vertex buffer
+			//std::vector<WORD> indicesList;			// As for index buffer
+			u_int vertexCount = 0;
+
+			FbxStringList uvNamesList;
+			pFbxMesh->GetUVSetNames(uvNamesList);
+
+			const FbxVector4 *pControlPointsArray = pFbxMesh->GetControlPoints();
+			const int polygonsNum = pFbxMesh->GetPolygonCount();
+
+			// Fetch Bone transform
+			//FbxTime::EMode timeMode = pFbxMesh->GetScene()->GetGlobalSettings().GetTimeMode();
+			//FbxTime frameTime;
+			//frameTime.SetTime(0, 0, 0, 1, 0, timeMode);
+			//fetchBoneMatrices(pFbxMesh, mesh.skeletal, frameTime * 20); // pose at frame 20 for testing
+
+			// Fetch Animations
+			FetchAnimations(pFbxMesh, mesh.skeletalAnimation);
+
+			// Fetch global transform matrix
+			FbxAMatrix globalTransform = pFbxMesh->GetNode()->EvaluateGlobalTransform(0);
+			mesh.globalTransform = XMFLOAT4X4(
+				globalTransform.mData[0][0], globalTransform.mData[0][1], globalTransform.mData[0][2], globalTransform.mData[0][3],
+				globalTransform.mData[1][0], globalTransform.mData[1][1], globalTransform.mData[1][2], globalTransform.mData[1][3],
+				globalTransform.mData[2][0], globalTransform.mData[2][1], globalTransform.mData[2][2], globalTransform.mData[2][3],
+				globalTransform.mData[3][0], globalTransform.mData[3][1], globalTransform.mData[3][2], globalTransform.mData[3][3]
+			);
+			/*for (int row = 0, column = 0; row < 4; ++row) {
+			for (column = 0; column < 4; ++column) {
+			mesh.globalTransform(row, column) = static_cast<float>(globalTransform[row][column]);
 			}
-			// Record the offset (how manay vertex)
-			int offset = 0;
-			for (Subset &subset : mesh.subsetsList) {
-				subset.startIndex = offset;
-				offset += subset.IndexCount;
-				// This will be used as counter in the following procedures, reset to zero
-				subset.IndexCount = 0;
-			}
-		}
-		indicesList.resize(polygonsNum * 3);
-		int materialIndex = 0;
-		for (int polygonIndex = 0; polygonIndex < polygonsNum; ++polygonIndex) {
-			// The material for current face
-			materialIndex = 0;
+			}*/
+			// Fetch material properties
+			const int materialsNum = pFbxMesh->GetNode()->GetMaterialCount();
 			if (materialsNum > 0) {
-				materialIndex = pFbxMesh->GetElementMaterial()->GetIndexArray().GetAt(polygonIndex);
+				mesh.subsetsList.resize(materialsNum);
 			}
-			// Where should I save the vertex attribute index, according to the material
+			else {
+				Subset dummyData;
+				RM::LoadShaderResourceView(pDevice, &dummyData.diffuse.pShaderResourceView, nullptr, nullptr);
+				strcpy_s(dummyData.diffuse.textureFileName, "null");
+				mesh.subsetsList.push_back(dummyData);
+			}
 
-			Subset &subset = mesh.subsetsList.at(materialIndex);
-			const int offsetIndex = subset.startIndex + subset.IndexCount;
+			for (int materialsIndex = 0; materialsIndex < materialsNum; materialsIndex++) {
+				Subset &subset = mesh.subsetsList.at(materialsIndex);
 
-			for (int vertexIndex = 0; vertexIndex < 3; vertexIndex++) {
-				vertex3D vertex;
-				const int controlPointIndex = pFbxMesh->GetPolygonVertex(polygonIndex, vertexIndex);
-				vertex.position.x = static_cast<float>(pControlPointsArray[controlPointIndex][0]);
-				vertex.position.y = static_cast<float>(pControlPointsArray[controlPointIndex][1]);
-				vertex.position.z = static_cast<float>(pControlPointsArray[controlPointIndex][2]);
+				const FbxSurfaceMaterial *pSurfaceMaterial = pFbxMesh->GetNode()->GetMaterial(materialsIndex);
+				const FbxProperty property = pSurfaceMaterial->FindProperty(FbxSurfaceMaterial::sDiffuse);
+				const FbxProperty factor = pSurfaceMaterial->FindProperty(FbxSurfaceMaterial::sDisplacementFactor);
 
-				FbxVector4 normal;
-				pFbxMesh->GetPolygonVertexNormal(polygonIndex, vertexIndex, normal);
-				vertex.normal.x = static_cast<float>(normal[0]);
-				vertex.normal.y = static_cast<float>(normal[1]);
-				vertex.normal.z = static_cast<float>(normal[2]);
-				vertex.color = subset.diffuse.color;
-				// Get UV coordinates
-				if (pFbxMesh->GetElementUVCount() > 0) {
-					FbxVector2 uv;
-					bool isUnmappedUV;
-					pFbxMesh->GetPolygonVertexUV(polygonIndex, vertexIndex, uvNamesList[0], uv, isUnmappedUV);
-					vertex.texcoord.x = static_cast<float>(uv[0]);
-					vertex.texcoord.y = 1.0f - static_cast<float>(uv[1]);
+				if (property.IsValid() && factor.IsValid()) {
+					FbxDouble3 color = property.Get<FbxDouble3>();
+					double f = factor.Get<FbxDouble>();
+					subset.diffuse.color.x = static_cast<float>(color[0] * f);
+					subset.diffuse.color.y = static_cast<float>(color[1] * f);
+					subset.diffuse.color.z = static_cast<float>(color[2] * f);
+					subset.diffuse.color.w = 1.0f;
+				}
+				if (property.IsValid()) {
+					const int texturesNum = property.GetSrcObjectCount<FbxFileTexture>();
+					// Save the txtures number
+
+					if (texturesNum > 0) {
+
+						const FbxFileTexture *pTextureFile = property.GetSrcObject<FbxFileTexture>();
+						if (pTextureFile) {
+
+							const char *pUVFileName = pTextureFile->GetRelativeFileName();
+							// Create "diffuse.pShaderResourceView"
+
+							// Already get the mesh file's floder path
+							int uvFileNameLength = strlen(pUVFileName) + 1;
+							const int uvFilePathLength = meshFileFloderPathLength + uvFileNameLength;
+							char *pUVFilePath = new char[uvFilePathLength];
+							memcpy(pUVFilePath, pFileFolderPath, meshFileFloderPathLength);
+							pUVFilePath[meshFileFloderPathLength] = '\0';
+							strcat_s(pUVFilePath, uvFilePathLength, pUVFileName);
+
+							RM::LoadShaderResourceView(pDevice, &subset.diffuse.pShaderResourceView, pUVFilePath, nullptr);
+
+							strcpy_s(subset.diffuse.textureFileName, pUVFilePath);
+
+							SAFE_DELETE(pUVFilePath);
+
+						}
+					}
+					else {
+						RM::LoadShaderResourceView(pDevice, &subset.diffuse.pShaderResourceView, nullptr, nullptr);
+						strcpy_s(subset.diffuse.textureFileName, "null");
+					}
+
 				}
 
-				// Set Bone Influences
-				for (int i = 0, max = boneInfluences[controlPointIndex].size(); i < max; ++i) {
-					vertex.boneWeight[i] = boneInfluences[controlPointIndex][i].weight;
-					vertex.boneIndices[i] = boneInfluences[controlPointIndex][i].index;
-				}
-
-				verticesList.push_back(vertex);
-				//indicesList.push_back(vertexCount);
-				indicesList.at(offsetIndex + vertexIndex) = static_cast<u_int>(vertexCount);
-
-				vertexCount += 1;
-
-
 			}
-			subset.IndexCount += 3;
-		}
-		// Create vertex, index, constant buffers
-		vertexCount = verticesList.size();
-		indexCount = indicesList.size();
-		vertex3D *vertices = new vertex3D[vertexCount];
-		WORD *indices = new WORD[indexCount];
 
-		for (u_int i = 0; i < vertexCount; ++i)
-		{
-			vertices[i] = verticesList[i];
-		}
-		for (int i = 0; i < indexCount; i++)
-		{
-			indices[i] = indicesList[i];
+
+
+			if (materialsNum > 0)
+			{
+				// Count the faces of each material
+				for (int polygonIndex = 0; polygonIndex < polygonsNum; ++polygonIndex) {
+					const u_int materialIndex = pFbxMesh->GetElementMaterial()->GetIndexArray().GetAt(polygonIndex);
+					mesh.subsetsList.at(materialIndex).IndexCount += 3;
+				}
+				// Record the offset (how manay vertex)
+				int offset = 0;
+				for (Subset &subset : mesh.subsetsList) {
+					subset.startIndex = offset;
+					offset += subset.IndexCount;
+					// This will be used as counter in the following procedures, reset to zero
+					subset.IndexCount = 0;
+				}
+			}
+			mesh.indicesList.resize(polygonsNum * 3);
+			int materialIndex = 0;
+			for (int polygonIndex = 0; polygonIndex < polygonsNum; ++polygonIndex) {
+				// The material for current face
+				materialIndex = 0;
+				if (materialsNum > 0) {
+					materialIndex = pFbxMesh->GetElementMaterial()->GetIndexArray().GetAt(polygonIndex);
+				}
+				// Where should I save the vertex attribute index, according to the material
+
+				Subset &subset = mesh.subsetsList.at(materialIndex);
+				const int offsetIndex = subset.startIndex + subset.IndexCount;
+
+				for (int vertexIndex = 0; vertexIndex < 3; vertexIndex++) {
+					Vertex3D vertex;
+					const int controlPointIndex = pFbxMesh->GetPolygonVertex(polygonIndex, vertexIndex);
+					vertex.position.x = static_cast<float>(pControlPointsArray[controlPointIndex][0]);
+					vertex.position.y = static_cast<float>(pControlPointsArray[controlPointIndex][1]);
+					vertex.position.z = static_cast<float>(pControlPointsArray[controlPointIndex][2]);
+
+					FbxVector4 normal;
+					pFbxMesh->GetPolygonVertexNormal(polygonIndex, vertexIndex, normal);
+					vertex.normal.x = static_cast<float>(normal[0]);
+					vertex.normal.y = static_cast<float>(normal[1]);
+					vertex.normal.z = static_cast<float>(normal[2]);
+					vertex.color = subset.diffuse.color;
+					// Get UV coordinates
+					if (pFbxMesh->GetElementUVCount() > 0) {
+						FbxVector2 uv;
+						bool isUnmappedUV;
+						pFbxMesh->GetPolygonVertexUV(polygonIndex, vertexIndex, uvNamesList[0], uv, isUnmappedUV);
+						vertex.texcoord.x = static_cast<float>(uv[0]);
+						vertex.texcoord.y = 1.0f - static_cast<float>(uv[1]);
+					}
+
+					// Set Bone Influences
+					for (int i = 0, max = boneInfluences[controlPointIndex].size(); i < max; ++i) {
+						vertex.boneWeight[i] = boneInfluences[controlPointIndex][i].weight;
+						vertex.boneIndices[i] = boneInfluences[controlPointIndex][i].index;
+					}
+
+					mesh.verticesList.push_back(vertex);
+					//indicesList.push_back(vertexCount);
+					mesh.indicesList.at(offsetIndex + vertexIndex) = static_cast<u_int>(vertexCount);
+
+					vertexCount += 1;
+
+
+				}
+				subset.IndexCount += 3;
+			}
+			// Create vertex, index, constant buffers
+			/*vertexCount = mesh.verticesList.size();
+			indexCount = mesh.indicesList.size();
+			Vertex3D *vertices = new Vertex3D[vertexCount];
+			WORD *indices = new WORD[indexCount];
+
+			for (u_int i = 0; i < vertexCount; ++i)
+			{
+			vertices[i] = mesh.verticesList[i];
+			}
+			for (int i = 0; i < indexCount; i++)
+			{
+			indices[i] = mesh.indicesList[i];
+			}*/
+
+			//CreateBuffers(pDevice, &mesh.vertexBuffer, &mesh.indexBuffer, vertices, vertexCount, indices, indexCount);
+			CreateBuffers(pDevice, &mesh.vertexBuffer, &mesh.indexBuffer,
+				mesh.verticesList.data(), mesh.verticesList.size(), mesh.indicesList.data(), mesh.indicesList.size());
+			//delete vertices;
+			//delete indices;
 		}
 
-		CreateBuffers(pDevice, &mesh.vertexBuffer, &mesh.indexBuffer, vertices, vertexCount, indices, indexCount);
-		delete vertices;
-		delete indices;
+		//SAFE_DELETE(pFileFolderPath);
+		pFbxManager->Destroy();
+
+
+		// TODO: fwrite, fread;
+		SaveFbxMeshData(outputFileName);
+
 	}
+	
 
-	SAFE_DELETE(pFileFolderPath);
-	pFbxManager->Destroy();
-
+	
 	// Initailize DirectX3D COM objects
 
 	// Create constant buffer
@@ -499,17 +533,19 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const 
 	depthStencilDesc.DepthEnable = TRUE;
 	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+
+
 }
 
-void SkinnedMesh::CreateBuffers(ID3D11Device *pDevice, ID3D11Buffer** ppVertexBuffer, ID3D11Buffer** ppIndexBuffer, vertex3D *pVertices, int vertexNum, WORD *pIndices, int indexNum)
+void SkinnedMesh::CreateBuffers(ID3D11Device *pDevice, ID3D11Buffer** ppVertexBuffer, ID3D11Buffer** ppIndexBuffer, Vertex3D *pVertices, int vertexNum, WORD *pIndices, int indexNum)
 {
-	//pVertices = new vertex3D[_vertexNum];
-	//memcpy(pVertices, _vertices, sizeof(vertex3D)*_vertexNum);
+	//pVertices = new Vertex3D[_vertexNum];
+	//memcpy(pVertices, _vertices, sizeof(Vertex3D)*_vertexNum);
 
 	D3D11_BUFFER_DESC bufferDesc;
 	ZeroMemory(&bufferDesc, sizeof(bufferDesc));
 	bufferDesc.Usage = /*D3D11_USAGE_IMMUTABLE*/D3D11_USAGE_DEFAULT/*D3D11_USAGE_DYNAMIC*/;
-	bufferDesc.ByteWidth = sizeof(vertex3D)*(vertexNum + 1);
+	bufferDesc.ByteWidth = sizeof(Vertex3D)*(vertexNum + 1);
 	bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	//bufferDesc.CPUAccessFlags = /*D3D11_CPU_ACCESS_WRITE*/0;
 
@@ -543,6 +579,150 @@ void SkinnedMesh::CreateBuffers(ID3D11Device *pDevice, ID3D11Buffer** ppVertexBu
 	}
 }
 
+int SkinnedMesh::SaveFbxMeshData(const char* pOutputFilePath)
+{
+	FILE *pFile;
+
+	char outputFileName[256];
+	strcpy_s(outputFileName, pOutputFilePath);
+
+	//////////////////////////////////////////////////////////////////////////////////////////////
+	//書き出し
+	if (fopen_s(&pFile, outputFileName, "wb") != 0) {
+		_RPT0(_CRT_ERROR, "File open error!\n");
+		return -1;
+	}
+
+	size_t meshNum = meshesList.size();
+	SAFE_WRITE(&meshNum, sizeof(size_t), pFile);
+	for (Mesh& mesh : meshesList) {
+		// globalTransform を書き出し
+		SAFE_WRITE(&mesh.globalTransform, sizeof(XMFLOAT4X4), pFile);
+
+		// verticesList を書き出し
+		size_t verticesNum = mesh.verticesList.size();
+		SAFE_WRITE(&verticesNum, sizeof(size_t), pFile);
+		SAFE_WRITE(mesh.verticesList.data(), sizeof(Vertex3D)*verticesNum, pFile);
+
+		// indeicesList を書き出し
+		size_t indicesNum = mesh.indicesList.size();
+		SAFE_WRITE(&indicesNum, sizeof(size_t), pFile);
+		SAFE_WRITE(mesh.indicesList.data(), sizeof(WORD)*indicesNum, pFile);
+
+		// subsetsList を書き出し
+		size_t subsetsNum = mesh.subsetsList.size();
+		SAFE_WRITE(&subsetsNum, sizeof(size_t), pFile);
+		for (Subset& subset : mesh.subsetsList) {
+			SAFE_WRITE(&subset.startIndex, sizeof(size_t), pFile);
+			SAFE_WRITE(&subset.IndexCount, sizeof(size_t), pFile);
+			SAFE_WRITE(&subset.diffuse.color, sizeof(XMFLOAT4), pFile);
+			SAFE_WRITE(&subset.diffuse.textureFileName, sizeof(subset.diffuse.textureFileName), pFile);
+		}
+
+		// skeletalAnimation を書き出し
+		size_t framesNum = mesh.skeletalAnimation.size();
+		SAFE_WRITE(&framesNum, sizeof(size_t), pFile);
+		SAFE_WRITE(&mesh.skeletalAnimation.samplingTime, sizeof(float), pFile);
+		SAFE_WRITE(&mesh.skeletalAnimation.animationTick, sizeof(float), pFile);
+		for (Skeletal& skeletal : mesh.skeletalAnimation) {
+			size_t bonesNum = skeletal.size();
+			SAFE_WRITE(&bonesNum, sizeof(size_t), pFile);
+			SAFE_WRITE(skeletal.data(), sizeof(XMFLOAT4X4)*bonesNum, pFile);
+		}
+
+	}
+
+	fclose(pFile);
+	return 0;
+}
+int SkinnedMesh::LoadFbxMeshData(ID3D11Device *pDevice, const char* pInputFilePath)
+{
+	//////////////////////////////////////////////////////////////////////////////////////////////
+	//読み込み
+	FILE *pFile;
+	if (fopen_s(&pFile, pInputFilePath, "rb") != 0)
+	{
+		_RPT0(_CRT_WARN, "File not exit!\n");
+		return -1;
+	}
+
+	// meshesListのサイズを読み込みして作成
+	size_t meshNum;
+	SAFE_READ(&meshNum, sizeof(size_t), pFile);
+	meshesList.resize(meshNum);
+	for (Mesh& mesh : meshesList) {
+		// globalTransform を読み込み
+		SAFE_READ(&mesh.globalTransform, sizeof(XMFLOAT4X4), pFile);
+
+		// verticesList のサイズを読み込みして作成
+		size_t verticesNum;
+		SAFE_READ(&verticesNum, sizeof(size_t), pFile);
+		mesh.verticesList.resize(verticesNum);
+		SAFE_READ(mesh.verticesList.data(), sizeof(Vertex3D)*verticesNum, pFile);
+		//Vertex3D* vertices = new Vertex3D[verticesNum];
+		//SAFE_READ(vertices, sizeof(Vertex3D)*verticesNum, pFile);
+		//std::vector<Vertex3D> verticesList(vertices, vertices + verticesNum);
+		//mesh.verticesList.swap(verticesList);
+		//delete vertices;
+		
+		// indicesList のサイズを読み込みして作成
+		size_t indicesNum;
+		SAFE_READ(&indicesNum, sizeof(size_t), pFile);
+		mesh.indicesList.resize(indicesNum);
+		SAFE_READ(mesh.indicesList.data(), sizeof(WORD)*indicesNum, pFile);
+		//WORD* indices = new WORD[indicesNum];
+		//SAFE_READ(indices, sizeof(WORD)*indicesNum, pFile);
+		//std::vector<WORD> indicesList(indices, indices + indicesNum);
+		//mesh.indicesList.swap(indicesList);
+		//delete indices;
+
+		// バッファーの作成
+		CreateBuffers(pDevice, &mesh.vertexBuffer, &mesh.indexBuffer,
+			mesh.verticesList.data(), mesh.verticesList.size(), mesh.indicesList.data(), mesh.indicesList.size());
+
+		// subsetsList のサイズを読み込みして作成
+		size_t subsetsNum = mesh.subsetsList.size();
+		SAFE_READ(&subsetsNum, sizeof(size_t), pFile);
+		mesh.subsetsList.resize(subsetsNum);
+		for (Subset& subset : mesh.subsetsList) {
+			SAFE_READ(&subset.startIndex, sizeof(size_t), pFile);
+			SAFE_READ(&subset.IndexCount, sizeof(size_t), pFile);
+			SAFE_READ(&subset.diffuse.color, sizeof(XMFLOAT4), pFile);
+			SAFE_READ(&subset.diffuse.textureFileName, sizeof(subset.diffuse.textureFileName), pFile);
+			// シェーダーリソースビューを作成
+			if (strcmp(subset.diffuse.textureFileName, "null") == 0) {
+				RM::LoadShaderResourceView(pDevice, &subset.diffuse.pShaderResourceView, nullptr, nullptr);
+			}
+			else {
+				RM::LoadShaderResourceView(pDevice, &subset.diffuse.pShaderResourceView, subset.diffuse.textureFileName, nullptr);
+			}
+		}
+
+		// skeletalAnimation のサイズを読み込みして作成
+		size_t framesNum;
+		SAFE_READ(&framesNum, sizeof(size_t), pFile);
+		mesh.skeletalAnimation.resize(framesNum);
+		SAFE_READ(&mesh.skeletalAnimation.samplingTime, sizeof(float), pFile);
+		SAFE_READ(&mesh.skeletalAnimation.animationTick, sizeof(float), pFile);
+		for (Skeletal& skeletal : mesh.skeletalAnimation) {
+			size_t bonesNum;
+			SAFE_READ(&bonesNum, sizeof(size_t), pFile);
+			skeletal.resize(bonesNum);
+			SAFE_READ(skeletal.data(), sizeof(XMFLOAT4X4)*bonesNum, pFile);
+			//XMFLOAT4X4* transforms = new XMFLOAT4X4[bonesNum];
+			//SAFE_READ(transforms, sizeof(XMFLOAT4X4)*bonesNum, pFile);
+			//std::vector<Bone> bonesList(transforms, transforms + bonesNum);
+			//skeletal.swap(bonesList);
+			//delete transforms;
+		}
+
+	}
+
+	fclose(pFile);
+
+	return 0;
+}
+
 void SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, bool isWireframe, const Mesh &mesh)
 {
 	if (isWireframe) {
@@ -552,7 +732,7 @@ void SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, bool isWireframe, co
 		pDeviceContext->RSSetState(pFillRasterizerState);
 	}
 
-	UINT pStrides = sizeof(vertex3D);
+	UINT pStrides = sizeof(Vertex3D);
 	UINT pOffsets = 0;
 	pDeviceContext->IASetPrimitiveTopology(/*D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP*/D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST/*D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP*/);
 	pDeviceContext->VSSetConstantBuffers(0, 1, &pConstantBuffer);
@@ -572,6 +752,7 @@ void SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, bool isWireframe, co
 	}
 }
 
+
 void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, bool isWireframe, int animationFrame, float elapsedTime, int* stopFrame)
 {
 	XMMATRIX worldViewProjection(world);
@@ -589,6 +770,19 @@ void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRI
 	XMMATRIX tansformation;
 	Skeletal skeletal;
 	SkeletalAnimation* skeletalAnimation;
+
+	//meshesList[0].globalTransform;
+	//meshesList[0].vertexBuffer;
+	//meshesList[0].indexBuffer;
+
+	//meshesList[0].skeletalAnimation[0][0].transform;
+	//meshesList[0].skeletalAnimation.animationTick;
+	//meshesList[0].skeletalAnimation.samplingTime;
+
+	//meshesList[0].subsetsList[0].startIndex;
+	//meshesList[0].subsetsList[0].IndexCount;
+	//meshesList[0].subsetsList[0].diffuse.color;
+	//meshesList[0].subsetsList[0].diffuse.pShaderResourceView;
 
 	for(Mesh& mesh: meshesList)
 	{
@@ -626,6 +820,7 @@ void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRI
 
 		Draw(pDeviceContext, isWireframe, mesh);
 	}
+
 }
 
 

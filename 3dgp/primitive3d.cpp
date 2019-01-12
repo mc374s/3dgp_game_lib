@@ -75,7 +75,7 @@ void Primitive3D::Initialize(ID3D11Device *pDevice, const int &type, const int &
 	{
 
 		// vertex data
-		vertex3D vertices[] =
+		Vertex3D vertices[] =
 		{
 			//UP 
 			{ XMFLOAT3(-1.0f, 1.0f,  1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
@@ -151,9 +151,9 @@ void Primitive3D::Initialize(ID3D11Device *pDevice, const int &type, const int &
 		float scaleAdjust = 0.5f;
 		float angleY = atanf((1.0f - scaleAdjust)*dHalf / (hHalf*2.0f));
 
-		vertex3D *vertices = new vertex3D[vertexNum];
+		Vertex3D *vertices = new Vertex3D[vertexNum];
 		WORD *indices = new WORD[indexNum];
-		/*vertex3D vertices[48];
+		/*Vertex3D vertices[48];
 		ZeroMemory(vertices, sizeof(vertices));
 		WORD indices[72];
 		ZeroMemory(indices, sizeof(indices));*/
@@ -246,24 +246,24 @@ void Primitive3D::Initialize(ID3D11Device *pDevice, const int &type, const int &
 
 
 
-void Primitive3D::CreateBuffers(ID3D11Device *pDevice, vertex3D *_pVertices, int _vertexNum, WORD *_pIndices, int _indexNum)
+void Primitive3D::CreateBuffers(ID3D11Device *pDevice, Vertex3D *_pVertices, int _vertexNum, WORD *_pIndices, int _indexNum)
 {
 
 	vertexNum = _vertexNum;
 	indexNum = _indexNum;
-	pVertices = new vertex3D[_vertexNum];
+	pVertices = new Vertex3D[_vertexNum];
 	pIndices = new WORD[_indexNum];
-	memcpy(pVertices, _pVertices, sizeof(vertex3D)*_vertexNum);
+	memcpy(pVertices, _pVertices, sizeof(Vertex3D)*_vertexNum);
 	memcpy(pIndices, _pVertices, sizeof(WORD)*_indexNum);
 	
 
-	//pVertices = new vertex3D[_vertexNum];
-	//memcpy(pVertices, _vertices, sizeof(vertex3D)*_vertexNum);
+	//pVertices = new Vertex3D[_vertexNum];
+	//memcpy(pVertices, _vertices, sizeof(Vertex3D)*_vertexNum);
 
 	D3D11_BUFFER_DESC bufferDesc;
 	ZeroMemory(&bufferDesc, sizeof(bufferDesc));
 	bufferDesc.Usage = /*D3D11_USAGE_IMMUTABLE*/D3D11_USAGE_DEFAULT/*D3D11_USAGE_DYNAMIC*/;
-	bufferDesc.ByteWidth = sizeof(vertex3D)*(vertexNum + 1);
+	bufferDesc.ByteWidth = sizeof(Vertex3D)*(vertexNum + 1);
 	bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	//bufferDesc.CPUAccessFlags = /*D3D11_CPU_ACCESS_WRITE*/0;
 
@@ -323,7 +323,7 @@ void Primitive3D::Draw(ID3D11DeviceContext *pDeviceContext, bool doFill)
 		pDeviceContext->RSSetState(pWireRasterizerState);
 	}
 
-	UINT pStrides = sizeof(vertex3D);
+	UINT pStrides = sizeof(Vertex3D);
 	UINT pOffsets = 0;
 	pDeviceContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &pStrides, &pOffsets);
 	pDeviceContext->IASetIndexBuffer(pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);

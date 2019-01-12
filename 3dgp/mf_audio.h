@@ -13,15 +13,15 @@ namespace GLC{
 
 struct NUMBERED_FILE
 {
-	int					fileNO;		
-	char*				fileName;	
+	int		fileNO;		
+	char* 	fileName;	
 };
 
 class MFAudioManager
 {
 private:
 	static IMFPMediaPlayer* pMFPlayer[AUDIO_MAX_NUM];	// MediaFoundationPlayer
-	static bool doLoop[AUDIO_MAX_NUM];					// loop flag
+	static bool				doLoop[AUDIO_MAX_NUM];		// loop flag
 	MFAudioManager();
 	~MFAudioManager();
 public:

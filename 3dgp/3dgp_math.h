@@ -34,14 +34,14 @@ inline DirectX::XMVECTOR XMConvertUIntToColor(UINTCOLOR inColor)
 	return DirectX::XMLoadFloat4(&rgba);
 }
 
-struct HitResult
+struct __declspec(align(16)) HitResult
 {
 	bool isHitted;
 	DirectX::XMVECTOR direction;
 	DirectX::XMVECTOR closestPoint;
 };
 
-struct Collision
+struct __declspec(align(16)) Collision
 {
 	enum TYPE {
 		_SPHERE = 1 << 0,
@@ -54,7 +54,7 @@ struct Collision
 	virtual HitResult HitJudgement(const Collision* other);
 };
 
-struct Sphere :public Collision
+struct __declspec(align(16)) Sphere :public Collision
 {
 	DirectX::XMVECTOR center;
 	float radius;
@@ -62,7 +62,7 @@ struct Sphere :public Collision
 	Sphere(DirectX::FXMVECTOR center, float radius) : center(center), radius(radius) { type = _SPHERE; };
 };
 
-struct Plane :public Collision
+struct __declspec(align(16)) Plane :public Collision
 {
 	DirectX::XMVECTOR normal;
 	float disToOrigin;
@@ -70,7 +70,7 @@ struct Plane :public Collision
 	Plane(DirectX::FXMVECTOR normal, float disToOrigin) :normal(normal), disToOrigin(disToOrigin) { type = _PLANE; };
 };
 
-struct AABB :public Collision
+struct __declspec(align(16)) AABB :public Collision
 {
 	DirectX::XMVECTOR minPos;
 	DirectX::XMVECTOR maxPos;

@@ -30,7 +30,7 @@ struct StageData {
 				break;
 			}
 		}
-	};
+	}
 	~StageData() {
 		if (collision) _mm_free(collision);
 	}

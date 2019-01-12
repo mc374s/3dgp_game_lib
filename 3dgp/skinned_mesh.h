@@ -15,7 +15,7 @@ class SkinnedMesh
 public:
 	struct BoneInfluence
 	{
-		int index;		// Index of bone
+		size_t index;		// Index of bone
 		float weight;	// Weight of bone
 	};
 	struct Bone
@@ -36,14 +36,14 @@ public:
 	};
 
 private:
-	struct vertex3D
+	struct Vertex3D
 	{
 		DirectX::XMFLOAT3 position;
 		DirectX::XMFLOAT4 color;
 		DirectX::XMFLOAT4 normal;
 		DirectX::XMFLOAT2 texcoord;
 		float boneWeight[MAX_BONE_INFLUENCES] = { 0.0f,0.0f,0.0f,0.0f };
-		int boneIndices[MAX_BONE_INFLUENCES] = {};
+		size_t boneIndices[MAX_BONE_INFLUENCES] = {};
 	};
 	struct VS_CBUFFER_PROJECTION
 	{
@@ -60,17 +60,20 @@ private:
 	{
 		DirectX::XMFLOAT4 color = { 0.8f,0.8f,0.8f,1.0f };
 		ID3D11ShaderResourceView* pShaderResourceView = NULL;
+		char textureFileName[256];
 	};
 	struct Subset 
 	{
-		u_int startIndex = 0;	// Start number of index buffers
-		u_int IndexCount = 0;	// Number of vertices(indices)
+		size_t startIndex = 0;	// Start number of index buffers
+		size_t IndexCount = 0;	// Number of vertices(indices)
 		Material diffuse;
 	};
 	struct Mesh
 	{
 		ID3D11Buffer* vertexBuffer;
 		ID3D11Buffer* indexBuffer;
+		std::vector<Vertex3D> verticesList;
+		std::vector<WORD> indicesList;
 		std::vector<Subset> subsetsList;
 		DirectX::XMFLOAT4X4 globalTransform = {
 			1.f,0,0,0,
@@ -105,7 +108,10 @@ private:
 		0.0f, 0.0f, 0.0f, 1.0f,
 	};
 
-	void CreateBuffers(ID3D11Device *pDevice, ID3D11Buffer** ppVertexBuffer, ID3D11Buffer** ppIndexBuffer, vertex3D *pVertices, int vertexNum, WORD *pIndices, int indexNum);
+	void CreateBuffers(ID3D11Device *pDevice, ID3D11Buffer** ppVertexBuffer, ID3D11Buffer** ppIndexBuffer, Vertex3D *pVertices, int vertexNum, WORD *pIndices, int indexNum);
+
+	int SaveFbxMeshData(const char* pOutputFilePath);
+	int LoadFbxMeshData(ID3D11Device *pDevice, const char* pInputFilePath);
 
 public:
 	int frame = 0;

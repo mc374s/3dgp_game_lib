@@ -110,7 +110,8 @@ PlayerManager::~PlayerManager()
 	//SAFE_DELETE(pPlayer);
 	for (int i = 0; i < Input::MAX_PLAYER_COUNT && i < playerNum; ++i) {
 		if (pPlayer[i]) {
-			_mm_free(pPlayer[i]);
+			//_mm_free(pPlayer[i]);
+			delete pPlayer[i];
 		}
 	}
 }
@@ -123,14 +124,17 @@ void PlayerManager::Init(int _playerNum, int playerType[])
 	
 	for (int i = 0; i < Input::MAX_PLAYER_COUNT && i < playerNum; ++i) {
 		if (pPlayer[i]) {
-			_mm_free(pPlayer[i]);
+			//_mm_free(pPlayer[i]);
+			delete pPlayer[i];
 		}
 		switch (playerType[i]) {
 		case Player::TYPE::A:
-			pPlayer[i] = new (_mm_malloc(sizeof(PlayerA), alignof(PlayerA))) PlayerA();
+			//pPlayer[i] = new (_mm_malloc(sizeof(PlayerA), alignof(PlayerA))) PlayerA();
+			pPlayer[i] = new PlayerA();
 			break;
 		case Player::TYPE::B:
-			pPlayer[i] = new (_mm_malloc(sizeof(PlayerB), alignof(PlayerB))) PlayerB();
+			//pPlayer[i] = new (_mm_malloc(sizeof(PlayerB), alignof(PlayerB))) PlayerB();
+			pPlayer[i] = new PlayerB();
 			break;
 		default:
 			break;

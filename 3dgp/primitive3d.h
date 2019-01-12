@@ -15,7 +15,7 @@ enum GEOMETRY_TYPE
 class Primitive3D
 {
 private:
-	struct vertex3D
+	struct Vertex3D
 	{
 		DirectX::XMFLOAT3 position;
 		DirectX::XMFLOAT4 color;
@@ -24,11 +24,11 @@ private:
 
 	struct PROJECTION_CBUFFER
 	{
-		DirectX::XMMATRIX world;					//ワールド変換行列
+		DirectX::XMMATRIX world;				//ワールド変換行列
 		DirectX::XMMATRIX view;					//ビュー変換行列
 		DirectX::XMMATRIX projection;			//プロジェクション変換行列
 		DirectX::XMMATRIX worldViewProjection;	//ワールド・ビュー・プロジェクション合成行列
-		DirectX::XMFLOAT4 materialColor;			//材質色
+		DirectX::XMFLOAT4 materialColor;		//材質色
 		DirectX::XMFLOAT4 lightDirection;		//ライト進行行列
 	};
 private:
@@ -52,16 +52,16 @@ private:
 	UINT longitudeNum;
 
 	template <size_t vertexNum, size_t indexNum>
-	void CreateBuffers(ID3D11Device *pDevice, vertex3D(&pVertices)[vertexNum], WORD(&pIndices)[indexNum]) {
+	void CreateBuffers(ID3D11Device *pDevice, Vertex3D(&pVertices)[vertexNum], WORD(&pIndices)[indexNum]) {
 		CreateBuffers(pDevice, pVertices, vertexNum, pIndices, indexNum);
 	};
-	void CreateBuffers(ID3D11Device *pDevice, vertex3D *pVertices, int vertexNum, WORD *pIndices, int indexNum);
+	void CreateBuffers(ID3D11Device *pDevice, Vertex3D *pVertices, int vertexNum, WORD *pIndices, int indexNum);
 
 	void Draw(ID3D11DeviceContext *pDeviceContext, bool doFill);
 
 public:
 
-	vertex3D *pVertices;
+	Vertex3D *pVertices;
 
 	Primitive3D(ID3D11Device *pDevice);
 	virtual ~Primitive3D();

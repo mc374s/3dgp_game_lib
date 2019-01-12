@@ -9,7 +9,7 @@ MeshFile e_sequencedFbxFiles[] = {
 	{ PLAYER_ATTACK,		"./Data/FbxFiles/FightingUnityChan/Animations/screw_kick.fbx" },
 
 	//{ ITEM_SWORD,			"./Data/FbxFiles/sword.fbx" },
-	//{ ITEM_FLOOR,			"./Data/FbxFiles/street_meter.fbx" },
+	{ ITEM_FLOOR,			"./Data/FbxFiles/street_meter.fbx" },
 	//{ ITEM_ONE_METER_BOX,	"./Data/FbxFiles/one_meter_box.fbx" },
 	
 	{ -1, NULL },

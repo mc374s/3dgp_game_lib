@@ -1,8 +1,6 @@
 ﻿#include "game_system.h"
 
 
-
-
 #include "blend.h"
 #include "sprite.h"
 #include "render_target.h"
@@ -269,11 +267,11 @@ void XM_CALLCONV MeshData::Draw(FXMVECTOR position, FXMVECTOR scaling, FXMVECTOR
 {
 	if (fileNO >= 0 && fileNO < MAX_MESH_FILE_NUM && pMeshManager->meshAt(fileNO) && pMeshManager->meshAt(fileNO)->data) {
 
-		XMVECTOR translation = position + positionAdjustion;
-		XMVECTOR scaleMul = scaling * scalingAdjustion;
-		XMVECTOR rotateAdd = (rotationDegree + rotationAdjustion)*0.01745f;
+		XMVECTOR translation	= position + positionAdjustion;
+		XMVECTOR scaleMul		= scaling * scalingAdjustion;
+		XMVECTOR rotateAdd		= (rotationDegree + rotationAdjustion)*0.01745f;
 
-		XMVECTOR rotation = XMQuaternionRotationRollPitchYawFromVector(rotateAdd);
+		XMVECTOR rotation		= XMQuaternionRotationRollPitchYawFromVector(rotateAdd);
 
 		//XMMATRIX worldXMatrix;
 		world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), scaleMul, g_XMZero, rotation, translation);

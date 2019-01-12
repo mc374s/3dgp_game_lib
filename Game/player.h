@@ -14,7 +14,7 @@
 #define P_JUMP_V0 (sqrt(2.0f*P_GF*P_JUMP_HEIGHT))
 
 
-__declspec(align(16)) class Player : public OBJ3D
+/*__declspec(align(16)) */class Player : public OBJ3D
 {
 private:
 
