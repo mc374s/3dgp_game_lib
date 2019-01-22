@@ -79,7 +79,7 @@ void OBJ3D::Draw()
 {
 	if (meshData)
 	{
-		meshData->Draw(transform.position, transform.scaling, transform.rotationDegree, frame);
+		meshData->Draw(transform.position, transform.scaling, transform.rotationDegree, &frame);
 		world = meshData->world;
 	}
 

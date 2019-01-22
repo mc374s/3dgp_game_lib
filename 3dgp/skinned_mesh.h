@@ -21,6 +21,7 @@ public:
 	struct Bone
 	{
 		DirectX::XMFLOAT4X4 transform;
+		//char				name[256];
 	};
 
 	typedef std::vector<BoneInfluence> BoneInfluencesPerContralPoint;
@@ -130,7 +131,7 @@ public:
 	//param(elapsedTime) How many seconds was last frame used
 	//
 	void XM_CALLCONV Draw(ID3D11DeviceContext *pDeviceContext, DirectX::FXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection,
-		bool isWireframe = false, int animationFrame = 0, float elapsedTime = 1 / 60.0f, int* stopFrame = nullptr);
+		bool isWireframe = false, int* animationFrame = nullptr, float elapsedTime = 1 / 60.0f);
 };
 
 

@@ -7,7 +7,7 @@
 
 namespace GLC{
 
-class Camera
+__declspec(align(16)) class Camera
 {
 public:
 	DirectX::XMVECTOR	eyePosition;

@@ -263,9 +263,9 @@ void Cube::Draw()
 
 // Skinned Mesh Data Management
 
-void XM_CALLCONV MeshData::Draw(FXMVECTOR position, FXMVECTOR scaling, FXMVECTOR rotationDegree, const int& frame, int* maxFrame)
+void XM_CALLCONV MeshData::Draw(FXMVECTOR position, FXMVECTOR scaling, FXMVECTOR rotationDegree, int* frame)
 {
-	if (fileNO >= 0 && fileNO < MAX_MESH_FILE_NUM && pMeshManager->meshAt(fileNO) && pMeshManager->meshAt(fileNO)->data) {
+	if (fileNO >= 0 && fileNO < MAX_MESH_FILE_NUM && pMeshManager->MeshAt(fileNO) && pMeshManager->MeshAt(fileNO)->data) {
 
 		XMVECTOR translation	= position + positionAdjustion;
 		XMVECTOR scaleMul		= scaling * scalingAdjustion;
@@ -276,7 +276,7 @@ void XM_CALLCONV MeshData::Draw(FXMVECTOR position, FXMVECTOR scaling, FXMVECTOR
 		//XMMATRIX worldXMatrix;
 		world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), scaleMul, g_XMZero, rotation, translation);
 		//XMStoreFloat4x4(&world, worldXMatrix);
-		pMeshManager->meshAt(fileNO)->data->Draw(Framework::pDeviceContext, world, GLC::mainCamera.view, GLC::mainCamera.projection,
+		pMeshManager->MeshAt(fileNO)->data->Draw(Framework::pDeviceContext, world, GLC::mainCamera.view, GLC::mainCamera.projection,
 			false, frame/*, Framework::frameTime*/);
 	}
 }
@@ -336,7 +336,7 @@ void MeshManager::LoadMeshes(MeshFile data[], int *progress)
 	}
 }
 
-const MeshFile* MeshManager::meshAt(int fileNO)
+const MeshFile* MeshManager::MeshAt(int fileNO)
 {
 	if (fileNO >= 0 && fileNO < MAX_MESH_FILE_NUM)
 	{

@@ -35,6 +35,7 @@ public:
 	bool isInit;
 	//void(*pfMove)();
 	int frame;
+	int maxFrame;
 
 	void(OBJ3D::*moveFunc)();
 

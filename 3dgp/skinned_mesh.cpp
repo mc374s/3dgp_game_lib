@@ -63,6 +63,7 @@ void FetchBoneMatrices(FbxMesh* pFbxMesh, std::vector<SkinnedMesh::Bone> &skelet
 			//
 			FbxNode* linked_node = pCluster->GetLink();
 			//_RPTN(_CRT_WARN, "%s:\n", linked_node->GetName());
+			//strcpy_s(bone.name, linked_node->GetName());
 
 			// This matrix transform coordinates of the initial pose from mesh spece to global space
 			FbxAMatrix referenceGlobalInitPosition;
@@ -204,6 +205,8 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const 
 		isImportSuccessed = pFbxImporter->Import(scene);
 		_ASSERT_EXPR(isImportSuccessed, pFbxImporter->GetStatus().GetErrorString());
 
+
+
 		// Convert mesh, NURBS and patch into triangle mesh
 		FbxGeometryConverter geometryConverter(pFbxManager);
 		geometryConverter.Triangulate(scene,/*replace*/true);
@@ -230,6 +233,137 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const 
 		//FbxMesh *pFbxMesh = fetchedMeshes.at(0)->GetMesh();		// Currently only one mesh
 		//FbxMesh *pFbxMesh = nullptr;
 		meshesList.resize(fetchedMeshes.size());
+
+
+
+
+		/*int stacksNum = scene->GetSrcObjectCount<FbxAnimStack>();
+		FbxAnimStack* pAnimStack = scene->GetSrcObject<FbxAnimStack>(0);
+		int animLayersNum = scene->GetSrcObjectCount<FbxAnimLayer>();
+		FbxAnimLayer* pAnimLayer = pAnimStack->GetMember<FbxAnimLayer>(0);
+		FbxNode* pNode = pAnimLayer->GetSrcObject<FbxNode>(0);*/
+
+		{
+			FbxManager* pFbxManager = FbxManager::Create();
+
+			// Create an IOSetting object, IOSROOT is defined in Fbxiosettingspath.h
+			pFbxManager->SetIOSettings(FbxIOSettings::Create(pFbxManager, IOSROOT));
+
+			// Create an importer
+			FbxImporter* pFbxImporter = FbxImporter::Create(pFbxManager, "");
+
+			// Initialize the importer
+			bool isImportSuccessed = false;
+			isImportSuccessed = pFbxImporter->Initialize("./Data/FbxFiles/FromMixamo/Motion/fight_idle.fbx", -1, pFbxManager->GetIOSettings());
+			_ASSERT_EXPR(isImportSuccessed, pFbxImporter->GetStatus().GetErrorString());
+
+			// Create a new scene, so it can be populated by the imported file
+			FbxScene* scene = FbxScene::Create(pFbxManager, "");
+
+			// Import the contents of the file into the scene
+			isImportSuccessed = pFbxImporter->Import(scene);
+			_ASSERT_EXPR(isImportSuccessed, pFbxImporter->GetStatus().GetErrorString());
+
+			FbxArray<FbxString*> pAnimationStackNamesArray;
+			scene->FillAnimStackNameArray(pAnimationStackNamesArray);
+			FbxAnimStack* pAnimStack = scene->GetCurrentAnimationStack();
+			FbxTimeSpan timeSpan = pAnimStack->GetLocalTimeSpan();
+			FbxTime animDuration = timeSpan.GetDuration();
+			FbxTime::EMode timeMode = scene->GetGlobalSettings().GetTimeMode();
+			int frameNum = animDuration.GetFrameCount(timeMode);
+			int boneNum = scene->GetNodeCount() - 1;
+			char** boneNames;
+			boneNames = new char*[boneNum];
+			for (int i = 0; i < boneNum; ++i) {
+				boneNames[i] = new char[128];
+				strcpy_s(boneNames[i], 128, scene->GetNode(i + 1)->GetName());
+			}
+
+			Mesh meshTemp;
+			//meshTemp.skeletalAnimation.resize(0);
+
+			FbxTime startTime = timeSpan.GetStart();
+			FbxTime endTime = timeSpan.GetStop();
+			FbxTime frameTime;
+			frameTime.SetTime(0, 0, 0, 1, 0, timeMode);
+			u_int samplingRate = 0;
+			samplingRate = samplingRate > 0 ? samplingRate : (u_int)frameTime.GetFrameRate(timeMode);
+			float samplingTime = 1.0f / samplingRate;
+			FbxTime samplingStep;
+			samplingStep.SetTime(0, 0, 1, 0, 0, timeMode);
+			samplingStep = static_cast<FbxLongLong>(samplingStep.Get()*samplingTime);
+			meshTemp.skeletalAnimation.samplingTime = samplingTime;
+			meshTemp.skeletalAnimation.animationTick = 0;
+
+			FbxNode* root = scene->GetRootNode();
+
+			for (FbxTime currentTime = startTime; currentTime < endTime; currentTime += samplingStep) {
+				Skeletal skeletal;
+				skeletal.resize(boneNum);
+				for (int j = 0; j < boneNum; ++j) {
+					SkinnedMesh::Bone &bone = skeletal.at(j);
+					FbxNode* pNode = root->FindChild(boneNames[j]);
+					//_RPTN(_CRT_WARN, "%s:\n", linked_node->GetName());
+					//strcpy_s(bone.name, linked_node->GetName());
+
+					// This matrix transform coordinates of the initial pose from mesh spece to global space
+					FbxAMatrix referenceGlobalInitPosition;
+
+					// This matrix transform coordinates of the initial pose from bone space to global space
+					FbxAMatrix clusterGlobalInitPosition;
+
+					// This matrix transform coordinates of the current pose from bone space to global space
+					FbxAMatrix clusterGlobalCurrentPosition;
+
+					// This matrix transform coordinates of the current pose form mesh space to global space
+					FbxAMatrix referenceGlobalCurrentPosition;
+					referenceGlobalCurrentPosition = pNode->EvaluateGlobalTransform(currentTime);
+
+					// Matrices are defined using the Cloum Major scheme. When a FbxAMatrix represents the translation part of the transformation
+					FbxAMatrix transform = referenceGlobalCurrentPosition;
+
+					// Convert FbxAMatrix(transform) to XMFLOAT4X4(bone.transform)
+					bone.transform = XMFLOAT4X4(
+						transform.mData[0][0], transform.mData[0][1], transform.mData[0][2], transform.mData[0][3],
+						transform.mData[1][0], transform.mData[1][1], transform.mData[1][2], transform.mData[1][3],
+						transform.mData[2][0], transform.mData[2][1], transform.mData[2][2], transform.mData[2][3],
+						transform.mData[3][0], transform.mData[3][1], transform.mData[3][2], transform.mData[3][3]
+					);
+				}
+
+				meshTemp.skeletalAnimation.push_back(skeletal);
+
+			}
+
+			meshesList[0].skeletalAnimation.resize(frameNum);
+			memcpy_s(meshesList[0].skeletalAnimation.data(), sizeof(Skeletal)*frameNum, meshTemp.skeletalAnimation.data(), sizeof(Skeletal)*frameNum);
+
+
+			//const FbxProperty property = pAnimCurve->FindProperty(FbxAnimCurve::);
+
+
+			//Mesh meshTemp;
+			//// Get the list of all the animation stack
+			//FbxArray<FbxString*> pAnimationStackNamesArray;
+			//scene->FillAnimStackNameArray(pAnimationStackNamesArray);
+			//FbxAnimEvaluator* pFbxAnimEvaluator = scene->GetAnimationEvaluator();
+			//pFbxAnimEvaluator->GetNodeGlobalTransform(0);
+
+
+			// Get the number of animations
+			//int animationsNum = pAnimationStackNamesArray.Size();
+			//FetchAnimations(scene, meshTemp.skeletalAnimation);
+
+		}
+
+
+
+
+
+
+
+
+
 
 		for (size_t i = 0, max = fetchedMeshes.size(); i < max; i++) {
 			FbxMesh *pFbxMesh = fetchedMeshes.at(i)->GetMesh();
@@ -436,7 +570,9 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const 
 		SaveFbxMeshData(outputFileName);
 
 	}
-	
+	if (maxFrame) {
+		(*maxFrame) = meshesList[0].skeletalAnimation.size();
+	}
 
 	
 	// Initailize DirectX3D COM objects
@@ -482,7 +618,7 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const 
 	//samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
 	//samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
 	//samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
-	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -507,12 +643,7 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const 
 	D3D11_RASTERIZER_DESC rasterizerDesc;
 	ZeroMemory(&rasterizerDesc, sizeof(rasterizerDesc));
 	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
-	if (exchangeAxisYwithAxisZ){
-		rasterizerDesc.CullMode = /*D3D11_CULL_BACK*//*D3D11_CULL_NONE*/D3D11_CULL_FRONT;
-	}
-	else {
-		rasterizerDesc.CullMode = /*D3D11_CULL_BACK*/D3D11_CULL_NONE/*D3D11_CULL_FRONT*/;
-	}
+	rasterizerDesc.CullMode = D3D11_CULL_BACK/*D3D11_CULL_NONE*//*D3D11_CULL_FRONT*/;
 	rasterizerDesc.FrontCounterClockwise = FALSE;
 	rasterizerDesc.DepthClipEnable = TRUE;
 	rasterizerDesc.MultisampleEnable = FALSE;
@@ -753,7 +884,7 @@ void SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, bool isWireframe, co
 }
 
 
-void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, bool isWireframe, int animationFrame, float elapsedTime, int* stopFrame)
+void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, bool isWireframe, int* animationFrame, float elapsedTime)
 {
 	XMMATRIX worldViewProjection(world);
 	worldViewProjection *= view;
@@ -771,37 +902,23 @@ void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRI
 	Skeletal skeletal;
 	SkeletalAnimation* skeletalAnimation;
 
-	//meshesList[0].globalTransform;
-	//meshesList[0].vertexBuffer;
-	//meshesList[0].indexBuffer;
-
-	//meshesList[0].skeletalAnimation[0][0].transform;
-	//meshesList[0].skeletalAnimation.animationTick;
-	//meshesList[0].skeletalAnimation.samplingTime;
-
-	//meshesList[0].subsetsList[0].startIndex;
-	//meshesList[0].subsetsList[0].IndexCount;
-	//meshesList[0].subsetsList[0].diffuse.color;
-	//meshesList[0].subsetsList[0].diffuse.pShaderResourceView;
 
 	for(Mesh& mesh: meshesList)
 	{
 		skeletalAnimation = &mesh.skeletalAnimation;
 		if (skeletalAnimation->size() > 0) {
-			if (animationFrame == 0)
+			if (animationFrame && (*animationFrame)== 0)
 			{
 				frame = skeletalAnimation->animationTick / skeletalAnimation->samplingTime;
 			}
-			else
+			else if (animationFrame)
 			{
-				frame = animationFrame;
+				frame = *animationFrame;
 			}
 
 			if (frame > skeletalAnimation->size() - 1) {
 				frame = 0;
-				if (stopFrame) {
-					*stopFrame = skeletalAnimation->size();
-				}
+				(*animationFrame) = -1;
 				skeletalAnimation->animationTick = 0;
 			}
 			skeletal = skeletalAnimation->at(frame);

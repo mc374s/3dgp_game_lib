@@ -31,9 +31,11 @@ void PlayerA::Standby()
 		meshData = &fbxPlayerStandby;
 		speed = Vector3(0, 0, 0);
 		step = STEP::BEGIN;
-		//break;
+		break;
 	case STEP::BEGIN:
-
+		if (frame < 0) {
+			frame = 0;
+		}
 		break;
 	default:
 		break;
@@ -51,9 +53,11 @@ void PlayerA::Run()
 		meshData = &fbxPlayerRun;
 		frame = 0;
 		step = STEP::BEGIN;
-		//break
+		break;
 	case STEP::BEGIN:
-		//++frame;
+		if (frame < 0) {
+			frame = 0;
+		}
 		switch (keyCode & (PAD_LEFT | PAD_RIGHT))
 		{
 		case PAD_LEFT:
@@ -121,8 +125,11 @@ void PlayerA::Jump()
 		meshData = &fbxPlayerJump;
 		frame = 0;
 		step = STEP::BEGIN;
-		//break;
+		break;
 	case STEP::BEGIN:
+		if (frame < 0) {
+			frame = 0;
+		}
 		++frame;
 		// PreMotion, Stop Forward movement
 		if (frame < 24) {
@@ -164,10 +171,12 @@ void PlayerA::Attack()
 		meshData = &fbxPlayerAttack;
 		frame = 0;
 		step = STEP::BEGIN;
-		//break;
+		break;
 	case STEP::BEGIN:
+		if (frame < 0) {
+			step = STEP::FINISH;
+		}
 		++frame;
-
 
 		break;
 	case STEP::FINISH:

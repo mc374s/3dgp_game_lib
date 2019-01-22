@@ -269,7 +269,7 @@ struct MeshFile
 };
 
 
-struct MeshData
+__declspec(align(16)) struct MeshData
 {
 	int fileNO;
 
@@ -289,7 +289,7 @@ struct MeshData
 		positionAdjustion = DirectX::XMLoadFloat3(&preSetPosition);
 		rotationAdjustion = DirectX::XMLoadFloat3(&preSetRotationDegree);
 	};
-	void XM_CALLCONV Draw(DirectX::FXMVECTOR position, DirectX::FXMVECTOR scaling, DirectX::FXMVECTOR rotationDegree, const int& frame = 0, int* maxFrame = nullptr);
+	void XM_CALLCONV Draw(DirectX::FXMVECTOR position, DirectX::FXMVECTOR scaling, DirectX::FXMVECTOR rotationDegree, int* frame = nullptr);
 
 };
 
@@ -310,7 +310,7 @@ public:
 	void LoadMeshes(MeshFile sequencedData[],int *progress);
 	void LoadMesh(MeshFile sequencedData[], int fileNO);
 
-	const MeshFile* meshAt(int fileNO);
+	const MeshFile* MeshAt(int fileNO);
 
 	void ReleaseMeshes();
 
