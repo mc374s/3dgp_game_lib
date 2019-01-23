@@ -25,7 +25,7 @@ void Player::Init()
 	Clear();
 	speedAcc.x = P_WALK_SPEED;
 	speedMax.x = P_WALK_SPEED_MAX;
-	meshData = &fbxPlayerStandby;
+	meshData = &fbxPlayerModel;
 	moveFunc = &Player::Standby;
 
 	//size = AABB(Vector3(0, 1.64f*0.5f, 0), Vector3(0.4f, 1.64f, 0.4f));
@@ -84,11 +84,14 @@ void Player::Draw()
 {
 	OBJ3D::Draw();
 
+
+#ifdef DEBUG
+
+
+
 	DXTK::DrawAABB(Framework::pDeviceContext, Matrix::Identity, GLC::mainCamera.view, GLC::mainCamera.projection,
 		collision.minPos, collision.maxPos, collisionColor);
 
-
-#ifdef DEBUG
 	char buf[256];
 	sprintf_s(buf, "Player:\nPosX:%lf \nPosY:%lf \nPosZ:%lf \nSpeedX:%lf \nSpeedY:%lf \nSpeedZ:%lf \n",
 		transform.position.x, transform.position.y, transform.position.z, speed.x, speed.y, speed.z);

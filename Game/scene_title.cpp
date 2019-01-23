@@ -55,7 +55,7 @@ SceneTitle::SceneTitle()
 
 
 	std::thread loadThread(loadMeshesProgress, nullptr, &progress);
-	loadThread.detach();
+	loadThread.join();
 
 	changeScene(SCENE_MAIN);
 

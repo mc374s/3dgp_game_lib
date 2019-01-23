@@ -289,6 +289,7 @@ __declspec(align(16)) struct MeshData
 		positionAdjustion = DirectX::XMLoadFloat3(&preSetPosition);
 		rotationAdjustion = DirectX::XMLoadFloat3(&preSetRotationDegree);
 	};
+	void SetMotion(int fbxFileNO);
 	void XM_CALLCONV Draw(DirectX::FXMVECTOR position, DirectX::FXMVECTOR scaling, DirectX::FXMVECTOR rotationDegree, int* frame = nullptr);
 
 };

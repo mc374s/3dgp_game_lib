@@ -15,6 +15,8 @@ PlayerA::~PlayerA()
 void PlayerA::Init()
 {
 	Player::Init();
+	meshData = &fbxPlayerModel;
+	//meshData->SetMotion(FBX_FILE_NO::PLAYER_STANDBY);
 }
 
 void PlayerA::Update()
@@ -28,7 +30,8 @@ void PlayerA::Standby()
 	switch (step) {
 	case STEP::INIT:
 		frame = 0;
-		meshData = &fbxPlayerStandby;
+		//meshData = &fbxPlayerStandby;
+		//meshData->SetMotion(FBX_FILE_NO::PLAYER_STANDBY);
 		speed = Vector3(0, 0, 0);
 		step = STEP::BEGIN;
 		break;
@@ -50,7 +53,8 @@ void PlayerA::Run()
 	switch (step) {
 	case STEP::INIT:
 		moveFunc = &Player::Run;
-		meshData = &fbxPlayerRun;
+		//meshData = &fbxPlayerRun;
+		meshData->SetMotion(FBX_FILE_NO::PLAYER_RUN);
 		frame = 0;
 		step = STEP::BEGIN;
 		break;
@@ -122,7 +126,8 @@ void PlayerA::Jump()
 	switch (step) {
 	case STEP::INIT:
 		moveFunc = &Player::Jump;
-		meshData = &fbxPlayerJump;
+		//meshData = &fbxPlayerJump;
+		meshData->SetMotion(FBX_FILE_NO::PLAYER_JUMP);
 		frame = 0;
 		step = STEP::BEGIN;
 		break;
@@ -168,7 +173,8 @@ void PlayerA::Attack()
 	switch (step) {
 	case STEP::INIT:
 		moveFunc = &Player::Attack;
-		meshData = &fbxPlayerAttack;
+		//meshData = &fbxPlayerAttack;
+		meshData->SetMotion(FBX_FILE_NO::PLAYER_ATTACK);
 		frame = 0;
 		step = STEP::BEGIN;
 		break;

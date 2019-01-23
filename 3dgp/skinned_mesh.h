@@ -111,8 +111,9 @@ private:
 
 	void CreateBuffers(ID3D11Device *pDevice, ID3D11Buffer** ppVertexBuffer, ID3D11Buffer** ppIndexBuffer, Vertex3D *pVertices, int vertexNum, WORD *pIndices, int indexNum);
 
-	int SaveFbxMeshData(const char* pOutputFilePath);
-	int LoadFbxMeshData(ID3D11Device *pDevice, const char* pInputFilePath);
+	int SaveFbxMeshData(const char* pOutputFilePath, std::vector<Mesh>& meshesList);
+	int LoadFbxMeshData(ID3D11Device *pDevice, const char* pInputFilePath, std::vector<Mesh>& meshesList);
+	int FetchAnimationsWithoutMesh(void* pFbxScene, SkinnedMesh::SkeletalAnimation &skeletalAnimation);
 
 public:
 	int frame = 0;
@@ -120,6 +121,8 @@ public:
 
 	SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const bool exchangeAxisYwithAxisZ = false, int* maxFrame = nullptr);
 	virtual ~SkinnedMesh();
+
+	void SetAnimation(const SkinnedMesh* pSkinnedMesh, int meshNO = 0);
 
 	//
 	//Set Shaders and States

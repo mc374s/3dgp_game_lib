@@ -2,13 +2,16 @@
 
 // 
 MeshFile e_sequencedFbxFiles[] = {
-	{ PLAYER_STANDBY,		"./Data/FbxFiles/FromMixamo/Model/lola_b_styperek.fbx" },
+	{ PLAYER_MODEL,			"./Data/FbxFiles/FromMixamo/Model/lola_b_styperek.fbx" },
+	{ PLAYER_STANDBY,		"./Data/FbxFiles/FromMixamo/Motion/fight_idle.fbx" },
 	//{ PLAYER_STANDBY,		"./Data/FbxFiles/FightingMotionsVolume1/Usable/idle_A.fbx" },
 	//{ PLAYER_WALK,		"./Data/FbxFiles/Karate Warrior Mecanim Animation Pack Free/Characters/Karate@Run.fbx" },
 	//{ PLAYER_RUN,			"./Data/FbxFiles/FightingUnityChan/Animations/run.fbx" },
-	{ PLAYER_RUN,			"./Data/FbxFiles/FromMixamo/Motion/fight_idle.fbx" },
-	{ PLAYER_JUMP,			"./Data/FbxFiles/FightingUnityChan/Animations/jump.fbx" },
-	{ PLAYER_ATTACK,		"./Data/FbxFiles/FightingUnityChan/Animations/screw_kick.fbx" },
+	{ PLAYER_RUN,			"./Data/FbxFiles/FromMixamo/Motion/walk.fbx" },
+	//{ PLAYER_JUMP,		"./Data/FbxFiles/FightingUnityChan/Animations/jump.fbx" },
+	{ PLAYER_JUMP,			"./Data/FbxFiles/FromMixamo/Motion/jump.fbx" },
+	//{ PLAYER_ATTACK,		"./Data/FbxFiles/FightingUnityChan/Animations/screw_kick.fbx" },
+	{ PLAYER_ATTACK,		"./Data/FbxFiles/FromMixamo/Motion/fire_ball.fbx" },
 	//{ PLAYER_ATTACK,		"./Data/FbxFiles/FightingMotionsVolume1/FBX/hp_straight_left_A.fbx" },
 	//{ ITEM_SWORD,			"./Data/FbxFiles/sword.fbx" },
 	{ ITEM_FLOOR,			"./Data/FbxFiles/street_meter.fbx" },
@@ -17,7 +20,7 @@ MeshFile e_sequencedFbxFiles[] = {
 	{ -1, NULL },
 };
 
-
+MeshData fbxPlayerModel		= MeshData(PLAYER_MODEL, /*Vector3(0.05, 0.05, 0.05)*/Vector3(1, 1, 1), Vector3(0, 0, 0), Vector3(0, 90, 0));
 MeshData fbxPlayerStandby	= MeshData(PLAYER_STANDBY, /*Vector3(0.05, 0.05, 0.05)*/Vector3(0.01, 0.01, 0.01), Vector3(0, 0, 0), Vector3(0, 90, 0));
 //MeshData fbxPlayerWalk	= MeshData(PLAYER_WALK, /*Vector3(0.05, 0.05, 0.05)*/Vector3(1, 1, 1), Vector3(0, 0, 0), Vector3(0, 90, 0));
 MeshData fbxPlayerRun		= MeshData(PLAYER_RUN, /*Vector3(0.05, 0.05, 0.05)*/Vector3(1, 1, 1), Vector3(0, 0, 0), Vector3(0, 90, 0));

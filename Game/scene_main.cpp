@@ -107,12 +107,13 @@ void SceneMain::Draw()
 
 
 	// -60F
-	pPlayerManager->Draw();
 	pMainStage->Draw();
-
 
 	// -210F
 	e_fbxItemFloor.Draw(DirectX::g_XMZero, DirectX::g_XMOne, DirectX::g_XMZero);
+
+	pPlayerManager->Draw();
+
 
 
 	if (isPanelVisible && skillConstructPanel) {

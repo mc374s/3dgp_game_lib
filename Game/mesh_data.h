@@ -6,6 +6,7 @@
 // Fbx Files numbering
 enum FBX_FILE_NO
 {
+	PLAYER_MODEL,
 	PLAYER_STANDBY,
 	//PLAYER_WALK,
 	PLAYER_RUN,
@@ -21,6 +22,7 @@ enum FBX_FILE_NO
 extern MeshFile e_sequencedFbxFiles[];
 
 // Player Model
+extern MeshData fbxPlayerModel;
 
 // Player Animation
 extern MeshData fbxPlayerStandby;

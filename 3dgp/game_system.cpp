@@ -262,6 +262,12 @@ void Cube::Draw()
 ////////////////////////////////////////////////////////////
 
 // Skinned Mesh Data Management
+void MeshData::SetMotion(int fbxFileNO)
+{
+	if (fbxFileNO >= 0 && fbxFileNO < MAX_MESH_FILE_NUM && pMeshManager->MeshAt(fbxFileNO) && pMeshManager->MeshAt(fbxFileNO)->data) {
+		pMeshManager->MeshAt(fileNO)->data->SetAnimation(pMeshManager->MeshAt(fbxFileNO)->data);
+	}
+}
 
 void XM_CALLCONV MeshData::Draw(FXMVECTOR position, FXMVECTOR scaling, FXMVECTOR rotationDegree, int* frame)
 {
