@@ -15,7 +15,7 @@ PlayerA::~PlayerA()
 void PlayerA::Init()
 {
 	Player::Init();
-	meshData = &fbxPlayerModel;
+	meshData = &fbxPlayerStandby;
 	//meshData->SetMotion(FBX_FILE_NO::PLAYER_STANDBY);
 }
 
@@ -30,7 +30,7 @@ void PlayerA::Standby()
 	switch (step) {
 	case STEP::INIT:
 		frame = 0;
-		//meshData = &fbxPlayerStandby;
+		meshData = &fbxPlayerStandby;
 		//meshData->SetMotion(FBX_FILE_NO::PLAYER_STANDBY);
 		speed = Vector3(0, 0, 0);
 		step = STEP::BEGIN;
@@ -53,8 +53,8 @@ void PlayerA::Run()
 	switch (step) {
 	case STEP::INIT:
 		moveFunc = &Player::Run;
-		//meshData = &fbxPlayerRun;
-		meshData->SetMotion(FBX_FILE_NO::PLAYER_RUN);
+		meshData = &fbxPlayerRun;
+		//meshData->SetMotion(FBX_FILE_NO::PLAYER_RUN);
 		frame = 0;
 		step = STEP::BEGIN;
 		break;
@@ -67,12 +67,12 @@ void PlayerA::Run()
 		case PAD_LEFT:
 			speed.x -= speedAcc.x;
 			targetRotation = Vector3(0, 180, 0);
-			//transform.rotationDegree.y = 180;
+			transform.rotationDegree.y = 180;
 			break;
 		case PAD_RIGHT:
 			speed.x += speedAcc.x;
 			targetRotation = Vector3::Zero;
-			//transform.rotationDegree.y = 0;
+			transform.rotationDegree.y = 0;
 			break;
 		default:
 			if (speed.x > 0) {
@@ -126,14 +126,14 @@ void PlayerA::Jump()
 	switch (step) {
 	case STEP::INIT:
 		moveFunc = &Player::Jump;
-		//meshData = &fbxPlayerJump;
-		meshData->SetMotion(FBX_FILE_NO::PLAYER_JUMP);
+		meshData = &fbxPlayerJump;
+		//meshData->SetMotion(FBX_FILE_NO::PLAYER_JUMP);
 		frame = 0;
 		step = STEP::BEGIN;
 		break;
 	case STEP::BEGIN:
 		if (frame < 0) {
-			frame = 0;
+			step = STEP::FINISH;
 		}
 		++frame;
 		// PreMotion, Stop Forward movement
@@ -173,8 +173,8 @@ void PlayerA::Attack()
 	switch (step) {
 	case STEP::INIT:
 		moveFunc = &Player::Attack;
-		//meshData = &fbxPlayerAttack;
-		meshData->SetMotion(FBX_FILE_NO::PLAYER_ATTACK);
+		meshData = &fbxPlayerAttack;
+		//meshData->SetMotion(FBX_FILE_NO::PLAYER_ATTACK);
 		frame = 0;
 		step = STEP::BEGIN;
 		break;
@@ -182,7 +182,7 @@ void PlayerA::Attack()
 		if (frame < 0) {
 			step = STEP::FINISH;
 		}
-		++frame;
+		//++frame;
 
 		break;
 	case STEP::FINISH:

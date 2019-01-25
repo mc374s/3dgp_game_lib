@@ -15,8 +15,8 @@ PlayerB::~PlayerB()
 void PlayerB::Init()
 {
 	Player::Init();
-	meshData = &fbxPlayerModel;
-	//meshData->SetMotion(FBX_FILE_NO::PLAYER_STANDBY);
+	meshData = &fbxPlayerBModel;
+	//meshData->SetMotion(FBX_FILE_NO::PLAYER_B_STANDBY);
 }
 
 void PlayerB::Update()
@@ -30,8 +30,8 @@ void PlayerB::Standby()
 	switch (step) {
 	case STEP::INIT:
 		frame = 0;
-		//meshData = &fbxPlayerStandby;
-		//meshData->SetMotion(FBX_FILE_NO::PLAYER_STANDBY);
+		//meshData = &fbxPlayerBStandby;
+		meshData->SetMotion(FBX_FILE_NO::PLAYER_B_STANDBY);
 		speed = Vector3(0, 0, 0);
 		step = STEP::BEGIN;
 		break;
@@ -53,8 +53,8 @@ void PlayerB::Run()
 	switch (step) {
 	case STEP::INIT:
 		moveFunc = &Player::Run;
-		//meshData = &fbxPlayerRun;
-		meshData->SetMotion(FBX_FILE_NO::PLAYER_RUN);
+		//meshData = &fbxPlayerBRun;
+		meshData->SetMotion(FBX_FILE_NO::PLAYER_B_RUN);
 		frame = 0;
 		step = STEP::BEGIN;
 		break;
@@ -67,12 +67,12 @@ void PlayerB::Run()
 		case PAD_LEFT:
 			speed.x -= speedAcc.x;
 			targetRotation = Vector3(0, 180, 0);
-			//transform.rotationDegree.y = 180;
+			transform.rotationDegree.y = 180;
 			break;
 		case PAD_RIGHT:
 			speed.x += speedAcc.x;
 			targetRotation = Vector3::Zero;
-			//transform.rotationDegree.y = 0;
+			transform.rotationDegree.y = 0;
 			break;
 		default:
 			if (speed.x > 0) {
@@ -126,14 +126,14 @@ void PlayerB::Jump()
 	switch (step) {
 	case STEP::INIT:
 		moveFunc = &Player::Jump;
-		//meshData = &fbxPlayerJump;
-		meshData->SetMotion(FBX_FILE_NO::PLAYER_JUMP);
+		//meshData = &fbxPlayerBJump;
+		meshData->SetMotion(FBX_FILE_NO::PLAYER_B_JUMP);
 		frame = 0;
 		step = STEP::BEGIN;
 		break;
 	case STEP::BEGIN:
 		if (frame < 0) {
-			frame = 0;
+			step = STEP::FINISH;
 		}
 		++frame;
 		// PreMotion, Stop Forward movement
@@ -173,8 +173,8 @@ void PlayerB::Attack()
 	switch (step) {
 	case STEP::INIT:
 		moveFunc = &Player::Attack;
-		//meshData = &fbxPlayerBttack;
-		meshData->SetMotion(FBX_FILE_NO::PLAYER_ATTACK);
+		//meshData = &fbxPlayerBAttack;
+		meshData->SetMotion(FBX_FILE_NO::PLAYER_B_ATTACK);
 		frame = 0;
 		step = STEP::BEGIN;
 		break;

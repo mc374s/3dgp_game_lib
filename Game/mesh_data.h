@@ -8,10 +8,15 @@ enum FBX_FILE_NO
 {
 	PLAYER_MODEL,
 	PLAYER_STANDBY,
-	//PLAYER_WALK,
 	PLAYER_RUN,
 	PLAYER_JUMP,
 	PLAYER_ATTACK,
+
+	PLAYER_B_MODEL,
+	PLAYER_B_STANDBY,
+	PLAYER_B_RUN,
+	PLAYER_B_JUMP,
+	PLAYER_B_ATTACK,
 	//
 	//ITEM_SWORD,
 	ITEM_FLOOR,
@@ -23,13 +28,18 @@ extern MeshFile e_sequencedFbxFiles[];
 
 // Player Model
 extern MeshData fbxPlayerModel;
+extern MeshData fbxPlayerBModel;
 
 // Player Animation
 extern MeshData fbxPlayerStandby;
-//extern MeshData fbxPlayerWalk;
 extern MeshData fbxPlayerRun;
 extern MeshData fbxPlayerJump;
 extern MeshData fbxPlayerAttack;
+
+extern MeshData fbxPlayerBStandby;
+extern MeshData fbxPlayerBRun;
+extern MeshData fbxPlayerBJump;
+extern MeshData fbxPlayerBAttack;
 
 //extern MeshData e_fbxItemSword;
 extern MeshData e_fbxItemFloor;

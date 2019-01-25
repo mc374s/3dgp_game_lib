@@ -170,6 +170,15 @@ void PlayerManager::Update()
 
 	centerPositions = (minPosition + maxPosition) / 2.0f;
 
+	// Exchange Player 1' controller with Player 2
+	if (Input::KEY_TRACKER.pressed.C) {
+		if (playerNum > 1) {
+			int recordValue = pPlayer[0]->controllerNO;
+			pPlayer[0]->controllerNO = pPlayer[1]->controllerNO;
+			pPlayer[1]->controllerNO = recordValue;
+		}
+	}
+
 
 	// Camera Work
 	if (Input::KEY.I) {
