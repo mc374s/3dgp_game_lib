@@ -12,6 +12,7 @@ class SceneTitle :public Scene, public Singleton<SceneTitle>
 private:
 	OBJ2D* pBG;
 public:
+	int progress = 0;
 	SceneTitle();
 	~SceneTitle();
 

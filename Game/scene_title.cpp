@@ -32,8 +32,6 @@ void loadeMessage() {
 	MessageBox(0, L"Meshes loaded!", L"loadeMessage()", MB_OK);
 }
 
-int progress = 0;
-
 SceneTitle::SceneTitle()
 {
 	Scene::Init();
@@ -55,7 +53,7 @@ SceneTitle::SceneTitle()
 
 
 	std::thread loadThread(loadMeshesProgress, nullptr, &progress);
-	loadThread.join();
+	loadThread.detach();
 
 	changeScene(SCENE_MAIN);
 

@@ -132,6 +132,9 @@ void SceneMain::Draw()
 	if (step == STEP::INIT) {
 		DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0x000000FF & (unsigned int)((20 - timer) / 20.0f * 255));
 	}
+	char buf[256];
+	sprintf_s(buf, "Loading Progress: %d %%", SCENE_TITLE->progress);
+	DrawString(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 100, buf, 0xFF0000FF, STR_CENTER);
 
 }
 
