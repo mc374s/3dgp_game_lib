@@ -3,6 +3,13 @@
 Texture2D diffuse_map : register(t0);
 SamplerState diffuse_map_sampler_state : register(s0);
 
+float4 getColor(VS_OUT pin)
+{
+    float4 color;
+    color = diffuse_map.Sample(diffuse_map_sampler_state, pin.texcoord);
+    return color;
+}
+
 float4 main(VS_OUT pin) : SV_TARGET
 {
 
@@ -10,7 +17,8 @@ float4 main(VS_OUT pin) : SV_TARGET
 	
 	//return diffuse_map.Sample(diffuse_map_sampler_state, pin.texcoord);
 
-	float4 color = diffuse_map.Sample(diffuse_map_sampler_state, pin.texcoord);
+	//float4 color = diffuse_map.Sample(diffuse_map_sampler_state, pin.texcoord);
+    float4 color = getColor(pin);
 
 	//float4 colorSum = { 0,0,0,0 };
 

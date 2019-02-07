@@ -4,23 +4,26 @@ VS_OUT main(float4 position : POSITION, float4 color : COLOR, float2 texcoord : 
 {
     float weight = 0.0f;
 
-	float3 p = { 0.0f,0.0f,0.0f };
-	float3 n = { 0.0f,0.0f,0.0f };
+    float3 p = { 0.0f, 0.0f, 0.0f };
+    float3 n = { 0.0f, 0.0f, 0.0f };
 
-	int boneIndex = 0, unInfluenceCount = 0;
-	for (boneIndex = 0; boneIndex  < 4; ++boneIndex) {
-		weight = boneWeights[boneIndex];
-        if (weight <= 0.0f){
+    int boneIndex = 0, unInfluenceCount = 0;
+    for (boneIndex = 0; boneIndex < 4; ++boneIndex)
+    {
+        weight = boneWeights[boneIndex];
+        if (weight <= 0.0f)
+        {
             ++unInfluenceCount;
         }
         p += (weight * mul(position, boneTransforms[boneIndices[boneIndex]])).xyz;
         n += (weight * mul(float4(normal.xyz, 0), boneTransforms[boneIndices[boneIndex]])).xyz;
     }
 
-	if (unInfluenceCount != boneIndex) {
-		position = float4(p, 1.0f);
-		normal = float4(n, 0.0f);
-	}
+    if (unInfluenceCount != boneIndex)
+    {
+        position = float4(p, 1.0f);
+        normal = float4(n, 0.0f);
+    }
 
 	VS_OUT vout;
 	vout.texcoord = texcoord;

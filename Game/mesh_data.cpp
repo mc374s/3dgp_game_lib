@@ -27,6 +27,9 @@ MeshFile e_sequencedFbxFiles[] = {
 	{ -1, NULL },
 };
 
+// 64000 polygons, 1000 frames
+
+
 MeshData fbxPlayerModel		= MeshData(PLAYER_MODEL, Vector3(1, 1, 1), Vector3(0, 0, 0), Vector3(0, 90, 0));
 MeshData fbxPlayerStandby	= MeshData(PLAYER_STANDBY, Vector3(1, 1, 1), Vector3(0, 0, 0), Vector3(0, 90, 0));
 MeshData fbxPlayerRun		= MeshData(PLAYER_RUN, Vector3(1, 1, 1), Vector3(0, 0, 0), Vector3(0, 90, 0));

@@ -485,9 +485,9 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const 
 		{ "BONES",		0, DXGI_FORMAT_R32G32B32A32_SINT,		0, 68,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		//{ "BONES",		0, DXGI_FORMAT_R32G32B32A32_SINT,		0, D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
-	RM::LoadVertexShader(pDevice, "./Data/Shader/texture_on_3d_bone_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &pVertexShader, &pInputLayout);
+	RM::LoadVertexShader(pDevice, "./Data/Shaders/texture_on_3d_bone_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &pVertexShader, &pInputLayout);
 
-	RM::LoadPixelShader(pDevice, "./Data/Shader/texture_on_ps.cso", &pPixelShader);
+	RM::LoadPixelShader(pDevice, "./Data/Shaders/texture_on_ps.cso", &pPixelShader);
 
 	// SAMPLER_DESC Initialize
 	D3D11_SAMPLER_DESC samplerDesc;
@@ -633,36 +633,47 @@ int SkinnedMesh::FetchAnimationsWithoutMesh(void* pFbxScene, SkinnedMesh::Skelet
 		skeletal.resize(boneNum);
 		for (int j = 0; j < boneNum; ++j) {
 			SkinnedMesh::Bone &bone = skeletal.at(j);
-			FbxNode* pNode = root->FindChild(boneNames[j]);
-			//_RPTN(_CRT_WARN, "%s:\n", linked_node->GetName());
-			//strcpy_s(bone.name, linked_node->GetName());
+			//FbxNode* pNode = root->FindChild(boneNames[j]);
+			FbxNode* pNode = scene->GetNode(j + 1);
+			pNode->FindDstObject(0);
+			FbxNodeAttribute* pFbxNodeAttribute = pNode->GetNodeAttribute();
+			if (pFbxNodeAttribute->GetAttributeType() == FbxNodeAttribute::eSkeleton) {
+				FbxSkeleton* pFbxSkeleton = pNode->GetSkeleton();
+				//pFbxSkeleton->
+				
+				//_RPTN(_CRT_WARN, "%s:\n", linked_node->GetName());
+				//strcpy_s(bone.name, linked_node->GetName());
 
-			// This matrix transform coordinates of the initial pose from mesh spece to global space
-			FbxAMatrix referenceGlobalInitPosition;
+				// This matrix transform coordinates of the initial pose from mesh spece to global space
+				FbxAMatrix referenceGlobalInitPosition;
 
-			// This matrix transform coordinates of the initial pose from bone space to global space
-			FbxAMatrix clusterGlobalInitPosition;
+				// This matrix transform coordinates of the initial pose from bone space to global space
+				FbxAMatrix clusterGlobalInitPosition;
 
-			// This matrix transform coordinates of the current pose from bone space to global space
-			FbxAMatrix clusterGlobalCurrentPosition;
+				// This matrix transform coordinates of the current pose from bone space to global space
+				FbxAMatrix clusterGlobalCurrentPosition;
 
-			// This matrix transform coordinates of the current pose form mesh space to global space
-			FbxAMatrix referenceGlobalCurrentPosition;
-			referenceGlobalCurrentPosition = pNode->EvaluateGlobalTransform(currentTime);
-			//referenceGlobalCurrentPosition = pNode->EvaluateGlobalTransform(currentTime);
-			//FbxSkeleton* pSkeleton = pNode->GetSkeleton();
-			//FbxAnimEvaluator* pFbxAnimEvaluator = pNode->GetAnimationEvaluator();
+				// This matrix transform coordinates of the current pose form mesh space to global space
+				FbxAMatrix referenceGlobalCurrentPosition;
+				referenceGlobalCurrentPosition = pNode->EvaluateGlobalTransform(currentTime);
+				//referenceGlobalCurrentPosition = pNode->EvaluateGlobalTransform(currentTime);
+				//FbxSkeleton* pSkeleton = pNode->GetSkeleton();
+				//FbxAnimEvaluator* pFbxAnimEvaluator = pNode->GetAnimationEvaluator();
 
-			// Matrices are defined using the Cloum Major scheme. When a FbxAMatrix represents the translation part of the transformation
-			FbxAMatrix transform = referenceGlobalCurrentPosition.Inverse();
+				// Matrices are defined using the Cloum Major scheme. When a FbxAMatrix represents the translation part of the transformation
+				FbxAMatrix transform = referenceGlobalCurrentPosition.Inverse();
+				FbxAMatrix parantTransform = pNode->GetParent()->EvaluateGlobalTransform(currentTime);
+				//transform= parantTransform*pNode->LclTranslation.Get()*pNode->RotationOffset*pNode->RotationPivot*pNode->PreRotation*pNode->LclRotation
 
-			// Convert FbxAMatrix(transform) to XMFLOAT4X4(bone.transform)
-			bone.transform = XMFLOAT4X4(
-				transform.mData[0][0], transform.mData[0][1], transform.mData[0][2], transform.mData[0][3],
-				transform.mData[1][0], transform.mData[1][1], transform.mData[1][2], transform.mData[1][3],
-				transform.mData[2][0], transform.mData[2][1], transform.mData[2][2], transform.mData[2][3],
-				transform.mData[3][0], transform.mData[3][1], transform.mData[3][2], transform.mData[3][3]
-			);
+				// Convert FbxAMatrix(transform) to XMFLOAT4X4(bone.transform)
+				bone.transform = XMFLOAT4X4(
+					transform.mData[0][0], transform.mData[0][1], transform.mData[0][2], transform.mData[0][3],
+					transform.mData[1][0], transform.mData[1][1], transform.mData[1][2], transform.mData[1][3],
+					transform.mData[2][0], transform.mData[2][1], transform.mData[2][2], transform.mData[2][3],
+					transform.mData[3][0], transform.mData[3][1], transform.mData[3][2], transform.mData[3][3]
+				);
+			}
+
 		}
 
 		skeletalAnimation.push_back(skeletal);
@@ -671,12 +682,14 @@ int SkinnedMesh::FetchAnimationsWithoutMesh(void* pFbxScene, SkinnedMesh::Skelet
 
 	//meshesList[0].skeletalAnimation.resize(frameNum);
 	//memcpy_s(meshesList[0].skeletalAnimation.data(), sizeof(Skeletal)*frameNum, meshTemp.skeletalAnimation.data(), sizeof(Skeletal)*frameNum);
-
-
-	for (int i = 0; i < boneNum; ++i) {
-		delete[] boneNames[i];
+	if (boneNames) {
+		for (int i = 0; i < boneNum; ++i) {
+			if (boneNames[i]) {
+				delete[] boneNames[i];
+			}
+		}
+		delete boneNames;
 	}
-	delete boneNames;
 
 
 	//const FbxProperty property = pAnimCurve->FindProperty(FbxAnimCurve::);

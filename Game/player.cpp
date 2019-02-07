@@ -84,21 +84,20 @@ void Player::Draw()
 {
 	OBJ3D::Draw();
 
-
 #ifdef DEBUG
+	
+	if (controllerNO == 0) {
+		DXTK::DrawAABB(Framework::pDeviceContext, Matrix::Identity, GLC::mainCamera.view, GLC::mainCamera.projection,
+			collision.minPos, collision.maxPos, collisionColor);
 
+		char buf[256];
+		sprintf_s(buf, "Player:\nPosX:%lf \nPosY:%lf \nPosZ:%lf \nSpeedX:%lf \nSpeedY:%lf \nSpeedZ:%lf \n",
+			transform.position.x, transform.position.y, transform.position.z, speed.x, speed.y, speed.z);
+		DrawString(0, 300, buf, 0xFFFFFFFF, STR_LEFT, 16, 16);
 
-
-	DXTK::DrawAABB(Framework::pDeviceContext, Matrix::Identity, GLC::mainCamera.view, GLC::mainCamera.projection,
-		collision.minPos, collision.maxPos, collisionColor);
-
-	char buf[256];
-	sprintf_s(buf, "Player:\nPosX:%lf \nPosY:%lf \nPosZ:%lf \nSpeedX:%lf \nSpeedY:%lf \nSpeedZ:%lf \n",
-		transform.position.x, transform.position.y, transform.position.z, speed.x, speed.y, speed.z);
-	DrawString(0, 300, buf, 0xFFFFFFFF, STR_LEFT, 16, 16);
+	}
 
 #endif // DEBUG
-
 }
 
 

@@ -45,8 +45,6 @@ public:
 
 public:
 	HWND outputWindow = NULL;
-	/*static CONST LONG SCREEN_WIDTH = SCREEN_WIDTH;
-	static CONST LONG SCREEN_HEIGHT = SCREEN_HEIGHT;*/
 
 	HRESULT hr;
 
@@ -66,21 +64,6 @@ public:
 	ID3D11Texture2D*				pDepthStencilResource = NULL;
 	ID3D11BlendState*				pBlendState = NULL;
 
-	Primitive3D *pPrimitive3D[20];
-
-	int blendMode = 1;
-	float alpha = 255.0f;
-	const char strBlendMode[16][16] = {
-		"NONE",
-		"ALPHA",
-		"ADD",
-		"SUBTRACT",
-		"REPLACE",
-		"MULTIPLY",
-		"LIGHTEN",
-		"DARKEN",
-		"SCREEN"
-	};
 
 	Framework(HWND _hwnd) /*: hwnd(hwnd)*/
 	{
@@ -96,7 +79,7 @@ public:
 	}
 	int Run();
 
-	LRESULT CALLBACK handle_message(HWND _hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+	LRESULT CALLBACK HandleMessage(HWND _hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
 private:
 
@@ -107,7 +90,7 @@ private:
 
 private:
 	HighResolutionTimer* timer;
-	void calculate_frame_stats();
+	void CalculateFrameStats();
 };
 
 

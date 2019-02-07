@@ -13,9 +13,9 @@ Primitive3D::Primitive3D(ID3D11Device *pDevice)
 		{ "NORMAL",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 28,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
-	RM::LoadVertexShader(pDevice, "./Data/Shader/texture_off_3d_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &pVertexShader, &pInputLayout);
+	RM::LoadVertexShader(pDevice, "./Data/Shaders/texture_off_3d_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &pVertexShader, &pInputLayout);
 
-	RM::LoadPixelShader(pDevice, "./Data/Shader/texture_off_ps.cso", &pPixelShader);
+	RM::LoadPixelShader(pDevice, "./Data/Shaders/texture_off_ps.cso", &pPixelShader);
 
 	// create rasterizer state
 	D3D11_RASTERIZER_DESC rasterizerDesc;

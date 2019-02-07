@@ -66,8 +66,8 @@ Sprite::Sprite(ID3D11Device* pDevice)
 		{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 12,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
-	RM::LoadVertexShader(pDevice, "./Data/Shader/texture_off_2d_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &pVertexShader, &pInputLayout);
-	RM::LoadPixelShader(pDevice, "./Data/Shader/texture_off_ps.cso", &pPixelShader);
+	RM::LoadVertexShader(pDevice, "./Data/Shaders/texture_off_2d_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &pVertexShader, &pInputLayout);
+	RM::LoadPixelShader(pDevice, "./Data/Shaders/texture_off_ps.cso", &pPixelShader);
 
 	pShaderResourceView = NULL;
 
@@ -103,7 +103,7 @@ Sprite::Sprite(ID3D11Device* pDevice, char* pFilename/*Texture file name*/, bool
 			{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 28,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "NORMAL",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 36,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		};
-		RM::LoadVertexShader(pDevice, "./Data/Shader/texture_on_3d_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &pVertexShader, &pInputLayout);
+		RM::LoadVertexShader(pDevice, "./Data/Shaders/texture_on_3d_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &pVertexShader, &pInputLayout);
 	}
 	else {
 		D3D11_INPUT_ELEMENT_DESC layoutDesc[] =
@@ -112,9 +112,9 @@ Sprite::Sprite(ID3D11Device* pDevice, char* pFilename/*Texture file name*/, bool
 			{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 12,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 28,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		};
-		RM::LoadVertexShader(pDevice, "./Data/Shader/texture_on_2d_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &pVertexShader, &pInputLayout);
+		RM::LoadVertexShader(pDevice, "./Data/Shaders/texture_on_2d_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &pVertexShader, &pInputLayout);
 	}
-	RM::LoadPixelShader(pDevice, "./Data/Shader/texture_on_ps.cso", &pPixelShader);
+	RM::LoadPixelShader(pDevice, "./Data/Shaders/texture_on_ps.cso", &pPixelShader);
 
 	ID3D11Resource* resource = NULL;
 	RM::LoadShaderResourceView(pDevice, &pShaderResourceView, pFilename, &resource);

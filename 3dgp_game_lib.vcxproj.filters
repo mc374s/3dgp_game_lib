@@ -18,8 +18,11 @@
     <Filter Include="3dgp\Sources">
       <UniqueIdentifier>{f6d4f758-a222-4b0a-8e8c-ebf1d308018f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="3dgp\Shaders">
+    <Filter Include="3dgp\Sources\Shaders">
       <UniqueIdentifier>{c488e051-da4c-43d8-843b-bb890bc3d457}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3dgp\Sources\Shaders\Shared">
+      <UniqueIdentifier>{a15d2bc7-79ba-45bf-be98-b27f91a2ae3d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -210,34 +213,34 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="3dgp\texture_off.hlsli">
-      <Filter>3dgp\Shaders</Filter>
+    <None Include="3dgp\Shaders\texture_off.hlsli">
+      <Filter>3dgp\Sources\Shaders\Shared</Filter>
     </None>
-    <None Include="3dgp\texture_on.hlsli">
-      <Filter>3dgp\Shaders</Filter>
+    <None Include="3dgp\Shaders\texture_on.hlsli">
+      <Filter>3dgp\Sources\Shaders\Shared</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="3dgp\texture_off_2d_vs.hlsl">
-      <Filter>3dgp\Shaders</Filter>
+    <FxCompile Include="3dgp\Shaders\texture_off_2d_vs.hlsl">
+      <Filter>3dgp\Sources\Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="3dgp\texture_off_3d_vs.hlsl">
-      <Filter>3dgp\Shaders</Filter>
+    <FxCompile Include="3dgp\Shaders\texture_off_3d_vs.hlsl">
+      <Filter>3dgp\Sources\Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="3dgp\texture_off_ps.hlsl">
-      <Filter>3dgp\Shaders</Filter>
+    <FxCompile Include="3dgp\Shaders\texture_off_ps.hlsl">
+      <Filter>3dgp\Sources\Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="3dgp\texture_on_2d_vs.hlsl">
-      <Filter>3dgp\Shaders</Filter>
+    <FxCompile Include="3dgp\Shaders\texture_on_2d_vs.hlsl">
+      <Filter>3dgp\Sources\Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="3dgp\texture_on_3d_bone_vs.hlsl">
-      <Filter>3dgp\Shaders</Filter>
+    <FxCompile Include="3dgp\Shaders\texture_on_3d_bone_vs.hlsl">
+      <Filter>3dgp\Sources\Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="3dgp\texture_on_3d_vs.hlsl">
-      <Filter>3dgp\Shaders</Filter>
+    <FxCompile Include="3dgp\Shaders\texture_on_3d_vs.hlsl">
+      <Filter>3dgp\Sources\Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="3dgp\texture_on_ps.hlsl">
-      <Filter>3dgp\Shaders</Filter>
+    <FxCompile Include="3dgp\Shaders\texture_on_ps.hlsl">
+      <Filter>3dgp\Sources\Shaders</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

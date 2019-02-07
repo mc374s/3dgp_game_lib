@@ -176,11 +176,6 @@ bool Framework::Initialize(HWND _hwnd)
 	// Initialzie the blending
 	MyBlending::Initialize(pDevice);
 
-	pPrimitive3D[0] = new Primitive3D(pDevice);
-	pPrimitive3D[0]->Initialize(pDevice, GEOMETRY_CUBE);
-	pPrimitive3D[1] = new Primitive3D(pDevice);
-	pPrimitive3D[1]->Initialize(pDevice, GEOMETRY_CYLINDER, 2, 24);
-
 	SpriteString::Initialize(pDevice);
 	DXTK::CreateDirectXTKObject(pDevice, pDeviceContext);
 
@@ -280,7 +275,7 @@ int Framework::Run()
 				Draw(timer->time_interval());
 			}
 
-			calculate_frame_stats();
+			CalculateFrameStats();
 
 			minFrameTime = MIN_FRAME_TIME_DAFAULT;
 			if (Input::KEY.LeftControl)
@@ -297,7 +292,7 @@ int Framework::Run()
 	return static_cast<int>(msg.wParam);
 }
 
-LRESULT CALLBACK Framework::handle_message(HWND _hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
+LRESULT CALLBACK Framework::HandleMessage(HWND _hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	//if (wparam == ABN_FULLSCREENAPP){
 	//	isFullScreen = !isFullScreen;
@@ -357,7 +352,7 @@ LRESULT CALLBACK Framework::handle_message(HWND _hwnd, UINT msg, WPARAM wparam, 
 	return 0;
 }
 
-void Framework::calculate_frame_stats()
+void Framework::CalculateFrameStats()
 {
 	// Code computes the average frames per second, and also the 
 	// average time it takes to render one frame.  These stats 
@@ -456,14 +451,7 @@ void Framework::Update(float elapsed_time/*Elapsed seconds from last frame*/)
 
 void Framework::Draw(float elapsed_time/*Elapsed seconds from last frame*/)
 {
-	//Camera::mainCamera.focusPosition = { focusPos.x,focusPos.y,focusPos.z,0 };
 
-	// Change the blending mode 
-	if (GetAsyncKeyState(VK_SPACE) < 0)
-	{
-		blendMode++;
-		blendMode %= 9;
-	}
 	MyBlending::setMode(pDeviceContext, BLEND_ALPHA);
 
 	pDeviceContext->OMSetRenderTargets(1, &pRenderTargetView, pDepthStencilView);
@@ -474,7 +462,6 @@ void Framework::Draw(float elapsed_time/*Elapsed seconds from last frame*/)
 	pDeviceContext->RSSetViewports(1, &mainCamera.viewPort);
 
 	// Just clear the backbuffer
-	//float ClearColor[4] = { 0.0f / 255.0f, 111.0f / 255.0f, 129.0f / 255.0f, 1.0f }; //red,green,blue,alpha
 	float ClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f }; //red,green,blue,alpha
 	pDeviceContext->ClearRenderTargetView(pRenderTargetView, ClearColor);
 	pDeviceContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -509,13 +496,6 @@ void Framework::Draw(float elapsed_time/*Elapsed seconds from last frame*/)
 		// 垂直同期OFF
 		pSwapChain->Present(0, 0);
 	}
-
-	
-	// For FullScreen Mode, Synchronize presentation for 1 vertical blanks
-	//pSwapChain->Present(1, 0);
-
-	// For Windowed Mode 
-	//pSwapChain->Present(0, 0);
 }
 
 void Framework::Release()
@@ -527,12 +507,9 @@ void Framework::Release()
 
 	if (pDeviceContext) {
 		pDeviceContext->ClearState();
-		//MessageBox(0, L"DeviceContext Cleared", L"framework", MB_OK);
 		pDeviceContext->Release();
-		//MessageBox(0, L"DeviceContext Released", L"framework", MB_OK);
 	}
 
-	
 	SAFE_RELEASE(pDevice);
 	SAFE_RELEASE(pDepthStencilResource);
 	SAFE_RELEASE(pDepthStencilState);
@@ -544,9 +521,4 @@ void Framework::Release()
 	SpriteString::Release();
 	DXTK::CleanupDirectXTKObject();
 
-	for (auto &p : pPrimitive3D)
-	{
-		delete p;
-		p = NULL;
-	}
 }

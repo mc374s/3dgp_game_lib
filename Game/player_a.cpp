@@ -34,7 +34,7 @@ void PlayerA::Standby()
 		//meshData->SetMotion(FBX_FILE_NO::PLAYER_STANDBY);
 		speed = Vector3(0, 0, 0);
 		step = STEP::BEGIN;
-		break;
+		//break;
 	case STEP::BEGIN:
 		if (frame < 0) {
 			frame = 0;
@@ -57,7 +57,7 @@ void PlayerA::Run()
 		//meshData->SetMotion(FBX_FILE_NO::PLAYER_RUN);
 		frame = 0;
 		step = STEP::BEGIN;
-		break;
+		//break;
 	case STEP::BEGIN:
 		if (frame < 0) {
 			frame = 0;
@@ -130,7 +130,7 @@ void PlayerA::Jump()
 		//meshData->SetMotion(FBX_FILE_NO::PLAYER_JUMP);
 		frame = 0;
 		step = STEP::BEGIN;
-		break;
+		//break;
 	case STEP::BEGIN:
 		if (frame < 0) {
 			step = STEP::FINISH;
@@ -177,7 +177,7 @@ void PlayerA::Attack()
 		//meshData->SetMotion(FBX_FILE_NO::PLAYER_ATTACK);
 		frame = 0;
 		step = STEP::BEGIN;
-		break;
+		//break;
 	case STEP::BEGIN:
 		if (frame < 0) {
 			step = STEP::FINISH;
