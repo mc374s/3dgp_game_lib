@@ -19,7 +19,7 @@ public:
 	std::vector<OBJ3D> pObjList;
 	std::vector<Collision*> pCollisionList;
 
-	void Init();
+	void Initialize();
 	void Update();
 	void Draw();
 

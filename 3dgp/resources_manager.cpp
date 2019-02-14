@@ -2,7 +2,7 @@
 
 #include "WICTextureLoader.h"
 #include <cstdio>
-#include <d3dcompiler.h>
+//#include <d3dcompiler.h>
 using namespace RM;
 
 /*///////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
@@ -14,11 +14,11 @@ int RM::LoadShaderResourceView(ID3D11Device* pDevice, ID3D11ShaderResourceView**
 	int fileNO = 0;
 
 	// すでに存在しているリソースがあれば、レファレンス作成。無ければ新規作成
-	for (fileNO = 0; fileNO < ResourcesManager::s_imgFileCounter; fileNO++)
+	for (fileNO = 0; fileNO < ResourcesManager::s_imgFileCounter; ++fileNO)
 	{
 		// pFileName == nullptrのときにダミーSRVを参照
 		if ((pFileName && strcmp(ResourcesManager::s_SRVResources[fileNO].pFileName, pFileName) == 0)
-			|| (!pFileName && strcmp(ResourcesManager::s_SRVResources[fileNO].pFileName, "NULL") == 0))
+			|| (!pFileName && strcmp(ResourcesManager::s_SRVResources[fileNO].pFileName, "null") == 0))
 		{
 			//　リソースを ppOutResource に返す
 			if (ppOutResource) {
@@ -56,7 +56,7 @@ int RM::LoadShaderResourceView(ID3D11Device* pDevice, ID3D11ShaderResourceView**
 				MessageBox(0, L"MakeDummyShaderResourceView Filed!", L"MyResourceManager::loadResource()", MB_OK);
 				return -1;
 			}
-			strcpy_s(ResourcesManager::s_SRVResources[fileNO].pFileName, "NULL");
+			strcpy_s(ResourcesManager::s_SRVResources[fileNO].pFileName, "null");
 		}
 
 		ResourcesManager::s_SRVResources[fileNO].fileRefNum++;
@@ -73,7 +73,7 @@ int RM::LoadShaderResourceView(ID3D11Device* pDevice, ID3D11ShaderResourceView**
 void RM::ReleaseShaderResourceView(ID3D11ShaderResourceView* pInSRV) {
 	if (pInSRV)
 	{
-		for (int i = 0; i < ResourcesManager::s_imgFileCounter; i++)
+		for (int i = 0; i < ResourcesManager::s_imgFileCounter; ++i)
 		{
 			if (ResourcesManager::s_SRVResources[i].pData == pInSRV)
 			{
@@ -95,7 +95,7 @@ int RM::LoadVertexShader(ID3D11Device* pDevice, char* pFilename, D3D11_INPUT_ELE
 	int fileNO = 0;
 
 	// すでに存在しているリソース
-	for (fileNO = 0; fileNO < ResourcesManager::s_vsFileCounter; fileNO++)
+	for (fileNO = 0; fileNO < ResourcesManager::s_vsFileCounter; ++fileNO)
 	{
 		if (strcmp(ResourcesManager::s_vertexShaderResources[fileNO].pFileName, pFilename) == 0)
 		{
@@ -155,7 +155,7 @@ int RM::LoadVertexShader(ID3D11Device* pDevice, char* pFilename, D3D11_INPUT_ELE
 void RM::ReleaseVertexShader(ID3D11VertexShader* pInVertexShader, ID3D11InputLayout* pInInputLayout) {
 	if (pInVertexShader)
 	{
-		for (int i = 0; i < ResourcesManager::s_vsFileCounter; i++)
+		for (int i = 0; i < ResourcesManager::s_vsFileCounter; ++i)
 		{
 			if (ResourcesManager::s_vertexShaderResources[i].pData == pInVertexShader)
 			{
@@ -180,7 +180,7 @@ int RM::LoadPixelShader(ID3D11Device* pDevice, char* pFilename, ID3D11PixelShade
 	int fileNO = 0;
 
 	// すでに存在しているリソース
-	for (fileNO = 0; fileNO < ResourcesManager::s_psFileCounter; fileNO++)
+	for (fileNO = 0; fileNO < ResourcesManager::s_psFileCounter; ++fileNO)
 	{
 		if (strcmp(ResourcesManager::s_pixelShaderResources[fileNO].pFileName, pFilename) == 0)
 		{
@@ -230,7 +230,7 @@ int RM::LoadPixelShader(ID3D11Device* pDevice, char* pFilename, ID3D11PixelShade
 void RM::ReleasePixelShader(ID3D11PixelShader* pIn) {
 	if (pIn)
 	{
-		for (int i = 0; i < ResourcesManager::s_psFileCounter; i++)
+		for (int i = 0; i < ResourcesManager::s_psFileCounter; ++i)
 		{
 			if (ResourcesManager::s_pixelShaderResources[i].pData == pIn)
 			{

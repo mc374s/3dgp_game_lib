@@ -30,17 +30,17 @@ SceneMain::SceneMain()
 
 }
 
-void SceneMain::Init()
+void SceneMain::Initialize()
 {
-	Scene::Init();
+	Scene::Initialize();
 
 	int playerType[Input::MAX_PLAYER_COUNT];
 
 	playerType[0] = Player::TYPE::A;
 	playerType[1] = Player::TYPE::B;
 
-	pPlayerManager->Init(2, playerType);
-	pMainStage->Init();
+	pPlayerManager->Initialize(2, playerType);
+	pMainStage->Initialize();
 }
 
 SceneMain::~SceneMain()
@@ -77,7 +77,7 @@ void SceneMain::Update()
 		{
 			GLC::MFAudioStop(BGM_MAIN);
 			GLC::MFAudioPlay(SE_START);
-			changeScene(SCENE_TITLE);
+			ChangeScene(SCENE_TITLE);
 			break;
 		}
 

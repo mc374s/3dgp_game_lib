@@ -22,7 +22,7 @@ public:
 };
 
 
-#define SCENE_TITLE (SceneTitle::getInstance())
+#define SCENE_TITLE (SceneTitle::GetInstance())
 
 
 #endif // !_SCENE_TITLE_H_

@@ -17,20 +17,23 @@ public:
 
 	Scene *pNextScene;
 
-	virtual void Init() {
+	virtual void Initialize() {
 		timer = 0;
 		step = 0;
 		pNextScene = nullptr;
 	};
-	/*virtual void update(float _elapsedTime = .0f) {};
-	virtual void Draw(float _elapsedTime = .0f) {};*/
 
 	virtual void Update() {};
 	virtual void Draw() {};
 
-	virtual void changeScene(Scene* pTargetScene) {
+	// Set current scene's next scene with pTaregtScene
+	// @doInitialization = true: initialize target scene before scene changing
+	// @doInitialization = false: do not call target scene's initialization
+	virtual void ChangeScene(Scene* pTargetScene, bool doInitialization = true) {
 		pTargetScene->pNextScene = nullptr;
-		pTargetScene->Init();
+		if (doInitialization) {
+			pTargetScene->Initialize();
+		}
 		pNextScene = pTargetScene;
 	};
 };

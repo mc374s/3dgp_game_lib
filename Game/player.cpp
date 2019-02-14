@@ -20,7 +20,7 @@ void Player::Clear()
 	collision = size;
 }
 
-void Player::Init()
+void Player::Initialize()
 {
 	Clear();
 	speedAcc.x = P_WALK_SPEED;
@@ -118,7 +118,7 @@ PlayerManager::~PlayerManager()
 	}
 }
 
-void PlayerManager::Init(int _playerNum, int playerType[])
+void PlayerManager::Initialize(int _playerNum, int playerType[])
 {
 	if (_playerNum <= Input::MAX_PLAYER_COUNT && _playerNum > 0) {
 		playerNum = _playerNum;
@@ -142,7 +142,7 @@ void PlayerManager::Init(int _playerNum, int playerType[])
 			break;
 		}
 
-		pPlayer[i]->Init();
+		pPlayer[i]->Initialize();
 		pPlayer[i]->controllerNO = i;
 
 		pPlayer[i]->transform.position.x += i * 2;
@@ -203,6 +203,63 @@ void PlayerManager::Update()
 	GLC::mainCamera.upDirection = Vector3(0, 1, 0) - forword*angle;
 
 	GLC::mainCamera.upDirection = DirectX::XMVector3Normalize(GLC::mainCamera.upDirection);
+
+	// Charactor Surround Camera for debug
+	static float aXY = -DirectX::XM_PIDIV2, aZY = DirectX::XM_1DIVPI;
+	static float d = DirectX::XM_PI;
+	static bool isCharactorSurroundCameraOn = false;
+	static GLC::Camera oldCamera;
+	if (Input::KEY_TRACKER.pressed.D1)
+	{
+		isCharactorSurroundCameraOn = !isCharactorSurroundCameraOn;
+		if (!isCharactorSurroundCameraOn)
+		{
+			aXY = -DirectX::XM_PIDIV2;
+			aZY = DirectX::XM_1DIVPI;
+			d = DirectX::XM_PI;
+			GLC::mainCamera = oldCamera;
+			//mainCamera = oldCamera;
+		}
+		else
+		{
+			oldCamera = GLC::mainCamera;
+			d = DirectX::XMVectorGetX(DirectX::XMVector3Length(DirectX::XMVectorSubtract(GLC::mainCamera.focusPosition, GLC::mainCamera.eyePosition)));
+		}
+	}
+	if (isCharactorSurroundCameraOn)
+	{
+		if (Input::KEY.J) {
+			aXY -= 0.01f;
+		}
+		if (Input::KEY.L) {
+			aXY += 0.01f;
+		}
+		if (Input::KEY.I) {
+			aZY += 0.01f;
+		}
+		if (Input::KEY.K) {
+			aZY -= 0.01f;
+		}
+		if (Input::KEY.O) {
+			d += 0.05f;
+		}
+		if (Input::KEY.U) {
+			d -= 0.05f;
+		}
+		//mainCamera.eyePosition = mainCamera.eyePosition*XMQuaternionRotationRollPitchYaw(aXY, aZY, 0);
+		GLC::mainCamera.eyePosition = DirectX::XMVectorSet(-fabs(d)*cosf(aZY)*sinf(aXY), fabs(d)*sinf(aZY), -fabs(d)*cosf(aZY)*cosf(aXY), 0);
+
+
+		DirectX::XMVECTOR forword = DirectX::XMVectorSubtract(GLC::mainCamera.focusPosition, GLC::mainCamera.eyePosition);
+		forword = DirectX::XMVector3Normalize(forword);
+		float angle = DirectX::XMVectorGetX(DirectX::XMVector3Dot(forword, { 0,1,0 }));
+		GLC::mainCamera.upDirection = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&DirectX::XMFLOAT3(0, 1, 0)), DirectX::XMVectorScale(forword, angle));
+
+		GLC::mainCamera.upDirection = DirectX::XMVector3Normalize(GLC::mainCamera.upDirection);
+
+		//mainCamera.upDirection = { sinf(aZY)*sinf(aXY), cosf(aZY), sinf(aZY)*cosf(aXY), 0 };
+
+	}
 
 }
 

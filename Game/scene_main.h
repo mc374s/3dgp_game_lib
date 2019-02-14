@@ -21,7 +21,7 @@ public:
 	SceneMain();
 	~SceneMain();
 
-	void Init();
+	void Initialize();
 	void Update();
 	void Draw();
 
@@ -29,6 +29,6 @@ public:
 	void gameMain();
 };
 
-#define SCENE_MAIN (SceneMain::getInstance())
+#define SCENE_MAIN (SceneMain::GetInstance())
 
 #endif // !_SCENE_MAIN_H_

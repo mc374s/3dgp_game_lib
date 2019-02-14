@@ -100,7 +100,7 @@ class ObjManager : public Singleton<ObjManager>, public Manager
 private:
 
 public:
-	void Init();
+	void Initialize();
 	void Update(int liveInPagination = 1);
 	void Draw(int liveInPagination = 1);
 
@@ -109,7 +109,7 @@ public:
 
 };
 
-#define pObjManager (ObjManager::getInstance())
+#define pObjManager (ObjManager::GetInstance())
 
 //#define GET_IDLE_OBJ_NO (OBJ2D::searchSet(pObjManager->ppObjs, OBJ_MAX_NUM))
 

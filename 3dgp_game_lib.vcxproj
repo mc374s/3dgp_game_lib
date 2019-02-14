@@ -152,9 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="3dgp\3dgp.h" />
     <ClInclude Include="3dgp\3dgp_math.h" />
-    <ClInclude Include="3dgp\blend.h" />
     <ClInclude Include="3dgp\camera.h" />
     <ClInclude Include="3dgp\directxtk.h" />
     <ClInclude Include="3dgp\framework.h" />
@@ -170,7 +168,10 @@
     <ClInclude Include="3dgp\skinned_mesh.h" />
     <ClInclude Include="3dgp\sprite.h" />
     <ClInclude Include="3dgp\sprite_string.h" />
+    <ClInclude Include="3dgp\state_subset.h" />
+    <ClInclude Include="3dgp\system.h" />
     <ClInclude Include="3dgp\template.h" />
+    <ClInclude Include="3dgp\texture.h" />
     <ClInclude Include="Game\collision_detection.h" />
     <ClInclude Include="Game\game.h" />
     <ClInclude Include="Game\mesh_data.h" />
@@ -187,7 +188,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="3dgp\3dgp_math.cpp" />
-    <ClCompile Include="3dgp\blend.cpp" />
     <ClCompile Include="3dgp\camera.cpp" />
     <ClCompile Include="3dgp\directxtk.cpp" />
     <ClCompile Include="3dgp\framework.cpp" />
@@ -201,6 +201,9 @@
     <ClCompile Include="3dgp\skinned_mesh.cpp" />
     <ClCompile Include="3dgp\sprite.cpp" />
     <ClCompile Include="3dgp\sprite_string.cpp" />
+    <ClCompile Include="3dgp\state_subset.cpp" />
+    <ClCompile Include="3dgp\system.cpp" />
+    <ClCompile Include="3dgp\texture.cpp" />
     <ClCompile Include="Game\collision_detection.cpp" />
     <ClCompile Include="Game\mesh_data.cpp" />
     <ClCompile Include="Game\numbers.cpp" />

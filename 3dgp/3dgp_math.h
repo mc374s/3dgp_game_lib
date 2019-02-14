@@ -5,6 +5,8 @@
 //#define _XM_NO_INTRINSICS_ 
 #include <DirectXMath.h>
 
+namespace GLC{
+
 typedef unsigned int UINTCOLOR;
 
 inline DirectX::XMVECTOR XMConvertUIntToColor(UINTCOLOR inColor)
@@ -94,6 +96,15 @@ HitResult XM_CALLCONV AABBHitAABB(DirectX::FXMVECTOR minPosA, DirectX::FXMVECTOR
 
 HitResult XM_CALLCONV SphereHitAABB(DirectX::FXMVECTOR centerA, float radiusA, DirectX::FXMVECTOR minPosB, DirectX::FXMVECTOR maxPosB);
 
+struct Rect
+{
+	int left;
+	int top;
+	int width;
+	int height;
+};
 
+
+}; // namespace GLC
 
 #endif // !_3DGP_MATH_

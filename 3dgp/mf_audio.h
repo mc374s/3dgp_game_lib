@@ -28,12 +28,12 @@ public:
 
 	static bool isLoaded;
 
-	static MFAudioManager* getInstance() {
+	static MFAudioManager* GetInstance() {
 		static MFAudioManager instance;
 		return &instance;
 	};
 
-	void loadAudios(const NUMBERED_FILE pData[]);
+	void LoadAudios(const NUMBERED_FILE pData[]);
 
 	friend void MFAudiosRelease();
 	friend void MFAudioCheckLoops();
@@ -43,7 +43,7 @@ public:
 	friend void MFAudioContinue(const int fileNO);
 	friend void MFAudioStop(const int fileNO);
 	friend void MFAudioPause(const int fileNO);
-	friend bool isMFAudioPlaying(const int fileNO);
+	friend bool IsMFAudioPlaying(const int fileNO);
 
 };
 

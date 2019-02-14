@@ -39,7 +39,7 @@ public:
 	virtual ~Player();
 
 	virtual void Clear();
-	virtual void Init();
+	virtual void Initialize();
 	virtual void Update();
 	virtual void Draw();
 
@@ -63,7 +63,7 @@ public:
 	PlayerA();
 	virtual ~PlayerA();
 
-	virtual void Init();
+	virtual void Initialize();
 	virtual void Update();
 
 	virtual void Standby();
@@ -81,7 +81,7 @@ public:
 	PlayerB();
 	virtual ~PlayerB();
 
-	virtual void Init();
+	virtual void Initialize();
 	virtual void Update();
 
 	virtual void Standby();
@@ -105,7 +105,7 @@ public:
 
 	int playerNum;
 
-	void Init(int playerNum = 1, int playerType[] = {0});
+	void Initialize(int playerNum = 1, int playerType[] = {0});
 	void Update();
 	void Draw();
 
@@ -113,7 +113,7 @@ public:
 
 };
 
-#define pPlayerManager (PlayerManager::getInstance())
+#define pPlayerManager (PlayerManager::GetInstance())
 
 
 #endif // !_PLAYER_H_

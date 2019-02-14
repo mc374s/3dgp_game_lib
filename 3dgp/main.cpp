@@ -1,9 +1,5 @@
 ﻿#include "framework.h"
 
-#include "../Game/game.h"
-#include "../Game/sound_data.h"
-#include "../Game/sprite_data.h"
-#include "../Game/scene_title.h"
 #include <thread>
 #include <tchar.h>
 
@@ -36,10 +32,6 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, LPWSTR cmd_line
 	wcex.hIconSm = 0;
 	RegisterClassEx(&wcex);
 
-	//MessageBox(0, L"main.cpp run", L"main", MB_OK);
-
-	MFAudioManager::getInstance()->loadAudios(audio_data);
-
 	RECT rc = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
 	HWND hwnd = CreateWindow(_T("3dgp"), _T(""), WS_OVERLAPPEDWINDOW ^ WS_MAXIMIZEBOX ^ WS_THICKFRAME | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, NULL, NULL, instance, NULL);
@@ -55,14 +47,8 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, LPWSTR cmd_line
 
 	//SetLayeredWindowAttributes(hwnd, RGB(255, 255, 255), 180, LWA_COLORKEY);
 	
-
-
+	// Framework Initialize
 	Framework f(hwnd);
-	srand(unsigned int(time(NULL)));
-	pTextureManager->LoadTextures(e_loadTexture);		// 2D画像の一括ロード
-
-	Framework::changeScene(SCENE_TITLE);
-
 
 	ShowWindow(hwnd, cmd_show);
 	SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(&f));

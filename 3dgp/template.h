@@ -6,41 +6,28 @@ class Singleton
 {
 public:
 
-	static T* getInstance() {
+	static T* GetInstance() {
 		static T instance;
 		return &instance;
 	};
 
 };
 
-
-// TODO : Overload float's operator == and !=
-//template<typename T>
-//bool operator==(const T& leftValue,const T& rightValue) const
-//{
-//	if (fabsf(leftValue - rightValue) < FLT_EPSILON)
-//	{
-//		return true;
-//	} 
-//	else
-//	{
-//		return false;
-//	}
-//}
-//
-//template<typename T>
-//bool operator!=(const T& leftValue, const T& rightValue) const
-//{
-//	if (fabsf(leftValue - rightValue) > FLT_EPSILON)
-//	{
-//		return true;
-//	} 
-//	else
-//	{
-//		return false;
-//	}
-//}
-
+template <typename D3D_TYPE>
+struct D3D11_RESOURCES {
+	D3D_TYPE pData;
+	char pFileName[256];
+	int fileRefNum = 0;
+	D3D11_RESOURCES() :pData(NULL), fileRefNum(0) {};
+	void Release() {
+		fileRefNum--;
+		if (fileRefNum <= 0) {
+			SAFE_RELEASE(pData);
+			ZeroMemory(pFileName, sizeof(pFileName));
+			fileRefNum = 0;
+		}
+	};
+};
 
 
 #endif // !_TEMPLATE_H_

@@ -1,6 +1,7 @@
 #include "3dgp_math.h"
 
 using namespace DirectX;
+using namespace GLC;
 
 HitResult Collision::HitJudgement(const Collision* other)
 {
@@ -32,7 +33,7 @@ HitResult Collision::HitJudgement(const Collision* other)
 	return hitResult;
 }
 
-HitResult XM_CALLCONV SphereHitSphere(DirectX::FXMVECTOR centerA, float radiusA, DirectX::FXMVECTOR centerB, float radiusB)
+HitResult XM_CALLCONV GLC::SphereHitSphere(DirectX::FXMVECTOR centerA, float radiusA, DirectX::FXMVECTOR centerB, float radiusB)
 {
 	HitResult hitResult;
 
@@ -48,7 +49,7 @@ HitResult XM_CALLCONV SphereHitSphere(DirectX::FXMVECTOR centerA, float radiusA,
 	return hitResult;
 }
 
-HitResult XM_CALLCONV AABBHitAABB(DirectX::FXMVECTOR minPosA, DirectX::FXMVECTOR maxPosA, DirectX::FXMVECTOR minPosB, DirectX::FXMVECTOR maxPosB)
+HitResult XM_CALLCONV GLC::AABBHitAABB(DirectX::FXMVECTOR minPosA, DirectX::FXMVECTOR maxPosA, DirectX::FXMVECTOR minPosB, DirectX::FXMVECTOR maxPosB)
 {
 	HitResult hitResult;
 	XMFLOAT3 minA, maxA, minB, maxB;
@@ -105,7 +106,7 @@ HitResult XM_CALLCONV AABBHitAABB(DirectX::FXMVECTOR minPosA, DirectX::FXMVECTOR
 	return hitResult;
 }
 
-HitResult XM_CALLCONV SphereHitAABB(DirectX::FXMVECTOR centerA, float radiusA, DirectX::FXMVECTOR minPosB, DirectX::FXMVECTOR maxPosB)
+HitResult XM_CALLCONV GLC::SphereHitAABB(DirectX::FXMVECTOR centerA, float radiusA, DirectX::FXMVECTOR minPosB, DirectX::FXMVECTOR maxPosB)
 {
 	HitResult hitResult;
 	XMFLOAT3 minB, maxB;

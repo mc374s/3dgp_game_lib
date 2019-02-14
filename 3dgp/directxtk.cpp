@@ -9,7 +9,7 @@ std::unique_ptr<BasicEffect>                            DXTK::BatchEffect;
 std::unique_ptr<GeometricPrimitive>                     DXTK::Cube;
 std::unique_ptr<PrimitiveBatch<VertexPositionColor>>    DXTK::Batch;
 
-HRESULT DXTK::CreateDirectXTKObject(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
+HRESULT DXTK::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 {
 	HRESULT hr = S_OK;
 	Batch.reset(new PrimitiveBatch<VertexPositionColor>(pDeviceContext));
@@ -36,7 +36,7 @@ HRESULT DXTK::CreateDirectXTKObject(ID3D11Device* pDevice, ID3D11DeviceContext* 
 	return S_OK;
 }
 
-void DXTK::CleanupDirectXTKObject() 
+void DXTK::Release() 
 {
 	if (pBatchInputLayout) pBatchInputLayout->Release();
 }

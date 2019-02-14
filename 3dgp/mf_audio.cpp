@@ -16,7 +16,7 @@ MFAudioManager::~MFAudioManager()
 	MFAudiosRelease();
 }
 
-void MFAudioManager::loadAudios(const NUMBERED_FILE _data[])
+void MFAudioManager::LoadAudios(const NUMBERED_FILE _data[])
 {
 	if (!MFAudioManager::isLoaded)
 	{
@@ -103,7 +103,7 @@ void GLC::MFAudioPause(const int _fileNO)
 	}
 }
 
-bool GLC::isMFAudioPlaying(const int _fileNO)
+bool GLC::IsMFAudioPlaying(const int _fileNO)
 {
 	if (MFAudioManager::pMFPlayer[_fileNO]) {
 		MFP_MEDIAPLAYER_STATE state = MFP_MEDIAPLAYER_STATE_EMPTY;

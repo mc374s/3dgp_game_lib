@@ -55,7 +55,7 @@ Stage::~Stage()
 
 }
 
-void Stage::Init()
+void Stage::Initialize()
 {
 	OBJ3D temp;
 	for (int i = 0, max = sizeof(stageData)/sizeof(StageData); i < max; ++i)

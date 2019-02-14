@@ -200,7 +200,7 @@ ObjManager::~ObjManager()
 
 }
 
-void ObjManager::Init() 
+void ObjManager::Initialize() 
 {
 
 }

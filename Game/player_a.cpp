@@ -12,9 +12,9 @@ PlayerA::~PlayerA()
 {
 }
 
-void PlayerA::Init()
+void PlayerA::Initialize()
 {
-	Player::Init();
+	Player::Initialize();
 	meshData = &fbxPlayerStandby;
 	//meshData->SetMotion(FBX_FILE_NO::PLAYER_STANDBY);
 }

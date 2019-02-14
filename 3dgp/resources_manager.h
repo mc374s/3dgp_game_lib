@@ -7,14 +7,13 @@
 //
 namespace RM {
 
-	#define FILE_NUM_MAX (64)
-	#define SAFE_RELEASE(ptr) {if(ptr){ptr->Release();}}
+	#define SAFE_RELEASE(ptr) {if(ptr){ptr->Release(); ptr=nullptr;}}
 	#define SAFE_DELETE(ptr) {if(ptr){delete ptr; ptr=nullptr;}}
 
 	template <typename D3D_TYPE>
 	struct D3D11_RESOURCES {
 		D3D_TYPE pData;
-		char pFileName[1024];
+		char pFileName[256];
 		int fileRefNum = 0;
 		D3D11_RESOURCES() :pData(NULL), fileRefNum(0) {};
 		void Release() {
@@ -28,6 +27,8 @@ namespace RM {
 	};
 
 	/*///////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
+
+	static const int FILE_NUM_MAX = 64;
 	class  ResourcesManager
 	{
 	private:

@@ -26,9 +26,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="3dgp\blend.h">
-      <Filter>3dgp\Headers</Filter>
-    </ClInclude>
     <ClInclude Include="3dgp\framework.h">
       <Filter>3dgp\Headers</Filter>
     </ClInclude>
@@ -67,9 +64,6 @@
     </ClInclude>
     <ClInclude Include="3dgp\game_system.h">
       <Filter>3dgp</Filter>
-    </ClInclude>
-    <ClInclude Include="3dgp\3dgp.h">
-      <Filter>3dgp\Headers</Filter>
     </ClInclude>
     <ClInclude Include="Game\game.h">
       <Filter>Headers</Filter>
@@ -122,11 +116,17 @@
     <ClInclude Include="Game\skill_construction.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="3dgp\system.h">
+      <Filter>3dgp\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\state_subset.h">
+      <Filter>3dgp\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\texture.h">
+      <Filter>3dgp\Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="3dgp\blend.cpp">
-      <Filter>3dgp\Sources</Filter>
-    </ClCompile>
     <ClCompile Include="3dgp\framework.cpp">
       <Filter>3dgp\Sources</Filter>
     </ClCompile>
@@ -210,6 +210,15 @@
     </ClCompile>
     <ClCompile Include="Game\player_b.cpp">
       <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="3dgp\system.cpp">
+      <Filter>3dgp\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="3dgp\state_subset.cpp">
+      <Filter>3dgp\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="3dgp\texture.cpp">
+      <Filter>3dgp\Sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

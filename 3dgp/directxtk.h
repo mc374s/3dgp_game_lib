@@ -26,8 +26,8 @@ public:
 	static std::unique_ptr<DirectX::GeometricPrimitive>								 Cube;
 	static std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>>    Batch;
 
-	static HRESULT CreateDirectXTKObject(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
-	static void CleanupDirectXTKObject();
+	static HRESULT Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
+	static void Release();
 
 	// Render a grid using PrimitiveBatch
 	static void XM_CALLCONV DrawGrid(ID3D11DeviceContext* pDeviceContext, DirectX::FXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection, 

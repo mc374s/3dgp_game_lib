@@ -34,7 +34,7 @@ void loadeMessage() {
 
 SceneTitle::SceneTitle()
 {
-	Scene::Init();
+	Scene::Initialize();
 	//pTextureManager->loadTextures(e_loadTexture);		// 2D画像の一括ロード
 	//std::thread loadThread_1(loadTextureProgress);
 	//loadThread_1.detach();
@@ -55,7 +55,7 @@ SceneTitle::SceneTitle()
 	std::thread loadThread(loadMeshesProgress, nullptr, &progress);
 	loadThread.detach();
 
-	changeScene(SCENE_MAIN);
+	ChangeScene(SCENE_MAIN);
 
 
 }
@@ -83,7 +83,7 @@ void SceneTitle::Update()
 		{
 			GLC::MFAudioStop(BGM_TITLE);
 			GLC::MFAudioPlay(SE_START);
-			changeScene(SCENE_MAIN);
+			ChangeScene(SCENE_MAIN);
 			break;
 		}
 

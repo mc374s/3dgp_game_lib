@@ -183,14 +183,14 @@ public:
 
 	void ReleaseTexture();
 
-	static TextureManager* getInstance() {
+	static TextureManager* GetInstance() {
 		static TextureManager instance;
 		return &instance;
 	};
 
 };
 
-#define pTextureManager (TextureManager::getInstance())
+#define pTextureManager (TextureManager::GetInstance())
 
 int BasicInput(int playerNO = 0);
 
@@ -315,14 +315,14 @@ public:
 
 	void ReleaseMeshes();
 
-	static MeshManager* getInstance() {
+	static MeshManager* GetInstance() {
 		static MeshManager instance;
 		return &instance;
 	};
 
 };
 
-#define pMeshManager (MeshManager::getInstance())
+#define pMeshManager (MeshManager::GetInstance())
 
 
 #endif // !_GAME_SYSTEM_H_

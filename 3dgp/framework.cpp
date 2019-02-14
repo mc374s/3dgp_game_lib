@@ -1,196 +1,122 @@
-﻿#include "resources_manager.h"
+﻿#include "framework.h"
+#include <ctime>
+#include <cstdlib>
+
+#include "resources_manager.h"
 
 #include "high_resolution_timer.h"
 
-#include "blend.h"
 #include "camera.h"
 #include "sprite_string.h"
 #include "primitive3d.h"
 #include "mf_audio.h"
-#include "Scene.h"
+#include "scene.h"
 
 #include "input.h"
 #include "directxtk.h"
 
-#include "framework.h"
-#include <ctime>
+#include "system.h"
+#include "state_subset.h"
+
+#include "../Game/sound_data.h"
+#include "../Game/sprite_data.h"
+#include "../Game/scene_title.h"
 
 using namespace GLC;
 using namespace DirectX;
 
 
-Scene* Framework::pScene = nullptr;
+Scene*	Framework::pScene = nullptr;
+double	Framework::frameTime = 0.0f;
 
-ID3D11Device*           Framework::pDevice = NULL;
-ID3D11DeviceContext*    Framework::pDeviceContext = NULL;
-
-ID3D11RenderTargetView*	Framework::pRenderTargetView = NULL;
-ID3D11DepthStencilView*	Framework::pDepthStencilView = NULL;
-
-double					Framework::frameTime = 0.0f;
-
-//ID3D11RenderTargetView* framework::s_pRenderTargetView = NULL;
-
-bool Framework::Initialize(HWND _hwnd)
+Framework::Framework(HWND hWnd)
 {
-	//MessageBox(0, L"Initializer called", L"framework", MB_OK);
-	outputWindow = _hwnd;
-	DXGI_SWAP_CHAIN_DESC descSwapChain;
-	ZeroMemory(&descSwapChain, sizeof(descSwapChain));
-	descSwapChain.BufferCount = 1;
-	descSwapChain.BufferDesc.Width = SCREEN_WIDTH;
-	descSwapChain.BufferDesc.Height = SCREEN_HEIGHT;
-	descSwapChain.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	descSwapChain.BufferDesc.RefreshRate.Numerator = 60;
-	descSwapChain.BufferDesc.RefreshRate.Denominator = 1;
-	descSwapChain.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	descSwapChain.OutputWindow = outputWindow;
-	descSwapChain.SampleDesc.Count = 1;
-	descSwapChain.SampleDesc.Quality = 0;
-	descSwapChain.Windowed = TRUE;
-	isFullScreen = !descSwapChain.Windowed;
-
-#ifdef _DEBUG
-	//createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
-#endif
-
-	D3D_DRIVER_TYPE driverTypes[] =
-	{
-		D3D_DRIVER_TYPE_HARDWARE,
-		D3D_DRIVER_TYPE_WARP,
-		D3D_DRIVER_TYPE_REFERENCE,
-	};
-	UINT numDriverTypes = ARRAYSIZE(driverTypes);
-
-	D3D_FEATURE_LEVEL featureLevels[] =
-	{
-		D3D_FEATURE_LEVEL_11_0,
-		D3D_FEATURE_LEVEL_10_1,
-		D3D_FEATURE_LEVEL_10_0
-		/*D3D_FEATURE_LEVEL_11_1,
-		D3D_FEATURE_LEVEL_11_0,
-		D3D_FEATURE_LEVEL_10_1,
-		D3D_FEATURE_LEVEL_10_0,
-		D3D_FEATURE_LEVEL_9_3,
-		D3D_FEATURE_LEVEL_9_2,
-		D3D_FEATURE_LEVEL_9_1*/
-	};
-	UINT numFeatureLevels = ARRAYSIZE(featureLevels);
-
-	for (UINT driverTypeIndex = 0; driverTypeIndex < numDriverTypes; driverTypeIndex++)
-	{
-		driverType = driverTypes[driverTypeIndex];
-		hr = D3D11CreateDeviceAndSwapChain(NULL, driverType, NULL, createDeviceFlags, featureLevels, numFeatureLevels,
-			D3D11_SDK_VERSION, &descSwapChain, &pSwapChain, &pDevice, &featureLevel, &pDeviceContext);
-		if (SUCCEEDED(hr)) {
-			break;
-		}
+	if (!Initialize(hWnd)) {
+		_RPT0(_CRT_ERROR, "Framework Iniialization Failed");
+		return;
 	}
-	if (FAILED(hr)) {
-		MessageBox(0, L"D3D11CreateDevice Failed.", L"Framework", MB_OK);
-		exit(-1);
-	}
-	if (featureLevel != D3D_FEATURE_LEVEL_11_0) {
-		//MessageBox(0, L"Direct3D Feature Level 11 unsupported.", 0, 0);
-		return false;
-	}
+}
+Framework::~Framework()
+{
+	Release();
+}
 
-	// Create a render target view
-	ID3D11Texture2D* pBackBuffer = NULL;
-	hr = pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
-	if (FAILED(hr)) {
-		MessageBox(0, L"GetBuffer Failed.", L"Framework", MB_OK);
-		return false;
-	}
+bool Framework::Initialize(HWND hWnd)
+{
+	// System stuffs Initialization
 
-	//D3D11_RENDER_TARGET_VIEW_DESC descRenderTargetView;
-
-	hr = pDevice->CreateRenderTargetView(pBackBuffer, NULL, &pRenderTargetView);
-	if (pBackBuffer) {
-		pBackBuffer->Release();
-	}
-	if (FAILED(hr)) {
-		MessageBox(0, L"CreateRenderTargetView Failed.", L"Framework", MB_OK);
-		return false;
-	}
-
-	// Create depth stencil texture
-	D3D11_TEXTURE2D_DESC descDepthStencil;
-	descDepthStencil.Width = SCREEN_WIDTH;
-	descDepthStencil.Height = SCREEN_HEIGHT;
-	descDepthStencil.MipLevels = 1;
-	descDepthStencil.ArraySize = 1;
-	descDepthStencil.Format = DXGI_FORMAT_D24_UNORM_S8_UINT/*DXGI_FORMAT_R32G32B32A32_FLOAT*//*DXGI_FORMAT_R8G8B8A8_UNORM*/;
-	descDepthStencil.SampleDesc.Count = 1;
-	descDepthStencil.SampleDesc.Quality = 0;
-	descDepthStencil.Usage = D3D11_USAGE_DEFAULT;
-	descDepthStencil.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-	descDepthStencil.CPUAccessFlags = 0;
-	descDepthStencil.MiscFlags = 0;
-
-	hr = pDevice->CreateTexture2D(&descDepthStencil, NULL, &pDepthStencilResource);
-	if (FAILED(hr)) {
-		MessageBox(0, L"CreateTexture2D Failed.", L"Framework", MB_OK);
-		exit(-1);
-	}
-
-	// Create the depth stencil view
-	D3D11_DEPTH_STENCIL_VIEW_DESC descDepthStencilView;
-	ZeroMemory(&descDepthStencilView, sizeof(descDepthStencilView));
-	descDepthStencilView.Format = descDepthStencil.Format;
-	descDepthStencilView.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-	descDepthStencilView.Texture2D.MipSlice = 0;
-	hr = pDevice->CreateDepthStencilView(pDepthStencilResource, &descDepthStencilView, &pDepthStencilView);
-	if (FAILED(hr)) {
-		MessageBox(0, L"CreateTexture2DResource Failed.", L"Framework", MB_OK);
-		return false;
-	}
-	pDeviceContext->OMSetRenderTargets(1, &pRenderTargetView, pDepthStencilView);
-
-	// create depth stencil state
-	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
-	depthStencilDesc.DepthEnable = TRUE;
-	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
-
-	hr = pDevice->CreateDepthStencilState(&depthStencilDesc, &pDepthStencilState);
-
-	// Setup the viewport
-	D3D11_VIEWPORT vp;
-	vp.Width = (FLOAT)SCREEN_WIDTH;
-	vp.Height = (FLOAT)SCREEN_HEIGHT;
-	vp.MinDepth = 0.0f;
-	vp.MaxDepth = 1.0f;
-	vp.TopLeftX = 0;
-	vp.TopLeftY = 0;
-	pDeviceContext->RSSetViewports(1, &vp);
-
-
-	UINT m4xMsaaQuality;
-	pDevice->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM/*DXGI_FORMAT_R32G32B32A32_FLOAT*//*DXGI_FORMAT_R8G8B8A8_UNORM*/, 4, &m4xMsaaQuality);
-
+	// Frame timer
 	timer = new HighResolutionTimer();
 
+	// Initialize DirectX COM objects 
+	if (FAILED(System::Initialize(hWnd))) {
+		_RPT0(_CRT_ERROR, "System Initialization Failed");
+		return false;
+	}
 
-	// Initialzie the blending
-	MyBlending::Initialize(pDevice);
+	// Create DirectXTK objects
+	if (FAILED(DXTK::Initialize(System::pd3dDevice, System::pImmediateContext))) {
+		_RPT0(_CRT_ERROR, "DirectXTK Objects Initialization Failed");
+		return false;
+	}
 
-	SpriteString::Initialize(pDevice);
-	DXTK::CreateDirectXTKObject(pDevice, pDeviceContext);
+	// State subsets initialization
+	Blend::Initialize(System::pd3dDevice);
+	Sampler::Initialize(System::pd3dDevice);
+	
+	// Ascii sprite font initialization
+	SpriteString::Initialize(System::pd3dDevice);
+
+
+	// Game stuffs Initialization
+
+	std::srand(unsigned int(time(NULL)));
+
+	// Load audio resources
+	MFAudioManager::GetInstance()->LoadAudios(audio_data);
+	
+	// Load 2d image resources
+	pTextureManager->LoadTextures(e_loadTexture);
+
+
+	// Initialize the world matrices
+
+	// Initialize the view matrix
+
+	// Initialize the projection matrix
+
+	// Set Entry Scene
+	ChangeScene(SCENE_TITLE);
 
 	return true;
 }
 
-void Framework::setFPSLimitation(int limitation)
+void Framework::Release()
 {
-	if (limitation <= 0)
-	{
+	Sampler::Release();
+	Blend::Release();
+
+	SpriteString::Release();
+	DXTK::Release();
+	System::Release();
+	delete timer;
+
+}
+
+// Set limitation to 0 fps means no limitation
+void Framework::SetFPSLimitation(int limitation)
+{
+	if (limitation <= 0) {
 		minFrameTime = 0;
 	}
-	else
-	{
+	else {
 		minFrameTime = 1.0 / (double)limitation;
+	}
+}
+
+void Framework::ChangeScene(Scene* pNextScene) {
+	if (pNextScene) {
+		pScene = pNextScene;
 	}
 }
 
@@ -198,34 +124,29 @@ int Framework::Run()
 {
 	MSG msg = {};
 
-	/*if (!initialize(hwnd))
-	{
-	MessageBox(0, L"Run: Iniialize FAILED", 0, 0);
-	return 0;
-	}*/
 	srand((unsigned int)time(NULL));
+
+	// Reset Input device
 	for (int padIndex = 0; padIndex < Input::MAX_PLAYER_COUNT; ++padIndex) {
 		Input::PAD_TRACKER[padIndex].Reset();
 	}
-
 	Input::KEY_TRACKER.Reset();
 
-	//DWORD preTime;
 
-	//////////////////////////////////////////////////////////////////////
-	// FPS locker
-	DWORD sleepTime;
+	// Check current device whether it was supported QueryPerformance function
 	if (QueryPerformanceFrequency(&timeFreq) == false)
 	{
 		MessageBox(0, L"This Device is too old, QueryPerformanceFrequency failed", L"Framework", MB_OK);
 		exit(-1);
 	}
 	QueryPerformanceCounter(&timeStart);
-	//////////////////////////////////////////////////////////////////////
 
+
+	DWORD sleepTime;
+
+	// Framework Main Loop
 	while (WM_QUIT != msg.message)
 	{
-		//QueryPerformanceFrequency(&timeFreq);
 		Input::isAnyKeyDown = false;
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
@@ -238,15 +159,16 @@ int Framework::Run()
 			// FPS locker
 			QueryPerformanceCounter(&timeEnd);
 			frameTime = static_cast<double>(timeEnd.QuadPart - timeStart.QuadPart) / static_cast<double>(timeFreq.QuadPart);
-			if (frameTime < minFrameTime) { // 時間に余裕がある
+			
+			// 
+			if (frameTime < minFrameTime) {
 				// ミリ秒に変換
 				sleepTime = static_cast<DWORD>((minFrameTime - frameTime) * 1000);
 
-				timeBeginPeriod(1);		// 分解能を上げる(こうしないとSleepの精度はガタガタ)
+				timeBeginPeriod(1);		// 分解能を上げる
 				Sleep(sleepTime);
 				timeEndPeriod(1);		// 戻す
-
-										// 次週に持ち越し(こうしないとfpsが変になる?)
+				// Skip to next frame
 				continue;
 			}
 			timeStart = timeEnd;
@@ -256,35 +178,30 @@ int Framework::Run()
 			Input::KEY = Input::pKeyboard->GetState();
 			Input::KEY_TRACKER.Update(Input::KEY);
 
+			// Update GamePads' state
 			for (int padIndex = 0; padIndex < Input::MAX_PLAYER_COUNT; ++padIndex) {
 				Input::PAD[padIndex] = Input::pGamePad->GetState(padIndex);
 				Input::PAD_TRACKER[padIndex].Update(Input::PAD[padIndex]);
-				//if (Input::PAD[padIndex].IsConnected()) {
-				//}
 			}
-			//DirectX::BasicEffect;
-
-			//preTime = timeGetTime();
-			timer->tick();
-
 
 			MFAudioCheckLoops();
 			if (isFocused)
 			{
-				Update(timer->time_interval());
-				Draw(timer->time_interval());
+				Update();
+				Draw();
 			}
 
+			timer->tick();
 			CalculateFrameStats();
 
 			minFrameTime = MIN_FRAME_TIME_DAFAULT;
 			if (Input::KEY.LeftControl)
 			{
-				setFPSLimitation(5);
+				SetFPSLimitation(5);
 			}
 			if (Input::KEY.LeftShift)
 			{
-				setFPSLimitation(0);
+				SetFPSLimitation(0);
 			}
 		}
 
@@ -294,9 +211,6 @@ int Framework::Run()
 
 LRESULT CALLBACK Framework::HandleMessage(HWND _hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
-	//if (wparam == ABN_FULLSCREENAPP){
-	//	isFullScreen = !isFullScreen;
-	//}
 	switch (msg)
 	{
 	case WM_PAINT:
@@ -344,7 +258,9 @@ LRESULT CALLBACK Framework::HandleMessage(HWND _hwnd, UINT msg, WPARAM wparam, L
 		break;
 	case WM_SIZE:
 		// Window resizing has already disabled, so WM_SIZE can be realized as FullScreen
-		isFullScreen = !isFullScreen;
+		if (wparam == SIZEFULLSCREEN) {
+			isFullScreen = !isFullScreen;
+		}
 		break;
 	default:
 		return DefWindowProc(_hwnd, msg, wparam, lparam);
@@ -357,168 +273,76 @@ void Framework::CalculateFrameStats()
 	// Code computes the average frames per second, and also the 
 	// average time it takes to render one frame.  These stats 
 	// are appended to the window caption bar.
+	static float sumTime = 0.0f;
 	static int frames = 0;
-	static float time_tlapsed = 0.0f;
+	static float lapsedTime = 0.0f;
 
-	frames++;
+	++frames;
+	sumTime += frameTime;
 
 	// Compute averages over one second period.
-	if ((timer->time_stamp() - time_tlapsed) >= 1.0f)
+	if ((timer->time_stamp() - lapsedTime) >= 1.0f)
 	{
 		float fps = static_cast<float>(frames); // fps = frameCnt / 1
 		float mspf = 1000.0f / fps;
 
 		static char buf[256] = "";
 		sprintf_s(buf, "Untitled FPS: %.0f / FrameTime: %.6f(ms)", fps, frameTime * 1000);
-		SetWindowTextA(outputWindow, buf);
+		SetWindowTextA(System::outputWindow, buf);
 
 		// Reset for next average.
 		frames = 0;
-		time_tlapsed += 1.0f;
+		lapsedTime += 1.0f;
 	}
 }
 
-void Framework::Update(float elapsed_time/*Elapsed seconds from last frame*/)
+void Framework::Update()
 {
-	if (pScene)
-	{
-		pScene->Update(/*elapsed_time*/);
-		if (pScene->pNextScene)
-		{
+	// Update a existed game scene
+	// If current scene's next scene was set up, set its next scene as current scene
+	if (pScene) {
+		pScene->Update();
+		if (pScene->pNextScene) {
 			pScene = pScene->pNextScene;
-			//s_pScene->update(/*elapsed_time*/);
 		}
-	}
-
-	// Charactor Surround Camera for debug
-	static float aXY = -XM_PIDIV2, aZY = XM_1DIVPI;
-	static float d = XM_PI;
-	static bool isCharactorSurroundCameraOn = false;
-	static Camera oldCamera;
-	if (Input::KEY_TRACKER.pressed.D1)
-	{
-		isCharactorSurroundCameraOn = !isCharactorSurroundCameraOn;
-		if (!isCharactorSurroundCameraOn)
-		{
-			aXY = -XM_PIDIV2;
-			aZY = XM_1DIVPI;
-			d = XM_PI;
-			GLC::mainCamera = oldCamera;
-			//mainCamera = oldCamera;
-		}
-		else
-		{
-			oldCamera = mainCamera;
-			d = XMVectorGetX(XMVector3Length(mainCamera.focusPosition - mainCamera.eyePosition));
-		}
-	}
-	if (isCharactorSurroundCameraOn)
-	{
-		if (Input::KEY.J) {
-			aXY -= 0.01f;
-		}
-		if (Input::KEY.L) {
-			aXY += 0.01f;
-		}
-		if (Input::KEY.I) {
-			aZY += 0.01f;
-		}
-		if (Input::KEY.K) {
-			aZY -= 0.01f;
-		}
-		if (Input::KEY.O) {
-			d += 0.05f;
-		}
-		if (Input::KEY.U) {
-			d -= 0.05f;
-		}
-		//mainCamera.eyePosition = mainCamera.eyePosition*XMQuaternionRotationRollPitchYaw(aXY, aZY, 0);
-		mainCamera.eyePosition = XMVectorSet(-fabs(d)*cosf(aZY)*sinf(aXY), fabs(d)*sinf(aZY), -fabs(d)*cosf(aZY)*cosf(aXY), 0);
-
-
-		XMVECTOR forword = XMVectorSubtract(mainCamera.focusPosition, mainCamera.eyePosition);
-		forword = XMVector3Normalize(forword);
-		float angle = XMVectorGetX(XMVector3Dot(forword, { 0,1,0 }));
-		mainCamera.upDirection = XMLoadFloat3(&XMFLOAT3(0, 1, 0)) - forword*angle;
-
-		mainCamera.upDirection = XMVector3Normalize(mainCamera.upDirection);
-
-		//mainCamera.upDirection = { sinf(aZY)*sinf(aXY), cosf(aZY), sinf(aZY)*cosf(aXY), 0 };
-		
 	}
 
 }
 
-void Framework::Draw(float elapsed_time/*Elapsed seconds from last frame*/)
+void Framework::Draw()
 {
+	// Clear backbuffer and set default depth stencil state
+	System::Clear();
 
-	MyBlending::setMode(pDeviceContext, BLEND_ALPHA);
+	// Alpha blending as default
+	Blend::SetMode(System::pImmediateContext, Blend::ALPHA);
 
-	pDeviceContext->OMSetRenderTargets(1, &pRenderTargetView, pDepthStencilView);
-
-	mainCamera.viewPort.Width = SCREEN_WIDTH;
-	mainCamera.viewPort.Height = SCREEN_HEIGHT;
-	mainCamera.Update();
-	pDeviceContext->RSSetViewports(1, &mainCamera.viewPort);
-
-	// Just clear the backbuffer
-	float ClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f }; //red,green,blue,alpha
-	pDeviceContext->ClearRenderTargetView(pRenderTargetView, ClearColor);
-	pDeviceContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-	pDeviceContext->OMSetDepthStencilState(pDepthStencilState, 1);
-
-	MyBlending::setMode(pDeviceContext, BLEND_ALPHA);
-
-
+	// Render a existed game scene
 	if (pScene)
 	{
-		pScene->Draw(/*elapsed_time*/);
+		pScene->Draw();
 	}
 
-	MyBlending::setMode(pDeviceContext, BLEND_NONE);
 
+	// TODO: Achieve Debug Class
 	// -5F
 	char buf[256];
 	sprintf_s(buf, "mainCamera: \nPosX: %f \nPosY: %f \nPosZ: %lf \nDistance: %f \n",
 		XMVectorGetX(mainCamera.eyePosition), XMVectorGetY(mainCamera.eyePosition), XMVectorGetZ(mainCamera.eyePosition),
 		XMVectorGetX(XMVector3Length(XMVectorSubtract(mainCamera.eyePosition, mainCamera.focusPosition))));
 
+	SpriteString::DrawString(System::pImmediateContext, 0, 0, buf);
 
-	MyBlending::setMode(pDeviceContext, BLEND_ALPHA);
-	SpriteString::DrawString(pDeviceContext, 0, 0, buf);
 
+	// Swap back buffer to front buffer
+	// If this application is full screen, enable the vertical synchronization for better performance
 	if (isFullScreen) {
-		// 垂直同期ON
-		pSwapChain->Present(1, 0);
+		// vertical synchronization ON
+		System::pSwapChain->Present(1, 0);
 	}
 	else {
-		// 垂直同期OFF
-		pSwapChain->Present(0, 0);
+		// vertical synchronization OFF
+		System::pSwapChain->Present(0, 0);
 	}
 }
 
-void Framework::Release()
-{
-	SAFE_RELEASE(pBlendState);
-	SAFE_RELEASE(pDepthStencilView);
-	SAFE_RELEASE(pRenderTargetView);
-	SAFE_RELEASE(pSwapChain);
-
-	if (pDeviceContext) {
-		pDeviceContext->ClearState();
-		pDeviceContext->Release();
-	}
-
-	SAFE_RELEASE(pDevice);
-	SAFE_RELEASE(pDepthStencilResource);
-	SAFE_RELEASE(pDepthStencilState);
-	
-	delete timer;
-
-	MyBlending::Release();
-
-	SpriteString::Release();
-	DXTK::CleanupDirectXTKObject();
-
-}

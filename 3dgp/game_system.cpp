@@ -1,20 +1,22 @@
 ﻿#include "game_system.h"
 
 
-#include "blend.h"
 #include "sprite.h"
 #include "render_target.h"
 #include "skinned_mesh.h"
 #include "primitive3d.h"
 
+#include "system.h"
+
 #include <fstream>
 
 using namespace DirectX;
+using namespace GLC;
 
 void SPRITE_DATA::Draw(float x, float y,const Transform2D& transform2D) {
 	if (texNO >= 0 && texNO < TEX_MAX && pTextureManager->textureAt(texNO) && pTextureManager->textureAt(texNO)->img)
 	{
-		pTextureManager->textureAt(texNO)->img->Draw(Framework::pDeviceContext, x + ofsX, y + ofsY, transform2D.scaleX*width, transform2D.scaleY*height, left, top, width, height,
+		pTextureManager->textureAt(texNO)->img->Draw(System::pImmediateContext, x + ofsX, y + ofsY, transform2D.scaleX*width, transform2D.scaleY*height, left, top, width, height,
 			XMConvertUIntToColor(transform2D.rgba), transform2D.angle, transform2D.centRotate, transform2D.centX, transform2D.centY, transform2D.reflectX, transform2D.scaleMode);
 	}
 }
@@ -27,7 +29,7 @@ void XM_CALLCONV SPRITE_DATA::Draw(FXMVECTOR pos, const Transform2D& transform2D
 
 			XMMATRIX world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), g_XMOne, g_XMZero, rotation, position3D);
 
-			pTextureManager->textureAt(texNO)->img->Draw(Framework::pDeviceContext, world, GLC::mainCamera.view, GLC::mainCamera.projection, XMVectorGetX(pos) + ofsX, XMVectorGetY(pos) + ofsY, transform2D.scaleX*width, transform2D.scaleY*height, left, top, width, height,
+			pTextureManager->textureAt(texNO)->img->Draw(System::pImmediateContext, world, GLC::mainCamera.view, GLC::mainCamera.projection, XMVectorGetX(pos) + ofsX, XMVectorGetY(pos) + ofsY, transform2D.scaleX*width, transform2D.scaleY*height, left, top, width, height,
 				XMConvertUIntToColor(transform2D.rgba), transform2D.angle, transform2D.centRotate, transform2D.centX, transform2D.centY, transform2D.reflectX, transform2D.scaleMode);
 		}
 		else
@@ -41,7 +43,7 @@ void TextureManager::LoadTextures(LOAD_TEXTURE data[])
 {
 	for (int i = data[0].texNO; data[i].texNO != -1 || data[i].fileName != NULL; i++)
 	{
-		data[i].img = new Sprite(Framework::pDevice, data[i].fileName, data[i].doProjection);
+		data[i].img = new Sprite(System::pd3dDevice, data[i].fileName, data[i].doProjection);
 		pTextures[i] = &data[i];
 	}
 }
@@ -50,7 +52,7 @@ void TextureManager::LoadTexture(LOAD_TEXTURE data[], int textureNO)
 {
 	if (data[textureNO].texNO != -1 || data[textureNO].fileName != NULL)
 	{
-		data[textureNO].img = new Sprite(Framework::pDevice, data[textureNO].fileName, data[textureNO].doProjection);
+		data[textureNO].img = new Sprite(System::pd3dDevice, data[textureNO].fileName, data[textureNO].doProjection);
 		pTextures[textureNO] = &data[textureNO];
 	}
 }
@@ -163,14 +165,14 @@ int BasicInput(int controllerNO)
 
 void DrawString(int x, int y, char *buf, UINTCOLOR color, int format, int sizeX, int sizeY, float angle)
 {
-	SpriteString::DrawString(Framework::pDeviceContext, x, y, buf, XMConvertUIntToColor(color), format, sizeX, sizeY, angle);
+	SpriteString::DrawString(System::pImmediateContext, x, y, buf, XMConvertUIntToColor(color), format, sizeX, sizeY, angle);
 }
 
 void DrawRectangle(int x, int y, int w, int h, float angle, UINTCOLOR color)
 {
-	static Sprite rect(Framework::pDevice);
+	static Sprite rect(System::pd3dDevice);
 	//MyBlending::setMode(framework::pDeviceContext, BLEND_REPLACE);
-	rect.Draw(Framework::pDeviceContext, x, y, w, h, angle, XMConvertUIntToColor(color));
+	rect.Draw(System::pImmediateContext, x, y, w, h, angle, XMConvertUIntToColor(color));
 	//MyBlending::setMode(framework::pDeviceContext, BLEND_ALPHA);
 }
 
@@ -183,7 +185,7 @@ View::View(int viewWidth, int viewHeight) :
 	scaling(g_XMOne),
 	rotationDegree(g_XMZero)
 {
-	pRenderTarget = new RenderTarget(Framework::pDevice, viewWidth, viewHeight);
+	pRenderTarget = new RenderTarget(System::pd3dDevice, viewWidth, viewHeight);
 }
 
 View::View(float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, float rotateAngle, UINTCOLOR blendColor, bool doReflection):
@@ -196,7 +198,7 @@ View::View(float drawX, float drawY, float drawWidth, float drawHeight, float sr
 	scaling(g_XMOne),
 	rotationDegree(g_XMZero)
 {
-	pRenderTarget = new RenderTarget(Framework::pDevice, drawWidth, drawHeight);
+	pRenderTarget = new RenderTarget(System::pd3dDevice, drawWidth, drawHeight);
 }
 
 View::~View()
@@ -215,7 +217,7 @@ void View::Set(float drawX, float drawY, float drawWidth, float drawHeight, floa
 
 	XMMATRIX world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), scaling, g_XMZero, rotation, position);
 
-	pRenderTarget->Draw(Framework::pDeviceContext, world, GLC::mainCamera.view, GLC::mainCamera.projection, drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, rotateAngle, XMConvertUIntToColor(blendColor), doReflection);
+	pRenderTarget->Draw(System::pImmediateContext, world, GLC::mainCamera.view, GLC::mainCamera.projection, drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, rotateAngle, XMConvertUIntToColor(blendColor), doReflection);
 }
 
 void View::Set()
@@ -224,16 +226,16 @@ void View::Set()
 
 	XMMATRIX world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), scaling, g_XMZero, rotate, position);
 
-	pRenderTarget->Draw(Framework::pDeviceContext, world, GLC::mainCamera.view, GLC::mainCamera.projection, drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, rotateAngle, XMConvertUIntToColor(blendColor), doReflection);
+	pRenderTarget->Draw(System::pImmediateContext, world, GLC::mainCamera.view, GLC::mainCamera.projection, drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, rotateAngle, XMConvertUIntToColor(blendColor), doReflection);
 }
 
 void View::Clear()
 {
-	Framework::pDeviceContext->OMSetRenderTargets(1, &Framework::pRenderTargetView, Framework::pDepthStencilView);
+	System::pImmediateContext->OMSetRenderTargets(1, &System::pRenderTargetView, System::pDepthStencilView);
 
 	GLC::mainCamera.viewPort.Width = SCREEN_WIDTH;
 	GLC::mainCamera.viewPort.Height = SCREEN_HEIGHT;
-	Framework::pDeviceContext->RSSetViewports(1, &GLC::mainCamera.viewPort);
+	System::pImmediateContext->RSSetViewports(1, &GLC::mainCamera.viewPort);
 }
 
 ///////////////////////////////////////////////////////////
@@ -241,8 +243,8 @@ void View::Clear()
 // Class Cube
 Cube::Cube(FXMVECTOR position, FXMVECTOR size, const UINTCOLOR &blendColor) :position(position), size(size), blendColor(blendColor)
 {
-	pPrimitive = new Primitive3D(Framework::pDevice);
-	pPrimitive->Initialize(Framework::pDevice, GEOMETRY_CUBE);
+	pPrimitive = new Primitive3D(System::pd3dDevice);
+	pPrimitive->Initialize(System::pd3dDevice, GEOMETRY_CUBE);
 }
 
 Cube::~Cube()
@@ -282,7 +284,7 @@ void XM_CALLCONV MeshData::Draw(FXMVECTOR position, FXMVECTOR scaling, FXMVECTOR
 		//XMMATRIX worldXMatrix;
 		world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), scaleMul, g_XMZero, rotation, translation);
 		//XMStoreFloat4x4(&world, worldXMatrix);
-		pMeshManager->MeshAt(fileNO)->data->Draw(Framework::pDeviceContext, world, GLC::mainCamera.view, GLC::mainCamera.projection,
+		pMeshManager->MeshAt(fileNO)->data->Draw(System::pImmediateContext, world, GLC::mainCamera.view, GLC::mainCamera.projection,
 			false, frame/*, Framework::frameTime*/);
 	}
 }
@@ -292,7 +294,7 @@ void MeshManager::LoadMesh(MeshFile data[], int fileNO)
 	if (data[fileNO].fileNO != -1 || data[fileNO].path != NULL)
 	{
 		meshes[fileNO] = new MeshFile(data[fileNO].fileNO, data[fileNO].path);
-		meshes[fileNO]->data = new SkinnedMesh(Framework::pDevice, data[fileNO].path);
+		meshes[fileNO]->data = new SkinnedMesh(System::pd3dDevice, data[fileNO].path);
 	}
 }
 
@@ -301,7 +303,7 @@ void MeshManager::LoadMeshes(MeshFile data[])
 	for (int i = data[0].fileNO; data[i].fileNO != -1 || data[i].path != NULL; i++)
 	{
 		meshes[i] = new MeshFile(data[i].fileNO, data[i].path);
-		meshes[i]->data = new SkinnedMesh(Framework::pDevice, data[i].path);
+		meshes[i]->data = new SkinnedMesh(System::pd3dDevice, data[i].path);
 	}
 }
 
@@ -331,7 +333,7 @@ void MeshManager::LoadMeshes(MeshFile data[], int *progress)
 	for (int i = data[0].fileNO; data[i].fileNO != -1 || data[i].path != NULL; i++)
 	{
 		meshes[i] = new MeshFile(data[i].fileNO, data[i].path);
-		meshes[i]->data = new SkinnedMesh(Framework::pDevice, data[i].path);
+		meshes[i]->data = new SkinnedMesh(System::pd3dDevice, data[i].path);
 		std::fstream file(data[i].path, std::ios::in);
 		file.seekg(0, std::ios::end);
 		loadedMeshSize+= file.tellg();
