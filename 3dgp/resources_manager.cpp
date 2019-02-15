@@ -78,6 +78,7 @@ void RM::ReleaseShaderResourceView(ID3D11ShaderResourceView* pInSRV) {
 			if (ResourcesManager::s_SRVResources[i].pData == pInSRV)
 			{
 				ResourcesManager::s_SRVResources[i].Release();
+				pInSRV = nullptr;
 				break;
 			}
 		}
@@ -164,6 +165,8 @@ void RM::ReleaseVertexShader(ID3D11VertexShader* pInVertexShader, ID3D11InputLay
 				{
 					SAFE_RELEASE(ResourcesManager::s_inputLayoutResources[i]);
 				}
+				pInVertexShader = nullptr;
+				pInInputLayout = nullptr;
 				break;
 			}
 		}
@@ -235,6 +238,7 @@ void RM::ReleasePixelShader(ID3D11PixelShader* pIn) {
 			if (ResourcesManager::s_pixelShaderResources[i].pData == pIn)
 			{
 				ResourcesManager::s_pixelShaderResources[i].Release();
+				pIn = nullptr;
 				break;
 			}
 		}

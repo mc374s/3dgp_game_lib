@@ -3,7 +3,6 @@
 #include <thread>
 #include <tchar.h>
 
-using namespace GLC;
 
 LRESULT CALLBACK fnWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {

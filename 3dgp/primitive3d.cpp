@@ -237,8 +237,8 @@ void Primitive3D::Initialize(ID3D11Device *pDevice, const int &type, const int &
 
 		CreateBuffers(pDevice, vertices, vertexCount, indices, indexCount);
 		
-		delete vertices;
-		delete indices;
+		delete[] vertices;
+		delete[] indices;
 	
 	}
 

@@ -206,3 +206,62 @@ void Sampler::Release()
 		}
 	}
 }
+
+
+//--------------------------------------------------------------------------------------
+// DepthStencilState
+//--------------------------------------------------------------------------------------
+ID3D11DepthStencilState* DepthStencil::State::pState[MAX];
+
+void DepthStencil::State::Initialize(ID3D11Device *pDevice)
+{
+	// create depth stencil state
+	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
+	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
+	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+
+	depthStencilDesc.DepthEnable = FALSE;
+	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	pDevice->CreateDepthStencilState(&depthStencilDesc, &State::pState[NONE]);
+
+	depthStencilDesc.DepthEnable = TRUE;
+	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	pDevice->CreateDepthStencilState(&depthStencilDesc, &State::pState[DEFAULT]);
+
+	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	pDevice->CreateDepthStencilState(&depthStencilDesc, &State::pState[READ]);
+	
+}
+
+//--------------------------------------------------------------------------------------
+// RasterizerState
+//--------------------------------------------------------------------------------------
+ID3D11RasterizerState* Rasterizer::State::pState[MAX];
+
+void Rasterizer::State::Initialize(ID3D11Device* pDevice)
+{
+	D3D11_RASTERIZER_DESC rasterizerDesc;
+	ZeroMemory(&rasterizerDesc, sizeof(rasterizerDesc));
+	rasterizerDesc.DepthClipEnable = TRUE;
+	rasterizerDesc.MultisampleEnable = TRUE;
+
+	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+	rasterizerDesc.CullMode = D3D11_CULL_NONE;
+	pDevice->CreateRasterizerState(&rasterizerDesc, &State::pState[CULL_NONE]);
+
+	rasterizerDesc.CullMode = D3D11_CULL_FRONT;
+	pDevice->CreateRasterizerState(&rasterizerDesc, &State::pState[CULL_CLOCKWISE]);
+
+	rasterizerDesc.CullMode = D3D11_CULL_BACK;
+	pDevice->CreateRasterizerState(&rasterizerDesc, &State::pState[CULL_COUNTER_CLOCKWISE]);
+
+	rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
+	rasterizerDesc.CullMode = D3D11_CULL_NONE;
+	pDevice->CreateRasterizerState(&rasterizerDesc, &State::pState[WIREFRAME]);
+}
+
+
+void test() {
+	DepthStencil::State::Get(DepthStencil::DEFAULT);
+	//Get(DepthStencil::DEFAULT);
+}

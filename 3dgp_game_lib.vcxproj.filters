@@ -125,6 +125,9 @@
     <ClInclude Include="3dgp\texture.h">
       <Filter>3dgp\Headers</Filter>
     </ClInclude>
+    <ClInclude Include="3dgp\shader.h">
+      <Filter>3dgp\Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="3dgp\framework.cpp">
@@ -218,6 +221,9 @@
       <Filter>3dgp\Sources</Filter>
     </ClCompile>
     <ClCompile Include="3dgp\texture.cpp">
+      <Filter>3dgp\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="3dgp\shader.cpp">
       <Filter>3dgp\Sources</Filter>
     </ClCompile>
   </ItemGroup>

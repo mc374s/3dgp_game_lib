@@ -29,8 +29,8 @@ public:
 
 	int controllerNO;
 	int keyCode;
-	AABB size;
-	AABB collision;
+	GLC::AABB size;
+	GLC::AABB collision;
 	Vector4 collisionColor;
 	Vector3 oldPos;
 	Vector3 moveDirection;
@@ -109,7 +109,7 @@ public:
 	void Update();
 	void Draw();
 
-	void DetectCollision(Collision* other);
+	void DetectCollision(GLC::Collision* other);
 
 };
 

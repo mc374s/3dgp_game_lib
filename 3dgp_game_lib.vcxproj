@@ -165,6 +165,7 @@
     <ClInclude Include="3dgp\render_target.h" />
     <ClInclude Include="3dgp\resources_manager.h" />
     <ClInclude Include="3dgp\scene.h" />
+    <ClInclude Include="3dgp\shader.h" />
     <ClInclude Include="3dgp\skinned_mesh.h" />
     <ClInclude Include="3dgp\sprite.h" />
     <ClInclude Include="3dgp\sprite_string.h" />
@@ -198,6 +199,7 @@
     <ClCompile Include="3dgp\primitive3d.cpp" />
     <ClCompile Include="3dgp\render_target.cpp" />
     <ClCompile Include="3dgp\resources_manager.cpp" />
+    <ClCompile Include="3dgp\shader.cpp" />
     <ClCompile Include="3dgp\skinned_mesh.cpp" />
     <ClCompile Include="3dgp\sprite.cpp" />
     <ClCompile Include="3dgp\sprite_string.cpp" />

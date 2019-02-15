@@ -1,7 +1,6 @@
 #ifndef _DIRECTXTK_H_
 #define _DIRECTXTK_H_
 
-
 //#define _XM_NO_INTRINSICS_
 #include <DirectXMath.h>
 
@@ -18,6 +17,10 @@
 
 class DXTK 
 {
+private:
+	static ID3D11Device*			pDevice;
+	static ID3D11DeviceContext*		pDeviceContext;
+
 public:
 
 	static ID3D11InputLayout*														 pBatchInputLayout;
@@ -30,11 +33,11 @@ public:
 	static void Release();
 
 	// Render a grid using PrimitiveBatch
-	static void XM_CALLCONV DrawGrid(ID3D11DeviceContext* pDeviceContext, DirectX::FXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection, 
+	static void XM_CALLCONV DrawGrid(DirectX::FXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection, 
 		DirectX::FXMVECTOR xAxis, DirectX::FXMVECTOR yAxis, DirectX::FXMVECTOR origin, size_t xdivs, size_t ydivs, DirectX::GXMVECTOR color);
-	static void XM_CALLCONV DrawAABB(ID3D11DeviceContext* pDeviceContext, DirectX::FXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection, 
+	static void XM_CALLCONV DrawAABB(DirectX::FXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection, 
 		DirectX::FXMVECTOR minPos, DirectX::FXMVECTOR maxPos, DirectX::FXMVECTOR color);
-	static void XM_CALLCONV DrawSphere(ID3D11DeviceContext* pDeviceContext, DirectX::FXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection, 
+	static void XM_CALLCONV DrawSphere(DirectX::FXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection, 
 		DirectX::FXMVECTOR centerPos, float radius, DirectX::FXMVECTOR color);
 
 };

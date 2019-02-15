@@ -9,12 +9,20 @@ std::unique_ptr<BasicEffect>                            DXTK::BatchEffect;
 std::unique_ptr<GeometricPrimitive>                     DXTK::Cube;
 std::unique_ptr<PrimitiveBatch<VertexPositionColor>>    DXTK::Batch;
 
+ID3D11Device*							DXTK::pDevice;
+ID3D11DeviceContext*					DXTK::pDeviceContext;
+
 HRESULT DXTK::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 {
+	DXTK::pDevice = pDevice;
+	DXTK::pDeviceContext = pDeviceContext;
+	//DXTK::DXTK::pDevice->AddRef();
+	//DXTK::pDeviceContext->AddRef();
+
 	HRESULT hr = S_OK;
 	Batch.reset(new PrimitiveBatch<VertexPositionColor>(pDeviceContext));
-	States.reset(new CommonStates(pDevice));
-	BatchEffect.reset(new BasicEffect(pDevice));
+	States.reset(new CommonStates(DXTK::pDevice));
+	BatchEffect.reset(new BasicEffect(DXTK::pDevice));
 	BatchEffect->SetVertexColorEnabled(true);
 
 	{
@@ -23,7 +31,7 @@ HRESULT DXTK::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceCont
 
 		BatchEffect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
 
-		hr = pDevice->CreateInputLayout(VertexPositionColor::InputElements,
+		hr = DXTK::pDevice->CreateInputLayout(VertexPositionColor::InputElements,
 			VertexPositionColor::InputElementCount,
 			shaderByteCode, byteCodeLength,
 			&pBatchInputLayout);
@@ -31,7 +39,7 @@ HRESULT DXTK::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceCont
 			return hr;
 	}
 
-	Cube = GeometricPrimitive::CreateCube(pDeviceContext, 1, false);
+	Cube = GeometricPrimitive::CreateCube(DXTK::pDeviceContext, 1, false);
 
 	return S_OK;
 }
@@ -41,16 +49,16 @@ void DXTK::Release()
 	if (pBatchInputLayout) pBatchInputLayout->Release();
 }
 
-void XM_CALLCONV DXTK::DrawGrid(ID3D11DeviceContext* pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, FXMVECTOR xAxis, FXMVECTOR yAxis, FXMVECTOR origin, size_t xdivs, size_t ydivs, GXMVECTOR color)
+void XM_CALLCONV DXTK::DrawGrid(FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, FXMVECTOR xAxis, FXMVECTOR yAxis, FXMVECTOR origin, size_t xdivs, size_t ydivs, GXMVECTOR color)
 {
 	BatchEffect->SetWorld(world);
 	BatchEffect->SetView(view);
 	BatchEffect->SetProjection(projection);
 	
-	BatchEffect->Apply(pDeviceContext);
+	BatchEffect->Apply(DXTK::pDeviceContext);
 
-	pDeviceContext->IASetInputLayout(pBatchInputLayout);
-	pDeviceContext->OMSetDepthStencilState(States->DepthDefault(), 1);
+	DXTK::pDeviceContext->IASetInputLayout(pBatchInputLayout);
+	DXTK::pDeviceContext->OMSetDepthStencilState(States->DepthDefault(), 1);
 
 	Batch->Begin();
 
@@ -95,16 +103,16 @@ void XM_CALLCONV DXTK::DrawGrid(ID3D11DeviceContext* pDeviceContext, FXMMATRIX w
 
 }
 
-void XM_CALLCONV DXTK::DrawAABB(ID3D11DeviceContext* pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, FXMVECTOR minPos, FXMVECTOR maxPos, FXMVECTOR color)
+void XM_CALLCONV DXTK::DrawAABB(FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, FXMVECTOR minPos, FXMVECTOR maxPos, FXMVECTOR color)
 {
 	BatchEffect->SetWorld(world);
 	BatchEffect->SetView(view);
 	BatchEffect->SetProjection(projection);
 
-	BatchEffect->Apply(pDeviceContext);
+	BatchEffect->Apply(DXTK::pDeviceContext);
 
-	pDeviceContext->IASetInputLayout(pBatchInputLayout);
-	//pDeviceContext->OMSetDepthStencilState(States->DepthDefault(), 1);
+	DXTK::pDeviceContext->IASetInputLayout(pBatchInputLayout);
+	//DXTK::pDeviceContext->OMSetDepthStencilState(States->DepthDefault(), 1);
 
 	Batch->Begin();
 
@@ -151,16 +159,16 @@ void XM_CALLCONV DXTK::DrawAABB(ID3D11DeviceContext* pDeviceContext, FXMMATRIX w
 	Batch->End();
 }
 
-void XM_CALLCONV DXTK::DrawSphere(ID3D11DeviceContext* pDeviceContext, FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, FXMVECTOR centerPos, float radius, FXMVECTOR color)
+void XM_CALLCONV DXTK::DrawSphere(FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection, FXMVECTOR centerPos, float radius, FXMVECTOR color)
 {
 	BatchEffect->SetWorld(world);
 	BatchEffect->SetView(view);
 	BatchEffect->SetProjection(projection);
 
-	BatchEffect->Apply(pDeviceContext);
+	BatchEffect->Apply(DXTK::pDeviceContext);
 
-	pDeviceContext->IASetInputLayout(pBatchInputLayout);
-	//pDeviceContext->OMSetDepthStencilState(States->DepthDefault(), 1);
+	DXTK::pDeviceContext->IASetInputLayout(pBatchInputLayout);
+	//DXTK::pDeviceContext->OMSetDepthStencilState(States->DepthDefault(), 1);
 
 	Batch->Begin();
 

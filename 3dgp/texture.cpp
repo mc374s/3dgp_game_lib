@@ -20,9 +20,7 @@ Texture::Texture(const char* fileName)
 Texture::~Texture()
 {
 	// Release resource reference
-	if (shaderResourceViewRef) {
-		RM::ReleaseShaderResourceView(shaderResourceViewRef);
-	}
+	RM::ReleaseShaderResourceView(shaderResourceViewRef);
 }
 
 void Texture::Load()

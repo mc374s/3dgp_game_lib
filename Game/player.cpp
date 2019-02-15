@@ -87,7 +87,7 @@ void Player::Draw()
 #ifdef DEBUG
 	
 	if (controllerNO == 0) {
-		DXTK::DrawAABB(Framework::pDeviceContext, Matrix::Identity, GLC::mainCamera.view, GLC::mainCamera.projection,
+		DXTK::DrawAABB(Matrix::Identity, GLC::mainCamera.view, GLC::mainCamera.projection,
 			collision.minPos, collision.maxPos, collisionColor);
 
 		char buf[256];
@@ -272,9 +272,9 @@ void PlayerManager::Draw()
 	}
 }
 
-void PlayerManager::DetectCollision(Collision* other)
+void PlayerManager::DetectCollision(GLC::Collision* other)
 {
-	HitResult hitResult;
+	GLC::HitResult hitResult;
 	for (int i = 0; i < playerNum; ++i) {
 		if (pPlayer[i]) {
 			hitResult = pPlayer[i]->collision.HitJudgement(other);

@@ -4,7 +4,9 @@
 #include <vector>
 
 class OBJ3D;
+namespace GLC{
 struct Collision;
+};
 
 namespace Game{
 
@@ -17,7 +19,7 @@ public:
 	~Stage();
 
 	std::vector<OBJ3D> pObjList;
-	std::vector<Collision*> pCollisionList;
+	std::vector<GLC::Collision*> pCollisionList;
 
 	void Initialize();
 	void Update();

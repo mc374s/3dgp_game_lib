@@ -56,7 +56,7 @@ const int	COLOR_VIOLET	= 0x800080FF;
 //#define KEY_RELEASE(vk_code) ((GetAsyncKeyState(vk_code) == 0))
 
 
-#define TEX_MAX (FILE_NUM_MAX)
+#define TEX_MAX (RM::FILE_NUM_MAX)
 
 enum STEP
 {
@@ -89,9 +89,9 @@ struct Transform2D
 	float	centX, centY;
 	int		scaleMode;
 
-	UINTCOLOR rgba;
+	GLC::UINTCOLOR rgba;
 
-	Transform2D(float scaleX = 1.0f, float scaleY = 1.0f, float angle = .0f, bool reflectX = false, bool centRotate = true, float centX = .0f, float centY = .0f, int scaleMode = 0, UINTCOLOR rgba = 0xFFFFFFFF) :
+	Transform2D(float scaleX = 1.0f, float scaleY = 1.0f, float angle = .0f, bool reflectX = false, bool centRotate = true, float centX = .0f, float centY = .0f, int scaleMode = 0, GLC::UINTCOLOR rgba = 0xFFFFFFFF) :
 		scaleX(scaleX),
 		scaleY(scaleY),
 		angle(angle),
@@ -194,9 +194,9 @@ public:
 
 int BasicInput(int playerNO = 0);
 
-void DrawString(int posX = 0, int posY = 0, char *pTextBuf = nullptr, UINTCOLOR textColor = 0xFFFFFFFF, int format = STR_LEFT, int characterSizeX = 32, int characterSizeY = 32, float characterRotateAngle = .0f);
+void DrawString(int posX = 0, int posY = 0, char *pTextBuf = nullptr, GLC::UINTCOLOR textColor = 0xFFFFFFFF, int format = STR_LEFT, int characterSizeX = 32, int characterSizeY = 32, float characterRotateAngle = .0f);
 
-void DrawRectangle(int leftTopX, int leftTopY, int width, int height, float rotateAngle = 0.0, UINTCOLOR fillColor = 0xFFFFFFFF);
+void DrawRectangle(int leftTopX, int leftTopY, int width, int height, float rotateAngle = 0.0, GLC::UINTCOLOR fillColor = 0xFFFFFFFF);
 
 
 
@@ -208,13 +208,13 @@ private:
 	RenderTarget *pRenderTarget;
 	int drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight;
 	float rotateAngle;
-	UINTCOLOR blendColor;
+	GLC::UINTCOLOR blendColor;
 
 
 public:
 
 	View(int viewWidth, int viewHeight);
-	View(float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, float rotateAngle = .0f, UINTCOLOR blendColor = 0xFFFFFFFF, bool doReflection = false);
+	View(float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, float rotateAngle = .0f, GLC::UINTCOLOR blendColor = 0xFFFFFFFF, bool doReflection = false);
 	~View();
 
 	bool doReflection;
@@ -224,7 +224,7 @@ public:
 
 	void Set();
 	// View, looks like a 3D textured sprite
-	void Set(float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, float rotateAngle = .0f, UINTCOLOR blendColor = 0xFFFFFFFF, bool doReflection = false);
+	void Set(float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, float rotateAngle = .0f, GLC::UINTCOLOR blendColor = 0xFFFFFFFF, bool doReflection = false);
 
 	// Reset ViewPort to real screen
 	static void Clear();
@@ -238,11 +238,11 @@ class Cube
 private:
 	Primitive3D *pPrimitive;
 public:
-	Cube(DirectX::FXMVECTOR position, DirectX::FXMVECTOR size, const UINTCOLOR &blendColor);
+	Cube(DirectX::FXMVECTOR position, DirectX::FXMVECTOR size, const GLC::UINTCOLOR &blendColor);
 	~Cube();
 	DirectX::XMVECTOR	position;
 	DirectX::XMVECTOR	size;
-	UINTCOLOR	blendColor;
+	GLC::UINTCOLOR	blendColor;
 
 	void Draw();
 

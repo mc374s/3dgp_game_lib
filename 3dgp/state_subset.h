@@ -3,7 +3,41 @@
 
 #include <d3d11.h>
 
-namespace GLC {
+namespace GLC 
+{
+
+template<typename D3D_TYPE, size_t MAX>
+class StateTemplate {
+public:
+
+protected:
+	StateTemplate() = default;
+	~StateTemplate() = default;
+
+	static D3D_TYPE* pState[MAX];
+
+public:
+	// Return a Initialized State Object*
+	template<typename MODE_TYPE>
+	static D3D_TYPE* Get(MODE_TYPE mode = MAX)
+	{
+		if (mode >= 0 && mode < MAX) {
+			return pState[mode];
+		}
+		else {
+			return nullptr;
+		}
+	};
+	static void Release() 
+	{
+		for (int i = 0; i < MAX; i++) {
+			if (pState[i]) {
+				pState[i]->Release();
+			}
+		}
+	};
+};
+
 
 //--------------------------------------------------------------------------------------
 // BlendState
@@ -43,7 +77,6 @@ private:
 	~Blend() {};
 
 public:
-
 	static void Initialize(ID3D11Device *pDevice);
 	// BlendState will be set here
 	static void SetMode(ID3D11DeviceContext* pDeviceContext, MODE mode = ALPHA);
@@ -61,7 +94,6 @@ class Sampler
 public:
 	enum MODE
 	{
-		NONE,
 		WRAP,
 		MIRROR,
 		CLAMP,
@@ -86,12 +118,53 @@ public:
 // TODO: Complete state_subset
 
 //--------------------------------------------------------------------------------------
-// DepethStencilState
+// DepthStencilState
 //--------------------------------------------------------------------------------------
+namespace DepthStencil
+{
+	enum MODE
+	{
+		NONE,
+		DEFAULT,
+		READ,
+
+		MAX
+	};
+	struct State : public StateTemplate<ID3D11DepthStencilState, MODE::MAX>
+	{
+		static void Initialize(ID3D11Device *pDevice);
+	private:
+		State() = default;
+		~State() = default;
+	};
+
+};
+
 
 //--------------------------------------------------------------------------------------
 // RasterizerState
 //--------------------------------------------------------------------------------------
+namespace Rasterizer
+{
+	enum MODE
+	{
+		CULL_NONE,
+		CULL_CLOCKWISE,
+		CULL_COUNTER_CLOCKWISE,
+		WIREFRAME,
+
+		MAX
+	};
+	struct State : public StateTemplate<ID3D11RasterizerState, MODE::MAX>
+	{
+		static void Initialize(ID3D11Device *pDevice);
+	private:
+		State() = default;
+		~State() = default;
+	};
+
+};
+
 
 }; // namespace GLC
 

@@ -688,7 +688,7 @@ int SkinnedMesh::FetchAnimationsWithoutMesh(void* pFbxScene, SkinnedMesh::Skelet
 				delete[] boneNames[i];
 			}
 		}
-		delete boneNames;
+		delete[] boneNames;
 	}
 
 
@@ -928,9 +928,9 @@ void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRI
 
 	// Play Fbx Animation	
 	XMMATRIX tansformation;
-	Skeletal skeletal;
+	
 	SkeletalAnimation* skeletalAnimation;
-
+	size_t bonesNum;
 
 	for(Mesh& mesh: meshesList)
 	{
@@ -950,11 +950,12 @@ void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRI
 				(*animationFrame) = -1;
 				skeletalAnimation->animationTick = 0;
 			}
-			skeletal = skeletalAnimation->at(frame);
-			size_t bonesNum = skeletal.size();
+			Skeletal& skeletal = skeletalAnimation->at(frame);
+			bonesNum = skeletal.size();
 			_ASSERT_EXPR(bonesNum < MAX_BONES, L"The bonesNum exceeds MAX_BONES!");
 			for (size_t i = 0; i < bonesNum; i++) {
-				updateCbuffer.boneTransforms[i] = skeletal[i].transform;
+				//updateCbuffer.boneTransforms[i] = skeletal->at(i).transform;
+				memcpy(&updateCbuffer.boneTransforms[i], &skeletal[i].transform, sizeof(XMFLOAT4X4));
 			}
 			skeletalAnimation->animationTick += elapsedTime;
 		}

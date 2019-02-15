@@ -143,6 +143,8 @@ HRESULT System::Initialize(HWND hWnd)
 
 void System::Clear()
 {
+	pImmediateContext->OMSetRenderTargets(1, &pRenderTargetView, pDepthStencilView);
+
 	float ClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f }; //red,green,blue,alpha
 	pImmediateContext->ClearRenderTargetView(pRenderTargetView, ClearColor);
 	pImmediateContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);

@@ -7,7 +7,6 @@
 #include "high_resolution_timer.h"
 
 #include "camera.h"
-#include "sprite_string.h"
 #include "primitive3d.h"
 #include "mf_audio.h"
 #include "scene.h"
@@ -17,6 +16,7 @@
 
 #include "system.h"
 #include "state_subset.h"
+//#include "sprite_string.h"
 
 #include "../Game/sound_data.h"
 #include "../Game/sprite_data.h"
@@ -311,20 +311,26 @@ void Framework::Update()
 
 void Framework::Draw()
 {
-	// Clear backbuffer and set default depth stencil state
+	// Reset Viewports before render target was reset.
+	mainCamera.viewPort.Width = SCREEN_WIDTH;
+	mainCamera.viewPort.Height = SCREEN_HEIGHT;
+	mainCamera.Update();
+	System::pImmediateContext->RSSetViewports(1, &mainCamera.viewPort);
+
+	// Clear backbuffer and set main render target default depth stencil state.
 	System::Clear();
 
-	// Alpha blending as default
+	// Alpha blending as default.
 	Blend::SetMode(System::pImmediateContext, Blend::ALPHA);
 
-	// Render a existed game scene
+	// Render a existed game scene.
 	if (pScene)
 	{
 		pScene->Draw();
 	}
 
 
-	// TODO: Achieve Debug Class
+	// TODO: Achieve Debug Class.
 	// -5F
 	char buf[256];
 	sprintf_s(buf, "mainCamera: \nPosX: %f \nPosY: %f \nPosZ: %lf \nDistance: %f \n",
@@ -334,8 +340,8 @@ void Framework::Draw()
 	SpriteString::DrawString(System::pImmediateContext, 0, 0, buf);
 
 
-	// Swap back buffer to front buffer
-	// If this application is full screen, enable the vertical synchronization for better performance
+	// Swap back buffer to front buffer.
+	// If this application is full screen, enable the vertical synchronization for better performance.
 	if (isFullScreen) {
 		// vertical synchronization ON
 		System::pSwapChain->Present(1, 0);
