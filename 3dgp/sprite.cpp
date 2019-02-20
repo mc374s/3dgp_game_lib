@@ -1,7 +1,10 @@
 ﻿#include "sprite.h"
 #include "resources_manager.h"
 
+#include "state_subset.h"
+
 using namespace DirectX;
+using namespace GLC;
 
 bool Sprite::Initialize(ID3D11Device* pDevice)
 {
@@ -22,21 +25,9 @@ bool Sprite::Initialize(ID3D11Device* pDevice)
 		return false;
 	}
 
-	// create rasterizer state
-	D3D11_RASTERIZER_DESC rasterizerDesc;
-	ZeroMemory(&rasterizerDesc, sizeof(rasterizerDesc));
-	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
-	rasterizerDesc.CullMode = D3D11_CULL_NONE;
-	rasterizerDesc.DepthClipEnable = FALSE;
-	rasterizerDesc.MultisampleEnable = FALSE;
-	rasterizerDesc.DepthBiasClamp = 0;
-	rasterizerDesc.SlopeScaledDepthBias = 0;
-	hr = pDevice->CreateRasterizerState(&rasterizerDesc, &pRasterizerState);
-	if (FAILED(hr))
-	{
-		MessageBox(0, L"sprite: Initialize hr failed", 0, 0);
-		return false;
-	}
+	// create rasterizer state reference
+	pRasterizerState = Rasterizer::State::Get(Rasterizer::CULL_NONE);
+
 
 	// Create constant buffer
 	//ZeroMemory(&VSConstantData, sizeof(VS_CONSTANT_BUFFER));
@@ -71,19 +62,9 @@ Sprite::Sprite(ID3D11Device* pDevice)
 
 	pShaderResourceView = NULL;
 
-	// create depth stencil state
-	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
-	depthStencilDesc.DepthEnable = FALSE;
-	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	// create depth stencil state reference
+	pDepthStencilState = DepthStencil::State::Get(DepthStencil::NONE);
 
-	hr = pDevice->CreateDepthStencilState(&depthStencilDesc, &pDepthStencilState);
-	if (FAILED(hr))
-	{
-		MessageBox(0, L"Create DepthStencilState failed", L"Sprite::Initialize", 0);
-		return;
-	}
 
 }
 
@@ -140,49 +121,15 @@ Sprite::Sprite(ID3D11Device* pDevice, char* pFilename/*Texture file name*/, bool
 	resource->QueryInterface(&texture2d);
 	texture2d->GetDesc(&renderTargetTextureDesc);
 
-	// SAMPLER_DESC Initialize
+	// Create sampler state reference
+	pSamplerState = Sampler::State(Sampler::WRAP);
 
-	D3D11_SAMPLER_DESC samplerDesc;
-	ZeroMemory(&samplerDesc, sizeof(samplerDesc));
-	//samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.MipLODBias = 0.0f;
-	samplerDesc.MaxAnisotropy = 16;
-	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-	/*samplerDesc.BorderColor[0] = 0;
-	samplerDesc.BorderColor[1] = 0;
-	samplerDesc.BorderColor[2] = 0;
-	samplerDesc.BorderColor[3] = 0;*/
-	samplerDesc.MinLOD = 0;
-	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-
-	hr = pDevice->CreateSamplerState(&samplerDesc, &pSamplerState);
-	if (FAILED(hr))
-	{
-		MessageBox(0, L"sprite: Create SamplerState failed", 0, 0);
-		return;
-	}
-
-	// create depth stencil state
-	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
+	// Create depth stencil state reference
 	if (doProjection) {
-		depthStencilDesc.DepthEnable = TRUE;
+		pDepthStencilState = DepthStencil::State::Get(DepthStencil::DEFAULT);
 	}
 	else {
-		depthStencilDesc.DepthEnable = FALSE;
-	}
-	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
-
-	hr = pDevice->CreateDepthStencilState(&depthStencilDesc, &pDepthStencilState);
-	if (FAILED(hr))
-	{
-		MessageBox(0, L"Create DepthStencilState failed", L"Sprite::Initialize", 0);
-		return;
+		pDepthStencilState = DepthStencil::State::Get(DepthStencil::NONE);
 	}
 
 
@@ -193,10 +140,11 @@ Sprite::Sprite(ID3D11Device* pDevice, char* pFilename/*Texture file name*/, bool
 
 Sprite::~Sprite()
 {
-	SAFE_RELEASE(pRasterizerState);
+	pRasterizerState = nullptr;
+	pSamplerState = nullptr;
+	pDepthStencilState = nullptr;
+
 	SAFE_RELEASE(pVertexBuffer);
-	SAFE_RELEASE(pSamplerState);
-	SAFE_RELEASE(pDepthStencilState);
 	SAFE_RELEASE(pVSProjectionCBuffer);
 
 	RM::ReleasePixelShader(pPixelShader);

@@ -100,7 +100,7 @@ void PlayerA::Run()
 			timeStep = 0;
 		}
 		if (timeStep < 1) {
-			timeStep = timeStep > totalTime ? 1 : (elapsedTime += Framework::frameTime) / totalTime;
+			timeStep = timeStep > totalTime ? 1 : (elapsedTime += Framework::deltaTime) / totalTime;
 			transform.rotationDegree = Vector3::Lerp(startRotation, targetRotation, timeStep);
 		}
 		oldKeyCode = keyCode;

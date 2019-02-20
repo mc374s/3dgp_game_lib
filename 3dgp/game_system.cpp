@@ -285,7 +285,7 @@ void XM_CALLCONV MeshData::Draw(FXMVECTOR position, FXMVECTOR scaling, FXMVECTOR
 		world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), scaleMul, g_XMZero, rotation, translation);
 		//XMStoreFloat4x4(&world, worldXMatrix);
 		pMeshManager->MeshAt(fileNO)->data->Draw(System::pImmediateContext, world, GLC::mainCamera.view, GLC::mainCamera.projection,
-			false, frame/*, Framework::frameTime*/);
+			false, frame/*, Framework::deltaTime*/);
 	}
 }
 

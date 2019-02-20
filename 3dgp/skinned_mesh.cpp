@@ -1,17 +1,20 @@
 ﻿#include "skinned_mesh.h"
 
 #include "resources_manager.h"
+#include "state_subset.h"
+
+#include "VertexTypes.h"
 
 //#include <crtdbg.h>
 #include <functional>
 
 #pragma comment(lib,"libfbxsdk-md")
 #include <fbxsdk.h>
-#include "directxtk.h"
 
 using namespace fbxsdk;
 
 using namespace DirectX;
+using namespace GLC;
 
 
 #define SAFE_WRITE(pBuffer,size,pFile) {if(fwrite(pBuffer,size,1,pFile)<1){_RPT0(_CRT_ERROR, "File write error!\n"); return -1;}}
@@ -205,8 +208,6 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const 
 		// Import the contents of the file into the scene
 		isImportSuccessed = pFbxImporter->Import(scene);
 		_ASSERT_EXPR(isImportSuccessed, pFbxImporter->GetStatus().GetErrorString());
-
-
 
 		// Convert mesh, NURBS and patch into triangle mesh
 		FbxGeometryConverter geometryConverter(pFbxManager);
@@ -489,60 +490,22 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const 
 
 	RM::LoadPixelShader(pDevice, "./Data/Shaders/texture_on_ps.cso", &pPixelShader);
 
-	// SAMPLER_DESC Initialize
-	D3D11_SAMPLER_DESC samplerDesc;
-	ZeroMemory(&samplerDesc, sizeof(samplerDesc));
-	//samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	//samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-	//samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
-	//samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
-	//samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
-	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.MipLODBias = 0.0f;
-	samplerDesc.MaxAnisotropy = 16;
-	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-	/*samplerDesc.BorderColor[0] = 1.0f;
-	samplerDesc.BorderColor[1] = 1.0f;
-	samplerDesc.BorderColor[2] = 1.0f;
-	samplerDesc.BorderColor[3] = 1.0f;*/
-	samplerDesc.MinLOD = 0;
-	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	VertexPositionNormalTangentColorTextureSkinning vertex;
+	vertex.weights;
+	sizeof(VertexPositionNormalTangentColorTextureSkinning);
+	sizeof(Vertex3D);
+	VertexPositionNormalColorTexture pnct;
+	//VertexPos
 
-	hr = pDevice->CreateSamplerState(&samplerDesc, &pSamplerState);
-	if (FAILED(hr))
-	{
-		MessageBox(0, L"skinned_mesh: Create SamplerState failed", 0, 0);
-		exit(-1);
-	}
+	// Create sampler state reference
+	pSamplerState = Sampler::State(Sampler::WRAP);
 
-	// Create rasterizer state
-	D3D11_RASTERIZER_DESC rasterizerDesc;
-	ZeroMemory(&rasterizerDesc, sizeof(rasterizerDesc));
-	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
-	rasterizerDesc.CullMode = D3D11_CULL_BACK/*D3D11_CULL_NONE*//*D3D11_CULL_FRONT*/;
-	rasterizerDesc.FrontCounterClockwise = FALSE;
-	rasterizerDesc.DepthClipEnable = TRUE;
-	rasterizerDesc.MultisampleEnable = FALSE;
-	rasterizerDesc.DepthBiasClamp = 0;
-	rasterizerDesc.SlopeScaledDepthBias = 0;
-	hr = pDevice->CreateRasterizerState(&rasterizerDesc, &pFillRasterizerState);
-	rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
-	hr = pDevice->CreateRasterizerState(&rasterizerDesc, &pWireRasterizerState);
-	if (FAILED(hr))
-	{
-		MessageBox(0, L"Create RasterizerState failed", L"SkinnedMesh::SkinnedMesh()", 0);
-		exit(-1);
-	}
+	// Create rasterizer state reference
+	pFillRasterizerState = Rasterizer::State::Get(Rasterizer::CULL_COUNTER_CLOCKWISE);
+	pWireRasterizerState = Rasterizer::State::Get(Rasterizer::WIREFRAME);
 
-	// Create depth stencil state
-	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
-	depthStencilDesc.DepthEnable = TRUE;
-	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	// Create depth stencil state reference
+	pDepthStencilState = DepthStencil::State::Get(DepthStencil::DEFAULT);
 
 
 }
@@ -930,7 +893,6 @@ void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRI
 	XMMATRIX tansformation;
 	
 	SkeletalAnimation* skeletalAnimation;
-	size_t bonesNum;
 
 	for(Mesh& mesh: meshesList)
 	{
@@ -951,7 +913,7 @@ void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRI
 				skeletalAnimation->animationTick = 0;
 			}
 			Skeletal& skeletal = skeletalAnimation->at(frame);
-			bonesNum = skeletal.size();
+			size_t bonesNum = skeletal.size();
 			_ASSERT_EXPR(bonesNum < MAX_BONES, L"The bonesNum exceeds MAX_BONES!");
 			for (size_t i = 0; i < bonesNum; i++) {
 				//updateCbuffer.boneTransforms[i] = skeletal->at(i).transform;
@@ -984,10 +946,9 @@ SkinnedMesh::~SkinnedMesh()
 
 	SAFE_RELEASE(pConstantBuffer);
 
-	SAFE_RELEASE(pWireRasterizerState);
-	SAFE_RELEASE(pFillRasterizerState);
-
-	SAFE_RELEASE(pDepthStencilState);
+	pWireRasterizerState = nullptr;
+	pFillRasterizerState = nullptr;
+	pDepthStencilState = nullptr;
 
 	RM::ReleasePixelShader(pPixelShader);
 	RM::ReleaseVertexShader(pVertexShader, pInputLayout);

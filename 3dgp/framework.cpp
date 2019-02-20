@@ -27,7 +27,7 @@ using namespace DirectX;
 
 
 Scene*	Framework::pScene = nullptr;
-double	Framework::frameTime = 0.0f;
+double	Framework::deltaTime = 0.0f;
 
 Framework::Framework(HWND hWnd)
 {
@@ -63,6 +63,8 @@ bool Framework::Initialize(HWND hWnd)
 	// State subsets initialization
 	Blend::Initialize(System::pd3dDevice);
 	Sampler::Initialize(System::pd3dDevice);
+	DepthStencil::Initialize(System::pd3dDevice);
+	Rasterizer::State::Initialize(System::pd3dDevice);
 	
 	// Ascii sprite font initialization
 	SpriteString::Initialize(System::pd3dDevice);
@@ -93,6 +95,8 @@ bool Framework::Initialize(HWND hWnd)
 
 void Framework::Release()
 {
+	Rasterizer::State::Release();
+	DepthStencil::State::Release();
 	Sampler::Release();
 	Blend::Release();
 
@@ -158,12 +162,12 @@ int Framework::Run()
 			//////////////////////////////////////////////////////////////////////
 			// FPS locker
 			QueryPerformanceCounter(&timeEnd);
-			frameTime = static_cast<double>(timeEnd.QuadPart - timeStart.QuadPart) / static_cast<double>(timeFreq.QuadPart);
+			deltaTime = static_cast<double>(timeEnd.QuadPart - timeStart.QuadPart) / static_cast<double>(timeFreq.QuadPart);
 			
 			// 
-			if (frameTime < minFrameTime) {
+			if (deltaTime < minFrameTime) {
 				// ミリ秒に変換
-				sleepTime = static_cast<DWORD>((minFrameTime - frameTime) * 1000);
+				sleepTime = static_cast<DWORD>((minFrameTime - deltaTime) * 1000);
 
 				timeBeginPeriod(1);		// 分解能を上げる
 				Sleep(sleepTime);
@@ -278,7 +282,7 @@ void Framework::CalculateFrameStats()
 	static float lapsedTime = 0.0f;
 
 	++frames;
-	sumTime += frameTime;
+	sumTime += deltaTime;
 
 	// Compute averages over one second period.
 	if ((timer->time_stamp() - lapsedTime) >= 1.0f)
@@ -287,7 +291,7 @@ void Framework::CalculateFrameStats()
 		float mspf = 1000.0f / fps;
 
 		static char buf[256] = "";
-		sprintf_s(buf, "Untitled FPS: %.0f / FrameTime: %.6f(ms)", fps, frameTime * 1000);
+		sprintf_s(buf, "Untitled FPS: %.0f / FrameTime: %.6f(ms)", fps, deltaTime * 1000);
 		SetWindowTextA(System::outputWindow, buf);
 
 		// Reset for next average.

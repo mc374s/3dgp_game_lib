@@ -2,6 +2,10 @@
 
 using namespace GLC;
 
+
+template<typename D3D_TYPE, size_t MAX>
+D3D_TYPE* StateTemplate<D3D_TYPE, MAX>::pState[MAX] = { nullptr };
+
 //--------------------------------------------------------------------------------------
 // BlendState
 //--------------------------------------------------------------------------------------
@@ -211,9 +215,7 @@ void Sampler::Release()
 //--------------------------------------------------------------------------------------
 // DepthStencilState
 //--------------------------------------------------------------------------------------
-ID3D11DepthStencilState* DepthStencil::State::pState[MAX];
-
-void DepthStencil::State::Initialize(ID3D11Device *pDevice)
+void DepthStencil::Initialize(ID3D11Device *pDevice)
 {
 	// create depth stencil state
 	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
@@ -233,10 +235,15 @@ void DepthStencil::State::Initialize(ID3D11Device *pDevice)
 	
 }
 
+//ID3D11DepthStencilState* DepthStencil::State(DepthStencil::MODE mode)
+//{
+//	return State::Get(mode);
+//}
+
 //--------------------------------------------------------------------------------------
 // RasterizerState
 //--------------------------------------------------------------------------------------
-ID3D11RasterizerState* Rasterizer::State::pState[MAX];
+//ID3D11RasterizerState* Rasterizer::State::pState[MAX];
 
 void Rasterizer::State::Initialize(ID3D11Device* pDevice)
 {

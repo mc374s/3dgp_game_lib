@@ -43,7 +43,7 @@ public:
 	Framework(HWND hWnd);
 	~Framework();
 
-	static double frameTime;
+	static double deltaTime;
 
 	bool isFullScreen;
 	bool isFocused = true;

@@ -33,11 +33,11 @@ public:
 		for (int i = 0; i < MAX; i++) {
 			if (pState[i]) {
 				pState[i]->Release();
+				pState[i] = nullptr;
 			}
 		}
 	};
 };
-
 
 //--------------------------------------------------------------------------------------
 // BlendState
@@ -115,7 +115,6 @@ public:
 	static void Release();
 };
 
-// TODO: Complete state_subset
 
 //--------------------------------------------------------------------------------------
 // DepthStencilState
@@ -132,7 +131,7 @@ namespace DepthStencil
 	};
 	struct State : public StateTemplate<ID3D11DepthStencilState, MODE::MAX>
 	{
-		static void Initialize(ID3D11Device *pDevice);
+		friend void Initialize(ID3D11Device *pDevice);
 	private:
 		State() = default;
 		~State() = default;

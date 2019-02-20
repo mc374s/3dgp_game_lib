@@ -234,6 +234,9 @@
     <None Include="3dgp\Shaders\texture_on.hlsli">
       <Filter>3dgp\Sources\Shaders\Shared</Filter>
     </None>
+    <None Include="3dgp\Shaders\common.hlsli">
+      <Filter>3dgp\Sources\Shaders\Shared</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="3dgp\Shaders\texture_off_2d_vs.hlsl">
@@ -255,6 +258,12 @@
       <Filter>3dgp\Sources\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="3dgp\Shaders\texture_on_ps.hlsl">
+      <Filter>3dgp\Sources\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="3dgp\Shaders\common_vs.hlsl">
+      <Filter>3dgp\Sources\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="3dgp\Shaders\common_ps.hlsl">
       <Filter>3dgp\Sources\Shaders</Filter>
     </FxCompile>
   </ItemGroup>
