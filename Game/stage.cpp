@@ -79,7 +79,7 @@ void Stage::Draw()
 
 	const DirectX::XMVECTORF32 xaxis = { 20.f, 0.f, 0.f };
 	const DirectX::XMVECTORF32 yaxis = { 0.f, 0.f, 20.f };
-	DXTK::DrawGrid(DirectX::XMMatrixIdentity(), GLC::mainCamera.view, GLC::mainCamera.projection,
+	DXTK::DrawGrid(DirectX::XMMatrixIdentity(), GLC::mainCamera.GetView(), GLC::mainCamera.GetProjection(),
 		xaxis, yaxis, DirectX::g_XMZero, 20, 20, DirectX::Colors::Gray);
 	for (auto &it : pObjList)
 	{
@@ -90,11 +90,11 @@ void Stage::Draw()
 		switch (it->type)
 		{
 		case Collision::_SPHERE:
-			DXTK::DrawSphere(Matrix::Identity, GLC::mainCamera.view, GLC::mainCamera.projection,
+			DXTK::DrawSphere(Matrix::Identity, GLC::mainCamera.GetView(), GLC::mainCamera.GetProjection(),
 				((Sphere*)it)->center, ((Sphere*)it)->radius, DirectX::Colors::Blue);
 			break;
 		case Collision::_AABB:
-			DXTK::DrawAABB(Matrix::Identity, GLC::mainCamera.view, GLC::mainCamera.projection,
+			DXTK::DrawAABB(Matrix::Identity, GLC::mainCamera.GetView(), GLC::mainCamera.GetProjection(),
 				((AABB*)it)->minPos, ((AABB*)it)->maxPos, DirectX::Colors::Blue);
 			break;
 		default:

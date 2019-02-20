@@ -9,6 +9,10 @@ namespace GLC{
 
 __declspec(align(16)) class Camera
 {
+private:
+	//DirectX::XMMATRIX view;
+	//DirectX::XMMATRIX projection;
+
 public:
 	DirectX::XMVECTOR	eyePosition;
 	DirectX::XMVECTOR	focusPosition;
@@ -21,10 +25,8 @@ public:
 
 	void Clear();
 
-	void Update();
-
-	DirectX::XMMATRIX view;
-	DirectX::XMMATRIX projection;
+	DirectX::XMMATRIX XM_CALLCONV GetProjection();
+	DirectX::XMMATRIX XM_CALLCONV GetView();
 };
 
 extern Camera mainCamera;

@@ -3,6 +3,8 @@
 
 #include "state_subset.h"
 
+#include "VertexTypes.h"
+
 using namespace DirectX;
 using namespace GLC;
 
@@ -93,6 +95,8 @@ Sprite::Sprite(ID3D11Device* pDevice, char* pFilename/*Texture file name*/, bool
 			{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 12,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 28,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		};
+
+
 		RM::LoadVertexShader(pDevice, "./Data/Shaders/texture_on_2d_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &pVertexShader, &pInputLayout);
 	}
 	RM::LoadPixelShader(pDevice, "./Data/Shaders/texture_on_ps.cso", &pPixelShader);

@@ -29,7 +29,7 @@ void XM_CALLCONV SPRITE_DATA::Draw(FXMVECTOR pos, const Transform2D& transform2D
 
 			XMMATRIX world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), g_XMOne, g_XMZero, rotation, position3D);
 
-			pTextureManager->textureAt(texNO)->img->Draw(System::pImmediateContext, world, GLC::mainCamera.view, GLC::mainCamera.projection, XMVectorGetX(pos) + ofsX, XMVectorGetY(pos) + ofsY, transform2D.scaleX*width, transform2D.scaleY*height, left, top, width, height,
+			pTextureManager->textureAt(texNO)->img->Draw(System::pImmediateContext, world, GLC::mainCamera.GetView(), GLC::mainCamera.GetProjection(), XMVectorGetX(pos) + ofsX, XMVectorGetY(pos) + ofsY, transform2D.scaleX*width, transform2D.scaleY*height, left, top, width, height,
 				XMConvertUIntToColor(transform2D.rgba), transform2D.angle, transform2D.centRotate, transform2D.centX, transform2D.centY, transform2D.reflectX, transform2D.scaleMode);
 		}
 		else
@@ -217,7 +217,7 @@ void View::Set(float drawX, float drawY, float drawWidth, float drawHeight, floa
 
 	XMMATRIX world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), scaling, g_XMZero, rotation, position);
 
-	pRenderTarget->Draw(System::pImmediateContext, world, GLC::mainCamera.view, GLC::mainCamera.projection, drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, rotateAngle, XMConvertUIntToColor(blendColor), doReflection);
+	pRenderTarget->Draw(System::pImmediateContext, world, GLC::mainCamera.GetView(), GLC::mainCamera.GetProjection(), drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, rotateAngle, XMConvertUIntToColor(blendColor), doReflection);
 }
 
 void View::Set()
@@ -226,7 +226,7 @@ void View::Set()
 
 	XMMATRIX world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), scaling, g_XMZero, rotate, position);
 
-	pRenderTarget->Draw(System::pImmediateContext, world, GLC::mainCamera.view, GLC::mainCamera.projection, drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, rotateAngle, XMConvertUIntToColor(blendColor), doReflection);
+	pRenderTarget->Draw(System::pImmediateContext, world, GLC::mainCamera.GetView(), GLC::mainCamera.GetProjection(), drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, rotateAngle, XMConvertUIntToColor(blendColor), doReflection);
 }
 
 void View::Clear()
@@ -284,7 +284,7 @@ void XM_CALLCONV MeshData::Draw(FXMVECTOR position, FXMVECTOR scaling, FXMVECTOR
 		//XMMATRIX worldXMatrix;
 		world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), scaleMul, g_XMZero, rotation, translation);
 		//XMStoreFloat4x4(&world, worldXMatrix);
-		pMeshManager->MeshAt(fileNO)->data->Draw(System::pImmediateContext, world, GLC::mainCamera.view, GLC::mainCamera.projection,
+		pMeshManager->MeshAt(fileNO)->data->Draw(System::pImmediateContext, world, GLC::mainCamera.GetView(), GLC::mainCamera.GetProjection(),
 			false, frame/*, Framework::deltaTime*/);
 	}
 }

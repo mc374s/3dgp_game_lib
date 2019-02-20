@@ -266,9 +266,3 @@ void Rasterizer::State::Initialize(ID3D11Device* pDevice)
 	rasterizerDesc.CullMode = D3D11_CULL_NONE;
 	pDevice->CreateRasterizerState(&rasterizerDesc, &State::pState[WIREFRAME]);
 }
-
-
-void test() {
-	DepthStencil::State::Get(DepthStencil::DEFAULT);
-	//Get(DepthStencil::DEFAULT);
-}

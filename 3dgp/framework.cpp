@@ -316,9 +316,8 @@ void Framework::Update()
 void Framework::Draw()
 {
 	// Reset Viewports before render target was reset.
-	mainCamera.viewPort.Width = SCREEN_WIDTH;
-	mainCamera.viewPort.Height = SCREEN_HEIGHT;
-	mainCamera.Update();
+	mainCamera.viewPort.Width = System::windowWidth;
+	mainCamera.viewPort.Height = System::windowHeight;
 	System::pImmediateContext->RSSetViewports(1, &mainCamera.viewPort);
 
 	// Clear backbuffer and set main render target default depth stencil state.

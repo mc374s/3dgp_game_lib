@@ -198,6 +198,7 @@ void RenderTarget::Draw(ID3D11DeviceContext* pDeviceContext)
 	pDeviceContext->ClearRenderTargetView(pRenderTargetView, ClearColor);
 	pDeviceContext->OMSetRenderTargets(1, &pRenderTargetView, NULL);
 
+
 	GLC::mainCamera.viewPort.Width = virtualWidth;
 	GLC::mainCamera.viewPort.Height = virtualHeight;
 	pDeviceContext->RSSetViewports(1, &GLC::mainCamera.viewPort);

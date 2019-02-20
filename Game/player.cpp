@@ -87,7 +87,7 @@ void Player::Draw()
 #ifdef DEBUG
 	
 	if (controllerNO == 0) {
-		DXTK::DrawAABB(Matrix::Identity, GLC::mainCamera.view, GLC::mainCamera.projection,
+		DXTK::DrawAABB(Matrix::Identity, GLC::mainCamera.GetView(), GLC::mainCamera.GetProjection(),
 			collision.minPos, collision.maxPos, collisionColor);
 
 		char buf[256];

@@ -1,7 +1,6 @@
 #include "camera.h"
 
 using namespace DirectX;
-
 using namespace GLC;
 
 Camera GLC::mainCamera;
@@ -27,8 +26,12 @@ void Camera::Clear()
 	upDirection = { 0, 1, 0, 0 };
 }
 
-void Camera::Update()
+XMMATRIX XM_CALLCONV Camera::GetProjection()
 {
-	view = XMMatrixLookAtLH(eyePosition, focusPosition, upDirection);
-	projection = XMMatrixPerspectiveFovLH(FovAngleY, viewPort.Width / viewPort.Height, 0.01f, 100.0f);
+	return XMMatrixPerspectiveFovLH(FovAngleY, viewPort.Width / viewPort.Height, 0.01f, 100.0f);
+}
+
+XMMATRIX XM_CALLCONV Camera::GetView()
+{
+	return XMMatrixLookAtLH(eyePosition, focusPosition, upDirection);
 }
