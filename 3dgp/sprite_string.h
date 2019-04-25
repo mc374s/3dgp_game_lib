@@ -9,6 +9,9 @@
 //#define _XM_NO_INTRINSICS_ 
 #include <DirectXMath.h>
 
+namespace GLC {
+
+class Texture;
 class Sprite;
 
 class SpriteString
@@ -16,16 +19,17 @@ class SpriteString
 private:
 	SpriteString() {};
 	~SpriteString() {};
-	static Sprite *s_pSprString;
+	static Sprite* asciiFontSprite;
+	static Texture* defaultAsciiFont;
 
 public:
-	static Sprite* Initialize(ID3D11Device* pDevice, char *pFilename = nullptr);
-	static void XM_CALLCONV DrawString(ID3D11DeviceContext* pDeviceConetxt, int drawX = 0, int drawY = 0, char *pIn = nullptr, DirectX::FXMVECTOR blendColor = DirectX::g_XMOne, int format = STR_LEFT, int sizeX = 32, int sizeY = 32, float rotateAngle = .0f, Sprite *pSprStringFont = nullptr);
+	static void Initialize(char *pFilename = nullptr);
+	static void XM_CALLCONV DrawString(int drawX = 0, int drawY = 0, char* pIn = nullptr, DirectX::FXMVECTOR blendColor = DirectX::g_XMOne, int format = STR_LEFT, int sizeX = 32, int sizeY = 32, float rotateAngle = .0f, Texture* pAsciiFont = nullptr);
 
 	static void Release();
 };
 
-
+}; // namespace GLC
 
 
 #endif // !_SPRITESTRING_H_

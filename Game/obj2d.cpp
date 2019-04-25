@@ -9,7 +9,6 @@ OBJ2D::OBJ2D()
 
 void OBJ2D::MemberCopy(const OBJ2D& inputObj)
 {
-	pos = inputObj.pos;
 	initPos = inputObj.initPos;
 	setPos = inputObj.setPos;
 	speed = inputObj.speed;
@@ -18,8 +17,8 @@ void OBJ2D::MemberCopy(const OBJ2D& inputObj)
 
 	size = inputObj.size;
 
-	transform2D = inputObj.transform2D;
 	transform = inputObj.transform;
+	rgba = inputObj.rgba;
 
 	timer = inputObj.timer;
 	step = inputObj.step;
@@ -60,12 +59,12 @@ void OBJ2D::Clear()
 {
 	pfMove = nullptr;
 	pSprData = nullptr;
-	pos = initPos = setPos = Vector3(0, 0, 0);
+	transform.position = initPos = setPos = Vector3(0, 0, 0);
 	speed = speedAcc = speedMax = size = Vector3(0, 0, 0);
 	timer = 0;
 	step = 0;
-	transform2D.Clear();
 	transform.Clear();
+	rgba = COLOR_WHITE;
 
 	alpha = 255;
 	isInit = false;
@@ -92,9 +91,9 @@ void OBJ2D::Draw()
 		if (alpha < 0) {
 			alpha = 0;
 		}
-		transform2D.rgba = transform2D.rgba >> 8 << 8 | alpha;
+		rgba = rgba >> 8 << 8 | alpha;
 		//pSprData->draw(pos.x, pos.y, &transform2D);
-		pSprData->Draw(pos, transform2D, transform.position, transform.rotationDegree);
+		pSprData->Draw(transform, rgba);
 	}
 }
 
@@ -163,7 +162,7 @@ void OBJ2DEX::animation()
 		{
 			aframe = 0;
 			animeNO++;
-			if ((pAnimeData[animeNO]).texNO < 0)
+			if (!(pAnimeData[animeNO]).image)
 			{
 				++animeCounter;
 				animeNO = 0;

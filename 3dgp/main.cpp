@@ -45,7 +45,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, LPWSTR cmd_line
 	SetLayeredWindowAttributes(hwnd, 0, 255, LWA_ALPHA);
 
 	//SetLayeredWindowAttributes(hwnd, RGB(255, 255, 255), 180, LWA_COLORKEY);
-	
+
 	// Framework Initialize
 	Framework f(hwnd);
 

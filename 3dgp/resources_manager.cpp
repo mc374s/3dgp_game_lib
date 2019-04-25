@@ -91,7 +91,7 @@ int ResourcesManager::s_vsFileCounter = 0;
 D3D11_RESOURCES<ID3D11VertexShader*> ResourcesManager::s_vertexShaderResources[FILE_NUM_MAX];
 ID3D11InputLayout* ResourcesManager::s_inputLayoutResources[FILE_NUM_MAX];
 
-int RM::LoadVertexShader(ID3D11Device* pDevice, char* pFilename, D3D11_INPUT_ELEMENT_DESC* pInLayoutDesc, int elementsNum, ID3D11VertexShader** ppOutVertexShader, ID3D11InputLayout** ppOutInputLayout)
+int RM::LoadVertexShader(ID3D11Device* pDevice, char* pFilename,const D3D11_INPUT_ELEMENT_DESC* pInLayoutDesc, int elementsNum, ID3D11VertexShader** ppOutVertexShader, ID3D11InputLayout** ppOutInputLayout)
 {
 	int fileNO = 0;
 
@@ -123,6 +123,7 @@ int RM::LoadVertexShader(ID3D11Device* pDevice, char* pFilename, D3D11_INPUT_ELE
 		fclose(fp);
 		// Create the vertex shader
 		HRESULT hr = pDevice->CreateVertexShader(cso_data, cso_sz, NULL, &ResourcesManager::s_vertexShaderResources[fileNO].pData);
+		//pDevice->CreateVertexShader()
 		if (FAILED(hr))
 		{
 			MessageBox(0, L"CreateVertexShader failed", L"ResourceManager::LoadVertexShader()", MB_OK);

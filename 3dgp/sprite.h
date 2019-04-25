@@ -5,80 +5,66 @@
 //#define _XM_NO_INTRINSICS_ 
 #include <DirectXMath.h>
 
-enum SCALE_MODE
-{
-	LEFTTOP,
-	TOPCENTER,
-	RIGHTTOP,
-	RIGHTCENTER,
-	RIGHTBOTTOM,
-	BOTTOMCENTER,
-	LEFTBOTTOM,
-	LEFTCENTER,
-	CENTER,
-};
+namespace GLC {
 
+// Forward declaration
+class Texture;
 
+// 
 class Sprite
 {
 private:
-	struct vertex
-	{
-		DirectX::XMFLOAT3 position;
-		DirectX::XMFLOAT4 color;
-		DirectX::XMFLOAT2 texcoord;
-		DirectX::XMFLOAT4 normal;
-	};
-
+	// Constant buffer per object
 	struct PROJECTION_CBUFFER
 	{
-		// TODO : Change to XMFLOAT4X4
-		DirectX::XMFLOAT4X4 world;				//ワールド変換行列
-		DirectX::XMFLOAT4X4 view;					//ビュー変換行列
-		DirectX::XMFLOAT4X4 projection;			//プロジェクション変換行列
-		DirectX::XMFLOAT4X4 worldViewProjection;	//ワールド・ビュー・プロジェクション合成行列
-		DirectX::XMFLOAT4	materialColor;		//材質色
-		DirectX::XMFLOAT4	lightDirection;		//ライト進行行列
+		DirectX::XMFLOAT4X4 world;
+		DirectX::XMFLOAT4X4 worldViewProjection;
+		DirectX::XMFLOAT4	materialColor;
+		DirectX::XMFLOAT4	lightDirection;
 	}updateCbuffer;
 
 private:
 
-	HRESULT hr;
-	UINT vertexCount;
+	// Private implementation: D3D COM object holder.
+	class Impl;
+	Impl* pImpl;
 
-	ID3D11RasterizerState*		pRasterizerState;
-	ID3D11Buffer*				pVertexBuffer;
-	D3D11_TEXTURE2D_DESC		renderTargetTextureDesc;
-	ID3D11SamplerState*			pSamplerState;
-	ID3D11DepthStencilState*	pDepthStencilState;
-
-	ID3D11Buffer*				pVSProjectionCBuffer;
-
-	ID3D11ShaderResourceView*	pShaderResourceView;
-	ID3D11VertexShader*			pVertexShader;
-	ID3D11InputLayout*			pInputLayout;
-	ID3D11PixelShader*			pPixelShader;
-
-	bool doProjection;
-
-	bool Initialize(ID3D11Device* pDevice);
-
-	DirectX::XMFLOAT3 RotationZ(DirectX::XMFLOAT3 coord, float angle, DirectX::XMFLOAT3 center);
+	// Forbidden Sprite's copy constructor
+	Sprite(const Sprite&) = delete;
 
 public:
 
-	Sprite(ID3D11Device* pDevice);
-	Sprite(ID3D11Device* pDevice, char* pFilename/*Texture file name*/, bool doProjection = false);
+	// 
+	Sprite(ID3D11DeviceContext* pDeviceContext);
+	Sprite(ID3D11DeviceContext* pDeviceContext, char* pFilename, bool doProjection = false);
 	~Sprite();
 
-	void Draw(ID3D11DeviceContext* pDeviceContext, vertex pCoordNDC[]);
-	void XM_CALLCONV Draw(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float rotateAngle = 0.0, DirectX::FXMVECTOR blendColor = DirectX::g_XMOne);
-	void XM_CALLCONV Draw(ID3D11DeviceContext* pDeviceContext, float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, DirectX::FXMVECTOR blendColor = DirectX::g_XMOne, float rotateAngle = .0f, bool doCenterRotation = true, float rotatePosX = .0f, float rotatePosY = .0f, bool doReflection = false, int scaleMode = LEFTTOP);
+	// Draw sprite with @texture clip by @sourceRectangle in 2D coordinate.
+	// @sourceRectangle: 4 elements include top, left, width, height
+	// @position, @scale, @rotation, @origin: affine transformation
+	// @blendColor: vertex color
+	void XM_CALLCONV Draw(Texture* texture,
+		DirectX::FXMVECTOR sourceRectangle,
+		DirectX::FXMVECTOR position = DirectX::g_XMZero,
+		DirectX::FXMVECTOR scale = DirectX::g_XMOne,
+		DirectX::CXMVECTOR rotation = DirectX::g_XMZero,
+		DirectX::CXMVECTOR origin = DirectX::g_XMZero,
+		DirectX::CXMVECTOR blendColor = DirectX::g_XMOne);
+	
+	// Draw sprite in 3D coordinate.
+	void XM_CALLCONV Draw(Texture* texture,
+		DirectX::FXMVECTOR sourceRectangle,
+		DirectX::FXMMATRIX view,
+		DirectX::CXMMATRIX projection,
+		DirectX::FXMVECTOR position = DirectX::g_XMZero,
+		DirectX::FXMVECTOR scale = DirectX::g_XMOne,
+		DirectX::CXMVECTOR rotation = DirectX::g_XMZero,
+		DirectX::CXMVECTOR origin = DirectX::g_XMZero,
+		DirectX::CXMVECTOR blendColor = DirectX::g_XMOne);
 
-	void XM_CALLCONV Draw(ID3D11DeviceContext *pDeviceContext, DirectX::FXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection, 
-		float drawX, float drawY, float drawWidth, float drawHeight, float srcX = .0f, float srcY = .0f, float srcWidth = .0f, float srcHeight = .0f, DirectX::FXMVECTOR blendColor = DirectX::g_XMOne,
-		float rotateAngle = .0f, bool doCenterRotation = true, float rotatePosX = .0f, float rotatePosY = .0f, bool doReflection = false, int scaleMode = LEFTTOP);
-};
+}; // class Sprite
+
+}; // namespace GLC
 
 
 #endif // ! _SPRITE_H_

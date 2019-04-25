@@ -1,270 +1,269 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Sources">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Headers">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
     <Filter Include="3dgp">
       <UniqueIdentifier>{6012e4b5-f790-43f1-af40-3abd6c465767}</UniqueIdentifier>
     </Filter>
-    <Filter Include="3dgp\Headers">
-      <UniqueIdentifier>{e773402f-6c47-4a1a-a2f7-b69caa45c58f}</UniqueIdentifier>
+    <Filter Include="3dgp\include">
+      <UniqueIdentifier>{3208b5d2-dbcb-439e-935b-6580f296a0a5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="3dgp\Sources">
+    <Filter Include="3dgp\lib">
       <UniqueIdentifier>{f6d4f758-a222-4b0a-8e8c-ebf1d308018f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="3dgp\Sources\Shaders">
+    <Filter Include="3dgp\lib\core">
+      <UniqueIdentifier>{bb3d7541-754f-4e1a-98f4-f2f2bf52f267}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3dgp\lib\obj">
+      <UniqueIdentifier>{d2b33547-e20c-4650-9f56-56e903d842d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3dgp\lib\core\inc">
+      <UniqueIdentifier>{a2eff8a7-a9e6-49ba-a05e-d0cd8bc51a27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="test">
+      <UniqueIdentifier>{ac8f1b29-6498-4d54-bfed-7e8a323ddadd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="test\Headers">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="test\Sources">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="3dgp\shaders">
       <UniqueIdentifier>{c488e051-da4c-43d8-843b-bb890bc3d457}</UniqueIdentifier>
     </Filter>
-    <Filter Include="3dgp\Sources\Shaders\Shared">
+    <Filter Include="3dgp\shaders\shared">
       <UniqueIdentifier>{a15d2bc7-79ba-45bf-be98-b27f91a2ae3d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="3dgp\framework.h">
-      <Filter>3dgp\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="3dgp\high_resolution_timer.h">
-      <Filter>3dgp\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="3dgp\mf_audio.h">
-      <Filter>3dgp\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="3dgp\misc.h">
-      <Filter>3dgp\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="3dgp\primitive3d.h">
-      <Filter>3dgp\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="3dgp\render_target.h">
-      <Filter>3dgp\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="3dgp\resources_manager.h">
-      <Filter>3dgp\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="3dgp\scene.h">
-      <Filter>3dgp\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="3dgp\skinned_mesh.h">
-      <Filter>3dgp\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="3dgp\sprite.h">
-      <Filter>3dgp\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="3dgp\sprite_string.h">
-      <Filter>3dgp\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="3dgp\template.h">
-      <Filter>3dgp\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="3dgp\game_system.h">
-      <Filter>3dgp</Filter>
-    </ClInclude>
     <ClInclude Include="Game\game.h">
-      <Filter>Headers</Filter>
+      <Filter>test\Headers</Filter>
     </ClInclude>
     <ClInclude Include="Game\mesh_data.h">
-      <Filter>Headers</Filter>
+      <Filter>test\Headers</Filter>
     </ClInclude>
     <ClInclude Include="Game\numbers.h">
-      <Filter>Headers</Filter>
+      <Filter>test\Headers</Filter>
     </ClInclude>
     <ClInclude Include="Game\obj2d.h">
-      <Filter>Headers</Filter>
+      <Filter>test\Headers</Filter>
     </ClInclude>
     <ClInclude Include="Game\obj3d.h">
-      <Filter>Headers</Filter>
+      <Filter>test\Headers</Filter>
     </ClInclude>
     <ClInclude Include="Game\player.h">
-      <Filter>Headers</Filter>
+      <Filter>test\Headers</Filter>
     </ClInclude>
     <ClInclude Include="Game\scene_main.h">
-      <Filter>Headers</Filter>
+      <Filter>test\Headers</Filter>
     </ClInclude>
     <ClInclude Include="Game\scene_title.h">
-      <Filter>Headers</Filter>
+      <Filter>test\Headers</Filter>
     </ClInclude>
     <ClInclude Include="Game\sound_data.h">
-      <Filter>Headers</Filter>
+      <Filter>test\Headers</Filter>
     </ClInclude>
     <ClInclude Include="Game\sprite_data.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="3dgp\camera.h">
-      <Filter>3dgp\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="3dgp\3dgp_math.h">
-      <Filter>3dgp\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="3dgp\input.h">
-      <Filter>3dgp\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="3dgp\directxtk.h">
-      <Filter>3dgp\Headers</Filter>
+      <Filter>test\Headers</Filter>
     </ClInclude>
     <ClInclude Include="Game\stage.h">
-      <Filter>Headers</Filter>
+      <Filter>test\Headers</Filter>
     </ClInclude>
     <ClInclude Include="Game\collision_detection.h">
-      <Filter>Headers</Filter>
+      <Filter>test\Headers</Filter>
     </ClInclude>
     <ClInclude Include="Game\skill_construction.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="3dgp\system.h">
-      <Filter>3dgp\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="3dgp\state_subset.h">
-      <Filter>3dgp\Headers</Filter>
+      <Filter>test\Headers</Filter>
     </ClInclude>
     <ClInclude Include="3dgp\texture.h">
-      <Filter>3dgp\Headers</Filter>
+      <Filter>3dgp\include</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\camera.h">
+      <Filter>3dgp\include</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\mf_audio.h">
+      <Filter>3dgp\include</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\scene.h">
+      <Filter>3dgp\include</Filter>
     </ClInclude>
     <ClInclude Include="3dgp\shader.h">
-      <Filter>3dgp\Headers</Filter>
+      <Filter>3dgp\include</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\sprite.h">
+      <Filter>3dgp\include</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\input.h">
+      <Filter>3dgp\include</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\3dgp_math.h">
+      <Filter>3dgp\include</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\skinned_mesh.h">
+      <Filter>3dgp\include</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\game_system.h">
+      <Filter>3dgp\include</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\framework.h">
+      <Filter>3dgp\lib\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\high_resolution_timer.h">
+      <Filter>3dgp\lib\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\misc.h">
+      <Filter>3dgp\lib\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\system.h">
+      <Filter>3dgp\lib\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\resources_manager.h">
+      <Filter>3dgp\lib\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\primitive3d.h">
+      <Filter>3dgp\include</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\directxtk.h">
+      <Filter>3dgp\lib\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\sprite_string.h">
+      <Filter>3dgp\lib\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\render_target.h">
+      <Filter>3dgp\include</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\template.h">
+      <Filter>3dgp\lib\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="3dgp\state_subset.h">
+      <Filter>3dgp\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Game\mesh_data.cpp">
+      <Filter>test\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\numbers.cpp">
+      <Filter>test\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\obj2d.cpp">
+      <Filter>test\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\obj3d.cpp">
+      <Filter>test\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\player.cpp">
+      <Filter>test\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\scene_main.cpp">
+      <Filter>test\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\scene_title.cpp">
+      <Filter>test\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\sound_data.cpp">
+      <Filter>test\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\sprite_data.cpp">
+      <Filter>test\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\stage.cpp">
+      <Filter>test\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\collision_detection.cpp">
+      <Filter>test\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\skill_construction.cpp">
+      <Filter>test\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\player_a.cpp">
+      <Filter>test\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\player_b.cpp">
+      <Filter>test\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="3dgp\camera.cpp">
+      <Filter>3dgp\lib\obj</Filter>
+    </ClCompile>
     <ClCompile Include="3dgp\framework.cpp">
-      <Filter>3dgp\Sources</Filter>
+      <Filter>3dgp\lib\core</Filter>
+    </ClCompile>
+    <ClCompile Include="3dgp\input.cpp">
+      <Filter>3dgp\lib\core</Filter>
     </ClCompile>
     <ClCompile Include="3dgp\mf_audio.cpp">
-      <Filter>3dgp\Sources</Filter>
+      <Filter>3dgp\lib\core</Filter>
     </ClCompile>
     <ClCompile Include="3dgp\primitive3d.cpp">
-      <Filter>3dgp\Sources</Filter>
+      <Filter>3dgp\lib\obj</Filter>
     </ClCompile>
     <ClCompile Include="3dgp\render_target.cpp">
-      <Filter>3dgp\Sources</Filter>
+      <Filter>3dgp\lib\obj</Filter>
     </ClCompile>
     <ClCompile Include="3dgp\resources_manager.cpp">
-      <Filter>3dgp\Sources</Filter>
+      <Filter>3dgp\lib\core</Filter>
     </ClCompile>
-    <ClCompile Include="3dgp\skinned_mesh.cpp">
-      <Filter>3dgp\Sources</Filter>
+    <ClCompile Include="3dgp\shader.cpp">
+      <Filter>3dgp\lib\obj</Filter>
     </ClCompile>
     <ClCompile Include="3dgp\sprite.cpp">
-      <Filter>3dgp\Sources</Filter>
+      <Filter>3dgp\lib\obj</Filter>
     </ClCompile>
-    <ClCompile Include="3dgp\sprite_string.cpp">
-      <Filter>3dgp\Sources</Filter>
+    <ClCompile Include="3dgp\skinned_mesh.cpp">
+      <Filter>3dgp\lib\obj</Filter>
+    </ClCompile>
+    <ClCompile Include="3dgp\state_subset.cpp">
+      <Filter>3dgp\lib\core</Filter>
+    </ClCompile>
+    <ClCompile Include="3dgp\system.cpp">
+      <Filter>3dgp\lib\core</Filter>
+    </ClCompile>
+    <ClCompile Include="3dgp\texture.cpp">
+      <Filter>3dgp\lib\obj</Filter>
+    </ClCompile>
+    <ClCompile Include="3dgp\3dgp_math.cpp">
+      <Filter>3dgp\lib\core</Filter>
     </ClCompile>
     <ClCompile Include="3dgp\game_system.cpp">
-      <Filter>3dgp</Filter>
+      <Filter>3dgp\lib\core</Filter>
+    </ClCompile>
+    <ClCompile Include="3dgp\directxtk.cpp">
+      <Filter>3dgp\lib\core</Filter>
+    </ClCompile>
+    <ClCompile Include="3dgp\sprite_string.cpp">
+      <Filter>3dgp\lib\core</Filter>
     </ClCompile>
     <ClCompile Include="3dgp\main.cpp">
       <Filter>3dgp</Filter>
     </ClCompile>
-    <ClCompile Include="Game\mesh_data.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\numbers.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\obj2d.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\obj3d.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\player.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\scene_main.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\scene_title.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\sound_data.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\sprite_data.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="3dgp\camera.cpp">
-      <Filter>3dgp\Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="3dgp\input.cpp">
-      <Filter>3dgp\Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="3dgp\directxtk.cpp">
-      <Filter>3dgp\Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="3dgp\3dgp_math.cpp">
-      <Filter>3dgp\Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\stage.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\collision_detection.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\skill_construction.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\player_a.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\player_b.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="3dgp\system.cpp">
-      <Filter>3dgp\Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="3dgp\state_subset.cpp">
-      <Filter>3dgp\Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="3dgp\texture.cpp">
-      <Filter>3dgp\Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="3dgp\shader.cpp">
-      <Filter>3dgp\Sources</Filter>
+    <ClCompile Include="Game\game.cpp">
+      <Filter>test\Sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="3dgp\Shaders\texture_off.hlsli">
-      <Filter>3dgp\Sources\Shaders\Shared</Filter>
-    </None>
     <None Include="3dgp\Shaders\texture_on.hlsli">
-      <Filter>3dgp\Sources\Shaders\Shared</Filter>
+      <Filter>3dgp\shaders\shared</Filter>
     </None>
     <None Include="3dgp\Shaders\common.hlsli">
-      <Filter>3dgp\Sources\Shaders\Shared</Filter>
+      <Filter>3dgp\shaders\shared</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="3dgp\Shaders\texture_off_2d_vs.hlsl">
-      <Filter>3dgp\Sources\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="3dgp\Shaders\texture_off_3d_vs.hlsl">
-      <Filter>3dgp\Sources\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="3dgp\Shaders\texture_off_ps.hlsl">
-      <Filter>3dgp\Sources\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="3dgp\Shaders\texture_on_2d_vs.hlsl">
-      <Filter>3dgp\Sources\Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="3dgp\Shaders\texture_on_3d_bone_vs.hlsl">
-      <Filter>3dgp\Sources\Shaders</Filter>
+      <Filter>3dgp\shaders</Filter>
     </FxCompile>
-    <FxCompile Include="3dgp\Shaders\texture_on_3d_vs.hlsl">
-      <Filter>3dgp\Sources\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="3dgp\Shaders\texture_on_ps.hlsl">
-      <Filter>3dgp\Sources\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="3dgp\Shaders\common_vs.hlsl">
-      <Filter>3dgp\Sources\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="3dgp\Shaders\common_ps.hlsl">
-      <Filter>3dgp\Sources\Shaders</Filter>
-    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="3dgp\Shaders\common_ps.hlsl">
+      <Filter>3dgp\shaders</Filter>
+    </Text>
+    <Text Include="3dgp\Shaders\common_vs.hlsl">
+      <Filter>3dgp\shaders</Filter>
+    </Text>
+    <Text Include="3dgp\Shaders\compile_shaders.cmd">
+      <Filter>3dgp\shaders</Filter>
+    </Text>
   </ItemGroup>
 </Project>

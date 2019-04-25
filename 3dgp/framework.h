@@ -14,18 +14,16 @@
 
 #define FPS (60)
 
+
 class HighResolutionTimer;
-
 class Scene;
-class Primitive3D;
-
 
 class Framework
 {
 private:
 	static Scene* pScene;
 
-	const double MIN_FRAME_TIME_DAFAULT = 1.0 / (double)FPS;
+	const double MIN_FRAME_TIME_DAFAULT = 1.0 / FPS;
 	double minFrameTime = MIN_FRAME_TIME_DAFAULT;
 	LARGE_INTEGER timeStart;
 	LARGE_INTEGER timeEnd;

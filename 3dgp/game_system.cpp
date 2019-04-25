@@ -13,55 +13,21 @@
 using namespace DirectX;
 using namespace GLC;
 
-void SPRITE_DATA::Draw(float x, float y,const Transform2D& transform2D) {
-	if (texNO >= 0 && texNO < TEX_MAX && pTextureManager->textureAt(texNO) && pTextureManager->textureAt(texNO)->img)
-	{
-		pTextureManager->textureAt(texNO)->img->Draw(System::pImmediateContext, x + ofsX, y + ofsY, transform2D.scaleX*width, transform2D.scaleY*height, left, top, width, height,
-			XMConvertUIntToColor(transform2D.rgba), transform2D.angle, transform2D.centRotate, transform2D.centX, transform2D.centY, transform2D.reflectX, transform2D.scaleMode);
-	}
-}
-
-void XM_CALLCONV SPRITE_DATA::Draw(FXMVECTOR pos, const Transform2D& transform2D, FXMVECTOR position3D,FXMVECTOR rotationDegree) {
-	if (texNO >= 0 && texNO < TEX_MAX && pTextureManager->textureAt(texNO) && pTextureManager->textureAt(texNO)->img) {
-		if (pTextureManager->textureAt(texNO)->doProjection)
-		{
-			XMVECTOR rotation = XMQuaternionRotationRollPitchYawFromVector(rotationDegree*0.01745f);
-
-			XMMATRIX world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), g_XMOne, g_XMZero, rotation, position3D);
-
-			pTextureManager->textureAt(texNO)->img->Draw(System::pImmediateContext, world, GLC::mainCamera.GetView(), GLC::mainCamera.GetProjection(), XMVectorGetX(pos) + ofsX, XMVectorGetY(pos) + ofsY, transform2D.scaleX*width, transform2D.scaleY*height, left, top, width, height,
-				XMConvertUIntToColor(transform2D.rgba), transform2D.angle, transform2D.centRotate, transform2D.centX, transform2D.centY, transform2D.reflectX, transform2D.scaleMode);
-		}
-		else
-		{
-			Draw(XMVectorGetX(pos), XMVectorGetY(pos), transform2D);
-		}
-	}
-}
-
-void TextureManager::LoadTextures(LOAD_TEXTURE data[])
+template<typename Resource, size_t AMOUNT>
+void ResourceManager<Resource, AMOUNT>::Load(Resource resources[])
 {
-	for (int i = data[0].texNO; data[i].texNO != -1 || data[i].fileName != NULL; i++)
-	{
-		data[i].img = new Sprite(System::pd3dDevice, data[i].fileName, data[i].doProjection);
-		pTextures[i] = &data[i];
+	for (int i = 0, max = ARRAYSIZE(resources); i < max && i < AMOUNT; ++i) {
+		resources[i].Load();
+		pResource[i] = &resources;
 	}
 }
 
-void TextureManager::LoadTexture(LOAD_TEXTURE data[], int textureNO)
+template<typename Resource, size_t AMOUNT>
+const Resource* ResourceManager<Resource,AMOUNT>::At(int resourceNO)
 {
-	if (data[textureNO].texNO != -1 || data[textureNO].fileName != NULL)
+	if (resourceNO >= 0 && resourceNO < AMOUNT)
 	{
-		data[textureNO].img = new Sprite(System::pd3dDevice, data[textureNO].fileName, data[textureNO].doProjection);
-		pTextures[textureNO] = &data[textureNO];
-	}
-}
-
-const LOAD_TEXTURE* TextureManager::textureAt(int fileNO)
-{
-	if (fileNO >= 0 && fileNO < TEX_MAX)
-	{
-		return pTextures[fileNO];
+		return pResource[resourceNO];
 	}
 	else
 	{
@@ -69,18 +35,19 @@ const LOAD_TEXTURE* TextureManager::textureAt(int fileNO)
 	}
 }
 
-void TextureManager::ReleaseTexture()
+template<typename Resource, size_t AMOUNT>
+void ResourceManager<Resource, AMOUNT>::Release()
 {
 	int i;
-	for (i = 0; i < TEX_MAX; i++)
+	for (i = 0; i < AMOUNT; i++)
 	{
-		if (pTextures[i])
+		if (pResource[i])
 		{
-			delete pTextures[i]->img;
-			ZeroMemory(pTextures[i], sizeof(*pTextures[i]));
+			delete pResource[i];
+			ZeroMemory(pResource[i], sizeof(*pResource[i]));
 		}
 	}
-	ZeroMemory(pTextures, sizeof(LOAD_TEXTURE)*i);
+	ZeroMemory(pResource, sizeof(Resource)*i);
 }
 
 
@@ -88,11 +55,13 @@ int BasicInput(int controllerNO)
 {
 	int keyCode = 0x0;
 
+	// @controllerNO check
 	if (controllerNO >= Input::MAX_PLAYER_COUNT || controllerNO < 0) {
 		_RPT0(_CRT_ERROR, "Illegal controllerNO");
 		return 0x0;
 	}
-	
+
+	// Assign keyboard to Controller 0(player 1)
 	if (controllerNO == 0) {
 		if (Input::KEY.Up) {
 			keyCode |= PAD_UP;
@@ -109,7 +78,7 @@ int BasicInput(int controllerNO)
 		if (Input::KEY_TRACKER.pressed.Enter) {
 			keyCode |= PAD_START;
 		}
-		if (Input::KEY_TRACKER.pressed.Escape) {
+		if (Input::KEY_TRACKER.pressed.Back) {
 			keyCode |= PAD_BACK;
 		}
 		if (Input::KEY_TRACKER.pressed.Z) {
@@ -125,7 +94,7 @@ int BasicInput(int controllerNO)
 			keyCode |= PAD_TRG4;
 		}
 	}
-	//
+	// Assign controller NO to target @controllerNO
 	if (Input::PAD[controllerNO].IsConnected()) {
 		if (Input::PAD[controllerNO].IsLeftThumbStickUp()) {
 			keyCode |= PAD_UP;
@@ -165,15 +134,7 @@ int BasicInput(int controllerNO)
 
 void DrawString(int x, int y, char *buf, UINTCOLOR color, int format, int sizeX, int sizeY, float angle)
 {
-	SpriteString::DrawString(System::pImmediateContext, x, y, buf, XMConvertUIntToColor(color), format, sizeX, sizeY, angle);
-}
-
-void DrawRectangle(int x, int y, int w, int h, float angle, UINTCOLOR color)
-{
-	static Sprite rect(System::pd3dDevice);
-	//MyBlending::setMode(framework::pDeviceContext, BLEND_REPLACE);
-	rect.Draw(System::pImmediateContext, x, y, w, h, angle, XMConvertUIntToColor(color));
-	//MyBlending::setMode(framework::pDeviceContext, BLEND_ALPHA);
+	SpriteString::DrawString(x, y, buf, XMConvertUIntToColor(color), format, sizeX, sizeY, angle);
 }
 
 
@@ -182,8 +143,8 @@ void DrawRectangle(int x, int y, int w, int h, float angle, UINTCOLOR color)
 View::View(int viewWidth, int viewHeight) :
 	doReflection(false),
 	position(g_XMZero),
-	scaling(g_XMOne),
-	rotationDegree(g_XMZero)
+	scale(g_XMOne),
+	rotation(g_XMZero)
 {
 	pRenderTarget = new RenderTarget(System::pd3dDevice, viewWidth, viewHeight);
 }
@@ -195,8 +156,8 @@ View::View(float drawX, float drawY, float drawWidth, float drawHeight, float sr
 	blendColor(blendColor),
 	doReflection(doReflection),
 	position(g_XMZero),
-	scaling(g_XMOne),
-	rotationDegree(g_XMZero)
+	scale(g_XMOne),
+	rotation(g_XMZero)
 {
 	pRenderTarget = new RenderTarget(System::pd3dDevice, drawWidth, drawHeight);
 }
@@ -212,19 +173,20 @@ View::~View()
 
 void View::Set(float drawX, float drawY, float drawWidth, float drawHeight, float srcX, float srcY, float srcWidth, float srcHeight, float rotateAngle, UINTCOLOR blendColor, bool doReflection)
 {
-	
-	XMVECTOR rotation = XMQuaternionRotationRollPitchYawFromVector(rotationDegree*0.01745f);
+	rotation = { 0,0,rotateAngle };
+	rotation = XMQuaternionRotationRollPitchYawFromVector(rotation*0.01745f);
 
-	XMMATRIX world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), scaling, g_XMZero, rotation, position);
+
+	XMMATRIX world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), scale, g_XMZero, rotation, position);
 
 	pRenderTarget->Draw(System::pImmediateContext, world, GLC::mainCamera.GetView(), GLC::mainCamera.GetProjection(), drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, rotateAngle, XMConvertUIntToColor(blendColor), doReflection);
 }
 
 void View::Set()
 {
-	XMVECTOR rotate = XMQuaternionRotationRollPitchYawFromVector(rotationDegree*0.01745f);
+	XMVECTOR rotate = XMQuaternionRotationRollPitchYawFromVector(rotation*0.01745f);
 
-	XMMATRIX world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), scaling, g_XMZero, rotate, position);
+	XMMATRIX world = XMMatrixTransformation(g_XMZero, XMQuaternionIdentity(), scale, g_XMZero, rotate, position);
 
 	pRenderTarget->Draw(System::pImmediateContext, world, GLC::mainCamera.GetView(), GLC::mainCamera.GetProjection(), drawX, drawY, drawWidth, drawHeight, srcX, srcY, srcWidth, srcHeight, rotateAngle, XMConvertUIntToColor(blendColor), doReflection);
 }
@@ -271,13 +233,13 @@ void MeshData::SetMotion(int fbxFileNO)
 	}
 }
 
-void XM_CALLCONV MeshData::Draw(FXMVECTOR position, FXMVECTOR scaling, FXMVECTOR rotationDegree, int* frame)
+void XM_CALLCONV MeshData::Draw(FXMVECTOR position, FXMVECTOR scale, FXMVECTOR rotation, int* frame)
 {
 	if (fileNO >= 0 && fileNO < MAX_MESH_FILE_NUM && pMeshManager->MeshAt(fileNO) && pMeshManager->MeshAt(fileNO)->data) {
 
 		XMVECTOR translation	= position + positionAdjustion;
-		XMVECTOR scaleMul		= scaling * scalingAdjustion;
-		XMVECTOR rotateAdd		= (rotationDegree + rotationAdjustion)*0.01745f;
+		XMVECTOR scaleMul		= scale * scaleAdjustion;
+		XMVECTOR rotateAdd		= (rotation + rotationAdjustion)*0.01745f;
 
 		XMVECTOR rotation		= XMQuaternionRotationRollPitchYawFromVector(rotateAdd);
 

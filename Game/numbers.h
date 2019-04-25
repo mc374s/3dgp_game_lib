@@ -1,12 +1,14 @@
 ﻿#ifndef _NUMBERS_H_
 #define _NUMBERS_H_
 
+#include "game.h"
+
 #define DIGIT_MAX (6)
 
 class Numbers
 {
 private:
-	SPRITE_DATA sprData;
+	Game::SpriteData* sprData;
 
 public:
 	virtual void MemberCopy(const Numbers& inputObj);
@@ -22,14 +24,14 @@ public:
 		float	w, h;
 	}digit[DIGIT_MAX];
 
-	Numbers(SPRITE_DATA* fontData = nullptr);
+	Numbers(Game::SpriteData* fontData = nullptr);
 
-	Vector3 pos;
 	Vector3 speed;
 	Vector3 speedAcc;
 	Vector3 speedMax;
 
-	Transform2D transform2D;
+	Game::Transform transform;
+	GLC::UINTCOLOR rgba;
 
 	int timer;
 	int step;

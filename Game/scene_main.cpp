@@ -22,8 +22,8 @@ SceneMain::SceneMain()
 {
 	//init();
 	pBG = new OBJ2D;
-	pBG->pSprData = &e_sprMainBG;
-	pBG->transform2D.scaleX = pBG->transform2D.scaleY = 1280.0f / 1920.0f;
+	pBG->pSprData = &Game::sprMainBG;
+	pBG->transform.scale.x = pBG->transform.scale.y = 1280.0f / 1920.0f;
 
 	skillConstructPanel = new SkillConstructionPanel;
 	isPanelVisible = false;
@@ -114,8 +114,6 @@ void SceneMain::Draw()
 
 	pPlayerManager->Draw();
 
-
-
 	if (isPanelVisible && skillConstructPanel) {
 		skillConstructPanel->Draw();
 	}
@@ -129,9 +127,6 @@ void SceneMain::Draw()
 
 #endif //  DEBUG
 
-	if (step == STEP::INIT) {
-		DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0x000000FF & (unsigned int)((20 - timer) / 20.0f * 255));
-	}
 	char buf[256];
 	sprintf_s(buf, "Loading Progress: %d %%", SCENE_TITLE->progress);
 	DrawString(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 100, buf, 0xFF0000FF, STR_CENTER);

@@ -7,7 +7,7 @@ struct VS_OUT
 
 #define MAX_BONES (32)
 
-cbuffer PROJECTION_CBUFFER : register(b0)
+cbuffer PROJECTION_CBUFFER : register(b3)
 {
 	row_major matrix world;
 	row_major matrix view;

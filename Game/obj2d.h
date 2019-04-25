@@ -5,6 +5,10 @@
 
 #define OBJ_MAX_NUM	(16)
 
+namespace Game {
+	struct SpriteData;
+}
+
 class OBJ2D
 {
 private:
@@ -16,8 +20,9 @@ public:
 	virtual ~OBJ2D();
 	const OBJ2D& OBJ2D::operator=(const OBJ2D& right);
 
-	SPRITE_DATA* pSprData;
-	Vector3 pos;
+	Game::SpriteData* pSprData;
+	Game::Transform transform;
+	UINT rgba;
 	Vector3 initPos;
 	Vector3 setPos;
 	Vector3 speed;
@@ -27,8 +32,6 @@ public:
 	Vector3 size;
 	bool isHitable;
 
-	Transform2D transform2D;
-	Transform transform;
 	//void(*pfMove)();
 	void(OBJ2D::*pfMove)();
 
@@ -61,7 +64,7 @@ public:
 	int animeNO;
 	int animeCounter;
 
-	SPRITE_DATA* pAnimeData;
+	Game::SpriteData* pAnimeData;
 
 	virtual void MemberCopy(const OBJ2DEX& inputObj);
 	OBJ2DEX();

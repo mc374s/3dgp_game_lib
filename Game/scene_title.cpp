@@ -1,8 +1,8 @@
 ﻿#include "scene_title.h"
 
 //#include "game.h"
-#include "sprite_data.h"
 #include "sound_data.h"
+#include "sprite_data.h"
 #include "obj2d.h"
 #include "scene_main.h"
 
@@ -42,8 +42,8 @@ SceneTitle::SceneTitle()
 	loadThread_2.detach();*/
 	// pMFAudioManager->loadAudios(audio_data);
 	pBG = new OBJ2D;
-	pBG->pSprData = &e_sprTitleBG;
-	pBG->transform2D.scaleX = pBG->transform2D.scaleY = 1280.0f / 1920.0f;
+	pBG->pSprData = &Game::sprTitleBG;
+	pBG->transform.scale.x = pBG->transform.scale.y = 1280.0f / 1920.0f;
 	//bg.pos = { SCREEN_WIDTH / 2,SCREEN_HEIGHT / 2,0 };
 
 	//pObjManager->init();

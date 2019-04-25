@@ -13,7 +13,12 @@ Texture::Texture()
 
 Texture::Texture(const char* fileName)
 {
-	strcpy_s(this->fileName, fileName);
+	if (fileName) {
+		strcpy_s(this->fileName, fileName);
+	}
+	else {
+		strcpy_s(this->fileName, "null");
+	}
 	shaderResourceViewRef = nullptr;
 }
 
@@ -28,7 +33,21 @@ void Texture::Load()
 	// Load ShaderResourceView from textures' @fileName
 	// If @fileName == "null", Load a dammy SRV
 	if (fileName && strcmp(fileName, "null") != 0) {
-		RM::LoadShaderResourceView(System::pd3dDevice, &shaderResourceViewRef, fileName);
+		ID3D11Resource* resource = nullptr;
+		RM::LoadShaderResourceView(System::pd3dDevice, &shaderResourceViewRef, fileName, &resource);
+		// If load successed, get image's width and height
+		if (resource) {
+			ID3D11Texture2D* texture2d = nullptr;
+			resource->QueryInterface(&texture2d);
+			if (texture2d) {
+				D3D11_TEXTURE2D_DESC texture2dDesc;
+				texture2d->GetDesc(&texture2dDesc);
+				width = texture2dDesc.Width;
+				height = texture2dDesc.Height;
+				texture2d->Release();
+			}
+			resource->Release();
+		}
 	}
 	else {
 		RM::LoadShaderResourceView(System::pd3dDevice, &shaderResourceViewRef, nullptr);
@@ -37,7 +56,7 @@ void Texture::Load()
 
 void Texture::Load(Texture textures[])
 {
-	for (int i = 0; textures[i].fileName != nullptr && i < RM::FILE_NUM_MAX; ++i) {
+	for (int i = 0; strcmp(textures[i].fileName, "null") != 0 && i < RM::FILE_NUM_MAX; ++i) {
 		textures[i].Load();
 	}
 }

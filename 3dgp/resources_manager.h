@@ -64,7 +64,7 @@ namespace RM {
 		// バーティクスシェーダーソースの管理
 
 		////重複の作成を回避するため、作成と伴にファレンスを作成する
-		friend int LoadVertexShader(ID3D11Device* pDevice, char* pFilename, D3D11_INPUT_ELEMENT_DESC* pInLayoutElements, int elementsNum, ID3D11VertexShader** ppOutVertexShader, ID3D11InputLayout** ppOutInputLayout);
+		friend int LoadVertexShader(ID3D11Device* pDevice, char* pFilename,const D3D11_INPUT_ELEMENT_DESC* pInLayoutElements, int elementsNum, ID3D11VertexShader** ppOutVertexShader, ID3D11InputLayout** ppOutInputLayout);
 		
 		////リファレンスがすべてクリアしたらリソースを解放する
 		friend void ReleaseVertexShader(ID3D11VertexShader* pInVertexShader, ID3D11InputLayout* pInInputLayout);

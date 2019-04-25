@@ -16,6 +16,7 @@ namespace GLC {
 
 	public:
 		char fileName[256];
+		unsigned int width, height;
 
 		Texture();
 		~Texture();

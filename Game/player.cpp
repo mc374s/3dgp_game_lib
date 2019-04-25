@@ -141,11 +141,12 @@ void PlayerManager::Initialize(int _playerNum, int playerType[])
 		default:
 			break;
 		}
+		if (pPlayer[i]) {
+			pPlayer[i]->Initialize();
+			pPlayer[i]->controllerNO = i;
 
-		pPlayer[i]->Initialize();
-		pPlayer[i]->controllerNO = i;
-
-		pPlayer[i]->transform.position.x += i * 2;
+			pPlayer[i]->transform.position.x += i * 2;
+		}
 	}
 }
 
@@ -172,9 +173,11 @@ void PlayerManager::Update()
 	// Exchange Player 1' controller with Player 2
 	if (Input::KEY_TRACKER.pressed.C) {
 		if (playerNum > 1) {
-			int recordValue = pPlayer[0]->controllerNO;
-			pPlayer[0]->controllerNO = pPlayer[1]->controllerNO;
-			pPlayer[1]->controllerNO = recordValue;
+			if (pPlayer[0] && pPlayer[1]) {
+				int recordValue = pPlayer[0]->controllerNO;
+				pPlayer[0]->controllerNO = pPlayer[1]->controllerNO;
+				pPlayer[1]->controllerNO = recordValue;
+			}
 		}
 	}
 

@@ -337,8 +337,9 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const 
 							RM::LoadShaderResourceView(pDevice, &subset.diffuse.pShaderResourceView, pUVFilePath, nullptr);
 
 							strcpy_s(subset.diffuse.textureFileName, pUVFilePath);
-
-							SAFE_DELETE(pUVFilePath);
+							if (pUVFilePath) {
+								delete[] pUVFilePath;
+							}
 
 						}
 					}
@@ -478,23 +479,24 @@ SkinnedMesh::SkinnedMesh(ID3D11Device *pDevice, const char *pFbxFileName, const 
 	// Define the input layout
 	D3D11_INPUT_ELEMENT_DESC layoutDesc[] =
 	{
-		{ "POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT,			0, 0,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,		0, 12,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,		0, 28,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,			0, 44,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "WEIGHTS",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,		0, 52,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "BONES",		0, DXGI_FORMAT_R32G32B32A32_SINT,		0, 68,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		//{ "BONES",		0, DXGI_FORMAT_R32G32B32A32_SINT,		0, D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT,			0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,		0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,		0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,			0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "WEIGHTS",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,		0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "BONES",		0, DXGI_FORMAT_R32G32B32A32_SINT,		0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 	RM::LoadVertexShader(pDevice, "./Data/Shaders/texture_on_3d_bone_vs.cso", layoutDesc, ARRAYSIZE(layoutDesc), &pVertexShader, &pInputLayout);
 
-	RM::LoadPixelShader(pDevice, "./Data/Shaders/texture_on_ps.cso", &pPixelShader);
+	//RM::LoadVertexShader(pDevice, "./Data/Shaders/common_vs_diffuse_tex_normal_bone.cso", layoutDesc, ARRAYSIZE(layoutDesc), &pVertexShader, &pInputLayout);
 
-	VertexPositionNormalTangentColorTextureSkinning vertex;
-	vertex.weights;
-	sizeof(VertexPositionNormalTangentColorTextureSkinning);
-	sizeof(Vertex3D);
-	VertexPositionNormalColorTexture pnct;
+	RM::LoadPixelShader(pDevice, "./Data/Shaders/common_ps_diffuse_tex.cso", &pPixelShader);
+
+	//VertexPositionNormalTangentColorTextureSkinning vertex;
+	//vertex.weights;
+	//sizeof(VertexPositionNormalTangentColorTextureSkinning);
+	//sizeof(Vertex3D);
+	//VertexPositionNormalColorTexture pnct;
 	//VertexPos
 
 	// Create sampler state reference
@@ -858,7 +860,7 @@ void SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, bool isWireframe, co
 	UINT pStrides = sizeof(Vertex3D);
 	UINT pOffsets = 0;
 	pDeviceContext->IASetPrimitiveTopology(/*D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP*/D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST/*D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP*/);
-	pDeviceContext->VSSetConstantBuffers(0, 1, &pConstantBuffer);
+	pDeviceContext->VSSetConstantBuffers(3, 1, &pConstantBuffer);
 	pDeviceContext->OMSetDepthStencilState(pDepthStencilState, 1);
 
 	pDeviceContext->IASetInputLayout(pInputLayout);
@@ -909,7 +911,9 @@ void XM_CALLCONV SkinnedMesh::Draw(ID3D11DeviceContext *pDeviceContext, FXMMATRI
 
 			if (frame > skeletalAnimation->size() - 1) {
 				frame = 0;
-				(*animationFrame) = -1;
+				if (animationFrame) {
+					(*animationFrame) = -1;
+				}
 				skeletalAnimation->animationTick = 0;
 			}
 			Skeletal& skeletal = skeletalAnimation->at(frame);

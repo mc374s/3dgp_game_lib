@@ -1,24 +1,87 @@
-struct VertexShaderOutput
+// Vertex shader Input
+struct VSIN
+{
+    float4 position : SV_Position;
+};
+
+struct VSIN_Color
+{
+    float4 position : SV_Position;
+    float4 color : COLOR;
+};
+
+struct VSIN_ColorTex
+{
+    float4 position : SV_Position;
+    float4 color : COLOR;
+    float2 texcoord : TEXCOORD;
+};
+
+struct VSIN_ColorNormal
+{
+	float4 position : SV_Position;
+	float4 color : COLOR;
+	float4 normal : NORMAL;
+};
+
+struct VSIN_NormalColorTex
 {
     float4 position : SV_Position;
     float4 normal : NORMAL;
-    float4 tangent : TANGENT;
     float4 color : COLOR;
     float2 texcoord : TEXCOORD;
-	
-    float4 materialColor : TEXCOORD1;
-    float4 lightDirection : TEXCOORD2;
-
-    uint psFlag : TEXCOORD3;
-	
 };
 
-// Pixel shader flags
-static const uint PS_TEXTURE_OFF = 1 << 0;
-static const uint PS_TEXTURE_ON = 1 << 1;
+struct VSIN_NormalColorTexWeight
+{
+    float4 position : SV_Position;
+    float4 normal : NORMAL;
+    float4 color : COLOR;
+    float2 texcoord : TEXCOORD0;
+	
+    uint blendIndices[4] : BLENDINDICES;
+    float blendWeight[4] : BLENDWEIGHT;
+};
 
-// Vertex shader flags
-static const uint VS_PROJECTION_OFF = 1 << 0;
-static const uint VS_PROJECTION_ON = 1 << 1;
-static const uint VS_SKINNED_OFF = 1 << 2;
-static const uint VS_SKINNED_ON = 1 << 3;
+
+// Vertex shader Output
+struct VSOUT
+{
+	float4 position : SV_Position;
+    float4 diffuse : COLOR;
+};
+
+struct VSOUT_Tex
+{
+	float4 position : SV_Position;
+    float4 diffuse : COLOR;
+    float2 texcoord : TEXCOORD0;
+};
+
+struct VSOUT_NormalTex
+{
+	float4 position : SV_Position;
+    float4 diffuse : COLOR;
+    float2 texcoord : TEXCOORD0;
+    float4 normal : TEXCOORD1;
+};
+
+
+// Pixel shader Input
+struct PSIN
+{
+    float4 diffuse : COLOR;
+};
+
+struct PSIN_Tex
+{
+    float4 diffuse : COLOR;
+    float2 texcoord : TEXCOORD0;
+};
+
+struct PSIN_NormalTex
+{
+    float4 diffuse : COLOR;
+    float2 texcoord : TEXCOORD0;
+    float4 normal : TEXCOORD1;
+};

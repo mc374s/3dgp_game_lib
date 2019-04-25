@@ -1,34 +1,29 @@
-﻿#include "game.h"
+﻿#include "numbers.h"
+
 #include "sprite_data.h"
 
-#include "numbers.h"
 
-//Numbers::Numbers()
-//{
-//	clear();
-//}
 
-Numbers::Numbers(SPRITE_DATA* pFontData)
+Numbers::Numbers(Game::SpriteData* pFontData)
 {
 	Clear();
 	if (pFontData == nullptr)
 	{
-		sprData = e_sprNumbers;
+		sprData = &Game::sprNumbers;
 	}
 	else
 	{
-		sprData = *pFontData;
+		sprData = pFontData;
 	}
 }
 
 void Numbers::MemberCopy(const Numbers& inputObj)
 {
-	pos = inputObj.pos;
 	speed = inputObj.speed;
 	speedAcc = inputObj.speedAcc;
 	speedMax = inputObj.speedMax;
 
-	transform2D = inputObj.transform2D;
+	transform = inputObj.transform;
 
 	timer = inputObj.timer;
 	step = inputObj.step;
@@ -61,8 +56,8 @@ const Numbers& Numbers::operator=(const Numbers& right)
 
 void Numbers::Clear()
 {
-	//SAFE_DELETE(sprData);
-	pos = Vector3(0, 0, 0);
+	sprData = nullptr;
+	transform.Clear();
 	speed = speedAcc = speedMax = Vector3(0, 0, 0);
 	timer = 0;
 	step = 0;
@@ -84,8 +79,8 @@ void Numbers::setValue(int value, Vector3 size)
 		value /= 10;					//  桁を1つシフト
 	}
 	--digitNum;
-	transform2D.scaleX = size.x;
-	transform2D.scaleY = size.y;
+	transform.scale.x = size.x;
+	transform.scale.y = size.y;
 	//isVisible = true;
 }
 
@@ -98,7 +93,7 @@ void Numbers::Draw()
 {
 	if (isVisible)
 	{
-		if (sprData.texNO > 0)
+		if (sprData)
 		{
 			if (alpha > 255) {
 				alpha = 255;
@@ -106,11 +101,12 @@ void Numbers::Draw()
 			if (alpha < 0) {
 				alpha = 0;
 			}
-			transform2D.rgba = transform2D.rgba >> 8 << 8 | alpha;
+			rgba = rgba >> 8 << 8 | alpha;
 			for (int i = digitNum; i >= 0; --i)
 			{
-				sprData.top = digit[i].val*sprData.height;
-				sprData.Draw(pos.x + (digitNum - i)*digit[i].w*sprData.width, pos.y, transform2D);
+				sprData->clipRect.top = digit[i].val*sprData->clipRect.height;
+				sprData->offsetX = (digitNum - i)*digit[i].w*sprData->clipRect.width;
+				sprData->Draw(transform, rgba);
 			}
 		}
 		if (!isVisibleAlways)

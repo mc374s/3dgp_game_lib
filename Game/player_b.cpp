@@ -67,12 +67,12 @@ void PlayerB::Run()
 		case PAD_LEFT:
 			speed.x -= speedAcc.x;
 			targetRotation = Vector3(0, 180, 0);
-			transform.rotationDegree.y = 180;
+			transform.rotation.y = 180;
 			break;
 		case PAD_RIGHT:
 			speed.x += speedAcc.x;
 			targetRotation = Vector3::Zero;
-			transform.rotationDegree.y = 0;
+			transform.rotation.y = 0;
 			break;
 		default:
 			if (speed.x > 0) {
@@ -94,14 +94,14 @@ void PlayerB::Run()
 			break;
 		}
 		if (keyCode && oldKeyCode != keyCode) {
-			startRotation = transform.rotationDegree;
-			//totalTime= transform.rotationDegree.y/180*2.5f;
+			startRotation = transform.rotation;
+			//totalTime= transform.rotation.y/180*2.5f;
 			elapsedTime = 0;
 			timeStep = 0;
 		}
 		if (timeStep < 1) {
 			timeStep = timeStep > totalTime ? 1 : (elapsedTime += Framework::deltaTime) / totalTime;
-			transform.rotationDegree = Vector3::Lerp(startRotation, targetRotation, timeStep);
+			transform.rotation = Vector3::Lerp(startRotation, targetRotation, timeStep);
 		}
 		oldKeyCode = keyCode;
 

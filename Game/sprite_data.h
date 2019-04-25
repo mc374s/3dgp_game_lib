@@ -3,34 +3,23 @@
 
 #include "game.h"
 
-// ラベル定義
-enum TEX_NO {
+namespace Game {
 
-	TEX_NUMBERS,
+	// Texture collection
+	extern GLC::Texture images[];
 
-	TEX_BG_TITLE,
-	TEX_BG_MAIN,
+	// Background Image
+	extern SpriteData sprTitleBG;
+	extern SpriteData sprMainBG;
 
-	TEX_WHITE,
-};
-
-
-extern LOAD_TEXTURE e_loadTexture[];
-
-// 背景
-extern SPRITE_LEFTTOP e_sprMainBG;
-extern SPRITE_LEFTTOP e_sprTitleBG;
+	// Charactors
 
 
-// キャラなど
+	// UI 
+	extern SpriteData sprNumbers;
+	extern SpriteData sprWhite;
 
+}; // namespace Game
 
-// UI関係
-
-extern SPRITE_CENTER e_sprNumbers;
-
-extern SPRITE_CENTER sprCenterWhite;
-
-// Effect関係
 
 #endif // !_SPRDATA_H_

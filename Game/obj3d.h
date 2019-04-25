@@ -24,7 +24,7 @@ public:
 	Vector3 size;
 	bool isHitable;
 
-	Transform transform;
+	Game::Transform transform;
 	Matrix world;
 
 

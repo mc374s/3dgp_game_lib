@@ -2,25 +2,25 @@
 
 using namespace GLC;
 
-D3D_DRIVER_TYPE                     System::driverType = D3D_DRIVER_TYPE_NULL;
-D3D_FEATURE_LEVEL                   System::featureLevel = D3D_FEATURE_LEVEL_11_0;
-ID3D11Device*                       System::pd3dDevice = nullptr;
-ID3D11DeviceContext*                System::pImmediateContext = nullptr;
-IDXGISwapChain*                     System::pSwapChain = nullptr;
-ID3D11RenderTargetView*             System::pRenderTargetView = nullptr;
-ID3D11Texture2D*                    System::pDepthStencil = nullptr;
-ID3D11DepthStencilView*             System::pDepthStencilView = nullptr;
-ID3D11DepthStencilState*            System::pDepthStencilState = nullptr;
+D3D_DRIVER_TYPE             System::driverType = D3D_DRIVER_TYPE_NULL;
+D3D_FEATURE_LEVEL           System::featureLevel = D3D_FEATURE_LEVEL_11_0;
+
+ID3D11Device*               System::pd3dDevice = nullptr;
+ID3D11DeviceContext*        System::pImmediateContext = nullptr;
+IDXGISwapChain*             System::pSwapChain = nullptr;
+ID3D11RenderTargetView*     System::pRenderTargetView = nullptr;
+ID3D11Texture2D*            System::pDepthStencil = nullptr;
+ID3D11DepthStencilView*     System::pDepthStencilView = nullptr;
+ID3D11DepthStencilState*    System::pDepthStencilState = nullptr;
 
 UINT System::windowWidth;
 UINT System::windowHeight;
 HWND System::outputWindow;
 
-
 HRESULT System::Initialize(HWND hWnd)
 {
 	HRESULT hr = S_OK;
-
+	
 	outputWindow = hWnd;
 
 	RECT rc;
@@ -71,6 +71,7 @@ HRESULT System::Initialize(HWND hWnd)
 		if (SUCCEEDED(hr))
 			break;
 	}
+	
 	if (FAILED(hr))
 		return hr;
 
@@ -145,7 +146,7 @@ void System::Clear()
 {
 	pImmediateContext->OMSetRenderTargets(1, &pRenderTargetView, pDepthStencilView);
 
-	float ClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f }; //red,green,blue,alpha
+	float ClearColor[4] = { 0.0f, 0.0f, 1.0f, 1.0f }; //red,green,blue,alpha
 	pImmediateContext->ClearRenderTargetView(pRenderTargetView, ClearColor);
 	pImmediateContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	
@@ -154,12 +155,40 @@ void System::Clear()
 
 void System::Release()
 {
-	if (pImmediateContext) pImmediateContext->ClearState();
+
 	if (pDepthStencilState) pDepthStencilState->Release();
 	if (pDepthStencilView) pDepthStencilView->Release();
 	if (pDepthStencil) pDepthStencil->Release();
 	if (pRenderTargetView) pRenderTargetView->Release();
 	if (pSwapChain) pSwapChain->Release();
+
+	if (pImmediateContext) pImmediateContext->ClearState();
 	if (pImmediateContext) pImmediateContext->Release();
 	if (pd3dDevice) pd3dDevice->Release();
+
+
+}
+
+void System::ReportLiveObjects()
+{
+#ifdef _DEBUG
+
+	OutputDebugStringA("##############################\n");
+
+	ID3D11Debug* pDebugDevice = nullptr;
+
+	HRESULT hr = pd3dDevice->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(&pDebugDevice));
+	if (FAILED(hr)) {
+		MessageBox(0, L"QueryInterface Error", L"System::ReportLiveObjects()", 0);
+	}
+
+	hr = pDebugDevice->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+	if (FAILED(hr)) {
+		MessageBox(0, L"ReportLiveDeviceObjects Error", L"System::ReportLiveObjects()", 0);
+	}
+	if (pDebugDevice) {
+		pDebugDevice->Release();
+	}
+
+#endif // _DEBUG
 }

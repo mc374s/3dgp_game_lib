@@ -1,42 +1,32 @@
-﻿//******************************************************************************
-//
-//
-//		2D画像データ
-//
-//
-//******************************************************************************
+﻿#include "sprite_data.h"
 
-// インクルード
-#include "sprite_data.h"
+using namespace GLC;
+using namespace Game;
 
+enum IMAGE
+{
+	NUMBERS,
+	BG_TITLE,
+	BG_MAIN,
+	WHITE,
 
-// 2D画像ロードデータ
-LOAD_TEXTURE e_loadTexture[] = {
-
-	{ TEX_NUMBERS,					"./Data/Images/UI/numbers.png" },
-
-	{ TEX_BG_TITLE,					"./Data/Images/BG/title.jpg" },
-	{ TEX_BG_MAIN,					"./Data/Images/BG/main.jpg" },
-
-	{ TEX_WHITE,					"./Data/Images/white.png" },
-
-	{ -1, NULL },
+	MAX
 };
 
-// 背景
-SPRITE_LEFTTOP e_sprMainBG = SPRITE_LEFTTOP(TEX_BG_MAIN, 0, 0, 1920, 1080);
-SPRITE_LEFTTOP e_sprTitleBG = SPRITE_LEFTTOP(TEX_BG_TITLE, 0, 0, 1920, 1080);
+Texture Game::images[] =
+{
+	{ "./Data/Images/UI/numbers.png" },
 
+	{ "./Data/Images/BG/title.jpg" },
+	{ "./Data/Images/BG/main.jpg" },
 
-// キャラなど
+	{ "./Data/Images/white.png" },
 
+	{ NULL },
+};
 
+SpriteData Game::sprTitleBG = SpriteData(&images[IMAGE::BG_TITLE], Game::Rectangle(0, 0, 1920, 1080));
+SpriteData Game::sprMainBG = SpriteData(&images[IMAGE::BG_MAIN], Game::Rectangle(0, 0, 1920, 1080));
 
-// UI関係
-
-SPRITE_CENTER e_sprNumbers = SPRITE_CENTER(TEX_NUMBERS, 0, 0, 76, 118);
-
-SPRITE_CENTER sprCenterWhite = SPRITE_CENTER(TEX_WHITE, 0, 0, 64, 64);
-
-
-//******************************************************************************
+SpriteData Game::sprNumbers = SpriteData(&images[IMAGE::NUMBERS], Game::Rectangle(0, 0, 76, 118));
+SpriteData Game::sprWhite = SpriteData(&images[IMAGE::WHITE], Game::Rectangle(0, 0, 64, 64));

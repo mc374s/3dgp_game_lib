@@ -3,8 +3,8 @@
 
 #include <cmath>
 #include "resources_manager.h"
-#include "framework.h"
 #include "sprite_string.h"
+#include "framework.h"
 #include "camera.h"
 #include "input.h"
 
@@ -48,14 +48,6 @@ const int	COLOR_BLUE		= 0x0000FFFF;
 const int	COLOR_CYAN		= 0x00FFFFFF;
 const int	COLOR_VIOLET	= 0x800080FF;
 
-#define KEY_DOWN(vk_code) ((GetAsyncKeyState(vk_code) & 0x0001 ? 1 : 0))
-#define KEY_PRESS(vk_code) ((GetAsyncKeyState(vk_code) & 0x8000 ?1 : 0))
-#define KEY_UP(vk_code) ((GetAsyncKeyState(vk_code) & 0x8000 ? 0 : 1))
-//#define KEY_CLICK(vk_code) ((GetAsyncKeyState(vk_code) & 0x0001 ? 1 : 0))
-//#define KEY_PRESS(vk_code) ((GetAsyncKeyState(vk_code) & 0x8001 ))
-//#define KEY_RELEASE(vk_code) ((GetAsyncKeyState(vk_code) == 0))
-
-
 #define TEX_MAX (RM::FILE_NUM_MAX)
 
 enum STEP
@@ -68,136 +60,46 @@ enum STEP
 	FINISH = 40,
 };
 
-class Sprite;
 
-struct LOAD_TEXTURE
-{
-	int		texNO;
-	char	*fileName;
-	bool	doProjection;	// 3d空間で描画するかどうか
-	Sprite* img;
-	LOAD_TEXTURE(int texNum, char *pFileName, bool doProjection = false) :texNO(texNum), fileName(pFileName), doProjection(doProjection) {};
-};
-
-
-struct Transform2D
-{
-	float	scaleX, scaleY;
-	float	angle;
-	bool	reflectX;
-	bool	centRotate;
-	float	centX, centY;
-	int		scaleMode;
-
-	GLC::UINTCOLOR rgba;
-
-	Transform2D(float scaleX = 1.0f, float scaleY = 1.0f, float angle = .0f, bool reflectX = false, bool centRotate = true, float centX = .0f, float centY = .0f, int scaleMode = 0, GLC::UINTCOLOR rgba = 0xFFFFFFFF) :
-		scaleX(scaleX),
-		scaleY(scaleY),
-		angle(angle),
-		reflectX(reflectX),
-		centRotate(centRotate),
-		centX(centX),
-		centY(centY),
-		scaleMode(scaleMode),
-		rgba(rgba)
-	{};
-
-	void Clear()
-	{
-		scaleX = 1.0f;
-		scaleY = 1.0f;
-		angle = .0f;
-		reflectX = false;
-		centRotate = true;
-		centX = .0f;
-		centY = .0f;
-		scaleMode = 0;
-		rgba = 0xFFFFFFFF;
-	};
-
-	static Transform2D& initialValue() {
-		static Transform2D initialValue;
-		return initialValue;
-	};
-
-	//static Transform2D initialValue;
-};
-
-struct SPRITE_DATA
-{
-	int		texNO = 0;
-	float	left, top;
-	float	width, height;
-	float	ofsX, ofsY;
-	int	frameNum;
-	SPRITE_DATA(int texNum = -1, float left = 0, float top = 0, float width = 0, float height = 0, float ofsX = 0, float ofsY = 0, int frameNum = 1) :
-		texNO(texNum),
-		left(left),
-		top(top),
-		width(width),
-		height(height),
-		ofsX(ofsX),
-		ofsY(ofsY),
-		frameNum(frameNum)
-	{};
-	void XM_CALLCONV Draw(DirectX::FXMVECTOR pos, const Transform2D& transform2d = Transform2D::initialValue(),
-		DirectX::FXMVECTOR postiotion3D = DirectX::g_XMZero, DirectX::FXMVECTOR rotationDegree = DirectX::g_XMZero);
-	void Draw(float x, float y, const Transform2D& transform2d = Transform2D::initialValue());
-	void Copy(const SPRITE_DATA* rhv) {
-		left = rhv->left; top = rhv->top; width = rhv->width; height = rhv->height; ofsX = rhv->ofsX; ofsY = rhv->ofsY;
-		//return *this;
-	};
-
-};
-
-typedef SPRITE_DATA SPRITE_LEFTTOP;
-
-struct SPRITE_CENTER : public SPRITE_DATA
-{
-	SPRITE_CENTER(int texNO, float left, float top, float width, float height, int frameNum = 1) : SPRITE_DATA(texNO, left, top, width, height, -width / 2, -height / 2, frameNum) {};
-};
-
-struct SPRITE_BOTTOM : public SPRITE_DATA
-{
-	SPRITE_BOTTOM(int texNO, float left, float top, float width, float height, int frameNum = 1) : SPRITE_DATA(texNO, left, top, width, height, -width / 2, -height, frameNum) {};
-};
-
-
-class TextureManager
+template<typename Resource, size_t AMOUNT>
+class ResourceManager
 {
 private:
-	LOAD_TEXTURE *pTextures[TEX_MAX];
+	Resource *pResource[AMOUNT];
 
-	TextureManager() {};
-	~TextureManager() {
-		ReleaseTexture();
+	ResourceManager() {};
+	~ResourceManager() {
+		Release();
 	};
 
 
 public:
-	void LoadTextures(LOAD_TEXTURE data[]);
-	void LoadTexture(LOAD_TEXTURE data[], int textureNO);
-	const LOAD_TEXTURE* textureAt(int fileNO);
+	void Load(Resource resources[]);
+	const Resource* At(int resourceNO);
 
 
-	void ReleaseTexture();
+	void Release();
 
-	static TextureManager* GetInstance() {
-		static TextureManager instance;
+	static ResourceManager* GetInstance() {
+		static ResourceManager instance;
 		return &instance;
 	};
 
 };
 
-#define pTextureManager (TextureManager::GetInstance())
 
-int BasicInput(int playerNO = 0);
+#define pTextureManager (ResourceManager<GLC::Texture, TEX_MAX>::GetInstance())
 
+// Keyboard: Up, Down, Left, Right, Enter, Back, Z, X, C, V
+// Controller: Up, Down, Left, Right, Start, Back, A, B, X, Y
+// All of the buttons are Triggers except Up, Down, Left, Right.
+int BasicInput(int controllerNO = 0);
+
+// Draw a simple text use default ascii font texture.
+// @format(STR_LEFT or STR_CENTER), @textColor(RGBA)
 void DrawString(int posX = 0, int posY = 0, char *pTextBuf = nullptr, GLC::UINTCOLOR textColor = 0xFFFFFFFF, int format = STR_LEFT, int characterSizeX = 32, int characterSizeY = 32, float characterRotateAngle = .0f);
 
-void DrawRectangle(int leftTopX, int leftTopY, int width, int height, float rotateAngle = 0.0, GLC::UINTCOLOR fillColor = 0xFFFFFFFF);
-
+//void DrawRectangle(int leftTopX, int leftTopY, int width, int height, float rotateAngle = 0.0, GLC::UINTCOLOR fillColor = 0xFFFFFFFF);
 
 
 //class View: extend from class RenderTarget
@@ -219,8 +121,8 @@ public:
 
 	bool doReflection;
 	DirectX::XMVECTOR position;
-	DirectX::XMVECTOR scaling;
-	DirectX::XMVECTOR rotationDegree;
+	DirectX::XMVECTOR scale;
+	DirectX::XMVECTOR rotation;
 
 	void Set();
 	// View, looks like a 3D textured sprite
@@ -273,7 +175,7 @@ __declspec(align(16)) struct MeshData
 {
 	int fileNO;
 
-	DirectX::XMVECTOR scalingAdjustion;
+	DirectX::XMVECTOR scaleAdjustion;
 	DirectX::XMVECTOR positionAdjustion;
 	DirectX::XMVECTOR rotationAdjustion;
 	DirectX::XMMATRIX world;
@@ -285,12 +187,12 @@ __declspec(align(16)) struct MeshData
 		:fileNO(fileNO), 
 		world(DirectX::XMMatrixIdentity())
 	{
-		scalingAdjustion = DirectX::XMLoadFloat3(&preSetScale);
+		scaleAdjustion = DirectX::XMLoadFloat3(&preSetScale);
 		positionAdjustion = DirectX::XMLoadFloat3(&preSetPosition);
 		rotationAdjustion = DirectX::XMLoadFloat3(&preSetRotationDegree);
 	};
 	void SetMotion(int fbxFileNO);
-	void XM_CALLCONV Draw(DirectX::FXMVECTOR position, DirectX::FXMVECTOR scaling, DirectX::FXMVECTOR rotationDegree, int* frame = nullptr);
+	void XM_CALLCONV Draw(DirectX::FXMVECTOR position, DirectX::FXMVECTOR scale, DirectX::FXMVECTOR rotation, int* frame = nullptr);
 
 };
 

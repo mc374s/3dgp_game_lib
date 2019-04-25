@@ -16,6 +16,7 @@
 
 #include "system.h"
 #include "state_subset.h"
+
 //#include "sprite_string.h"
 
 #include "../Game/sound_data.h"
@@ -44,7 +45,7 @@ Framework::~Framework()
 bool Framework::Initialize(HWND hWnd)
 {
 	// System stuffs Initialization
-
+	
 	// Frame timer
 	timer = new HighResolutionTimer();
 
@@ -67,7 +68,7 @@ bool Framework::Initialize(HWND hWnd)
 	Rasterizer::State::Initialize(System::pd3dDevice);
 	
 	// Ascii sprite font initialization
-	SpriteString::Initialize(System::pd3dDevice);
+	SpriteString::Initialize();
 
 
 	// Game stuffs Initialization
@@ -78,18 +79,15 @@ bool Framework::Initialize(HWND hWnd)
 	MFAudioManager::GetInstance()->LoadAudios(audio_data);
 	
 	// Load 2d image resources
-	pTextureManager->LoadTextures(e_loadTexture);
-
+	//pTextureManager->LoadTextures(e_loadTexture);
+	Texture::Load(Game::images);
 
 	// Initialize the world matrices
-
 	// Initialize the view matrix
-
 	// Initialize the projection matrix
 
 	// Set Entry Scene
 	ChangeScene(SCENE_TITLE);
-
 	return true;
 }
 
@@ -105,6 +103,12 @@ void Framework::Release()
 	System::Release();
 	delete timer;
 
+	Input::pGamePad.reset();
+	Input::pKeyboard.reset();
+	//sizeof(*(Input::pGamePad.get()));
+	//sizeof(*(Input::pKeyboard.get()));
+
+	//System::ReportLiveObjects();
 }
 
 // Set limitation to 0 fps means no limitation
@@ -166,12 +170,14 @@ int Framework::Run()
 			
 			// 
 			if (deltaTime < minFrameTime) {
-				// ミリ秒に変換
-				sleepTime = static_cast<DWORD>((minFrameTime - deltaTime) * 1000);
 
-				timeBeginPeriod(1);		// 分解能を上げる
+				// Calculate thread sleep time, in milliseconds.
+				sleepTime = static_cast<DWORD>((minFrameTime - deltaTime) * 1000);
+				// Minimum timer resolution, in one millisecond.
+				timeBeginPeriod(1);
 				Sleep(sleepTime);
-				timeEndPeriod(1);		// 戻す
+				// Minimum timer resolution end.
+				timeEndPeriod(1);
 				// Skip to next frame
 				continue;
 			}
@@ -261,7 +267,7 @@ LRESULT CALLBACK Framework::HandleMessage(HWND _hwnd, UINT msg, WPARAM wparam, L
 		Input::pGamePad->Resume();
 		break;
 	case WM_SIZE:
-		// Window resizing has already disabled, so WM_SIZE can be realized as FullScreen
+		// Window resizing was already disabled, so WM_SIZE message can be realized as toggle full screen
 		if (wparam == SIZEFULLSCREEN) {
 			isFullScreen = !isFullScreen;
 		}
@@ -287,7 +293,7 @@ void Framework::CalculateFrameStats()
 	// Compute averages over one second period.
 	if ((timer->time_stamp() - lapsedTime) >= 1.0f)
 	{
-		float fps = static_cast<float>(frames); // fps = frameCnt / 1
+		float fps = static_cast<float>(frames); // fps = frame count / 1
 		float mspf = 1000.0f / fps;
 
 		static char buf[256] = "";
@@ -340,7 +346,7 @@ void Framework::Draw()
 		XMVectorGetX(mainCamera.eyePosition), XMVectorGetY(mainCamera.eyePosition), XMVectorGetZ(mainCamera.eyePosition),
 		XMVectorGetX(XMVector3Length(XMVectorSubtract(mainCamera.eyePosition, mainCamera.focusPosition))));
 
-	SpriteString::DrawString(System::pImmediateContext, 0, 0, buf);
+	SpriteString::DrawString(0, 0, buf);
 
 
 	// Swap back buffer to front buffer.
